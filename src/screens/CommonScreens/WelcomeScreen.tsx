@@ -1,32 +1,39 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
-} from 'react-native';
+import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { FONT } from '../../theme/fonts';
+import PrimaryButton from '../../components/Buttons/PrimaryButton';
+import Customer from '../../assets/svgs/Customer.svg';
+import Professional from '../../assets/svgs/Professional.svg';
+import { useNavigation } from '@react-navigation/native';
+import { FONTSIZE, WIDTH } from '../../utils/responsive';
+import Logo from '../../assets/svgs/PreworksLogo.svg';
 
-const WelcomeScreen = ({ navigation }) => {
+const WelcomeScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <ImageBackground
-      source={require('../../assets/images/building.jpg')}
+      source={require('../../assets/pngs/BGImg.png')}
       style={styles.container}
       resizeMode="cover"
     >
       <View style={styles.overlay}>
+        <Logo width={180} height={180} />
+
         <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.subtitle}>
-          Please choose one of the options below to register.
-        </Text>
+        <Text style={styles.subtitle}>Please Select Your User Type</Text>
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Customer</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          title="Customer"
+          Icon={Customer}
+          onPress={() => navigation.navigate('Onboarding')}
+        />
 
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Professional</Text>
-        </TouchableOpacity>
+        <PrimaryButton
+          title="Professional"
+          Icon={Professional}
+          onPress={() => navigation.navigate('ProfWelc')}
+        />
       </View>
     </ImageBackground>
   );
@@ -43,21 +50,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: WIDTH(4),
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    shadowColor: 'black',
   },
 
   title: {
-    fontSize: 28,
+    fontSize: FONTSIZE(3.2),
     fontWeight: '700',
     color: '#fff',
     marginBottom: 10,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   subtitle: {
-    fontSize: 14,
+    fontSize: FONTSIZE(1.6),
     color: '#fff',
     textAlign: 'center',
     marginBottom: 40,
+    fontFamily: FONT.POPPINS_REGULAR,
+    fontWeight: '500',
   },
 
   button: {

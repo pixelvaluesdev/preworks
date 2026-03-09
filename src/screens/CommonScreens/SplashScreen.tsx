@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet } from 'react-native';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
-const SplashScreen = ({ navigation }) => {
+const SplashScreen = () => {
+  const navigation = useNavigation<any>();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace('Welcome');

@@ -3,6 +3,8 @@ const Colors = {
 
   secondary: '#2F8C61',
 
+  lightGreen: '#B4F2BB',
+
   background: '#FFFFFF',
 
   surface: '#F8F9FA',
