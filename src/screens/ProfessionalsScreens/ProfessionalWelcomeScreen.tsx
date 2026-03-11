@@ -22,6 +22,7 @@ const ProfessionalWelcomeScreen = ({ navigation }) => {
           title="Builder"
           Icon={Architect}
           //   onPress={() => navigation.navigate('BuilderRegister')}
+          onPress={() => navigation.navigate('ProfTabNav')}
         />
 
         <PrimaryButton

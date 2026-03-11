@@ -13,10 +13,70 @@ import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import OTPInput from '../../components/Inputs/OtpInput';
 import Colors from '../../constants/colors';
 import { useNavigation } from '@react-navigation/native';
+import ApiManager from '../../apis/ApiManager';
+import { useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { setUser, setUserToken } from '../../redux/slices/authSlice';
+
 const VerificationScreen = () => {
   const [otp, setOtp] = useState('');
+  const route = useRoute();
+  const { phone } = route.params;
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const handleVerifyOtp = async () => {
+    try {
+      if (otp.length !== 6) {
+        alert('Please enter valid OTP');
+        return;
+      }
+
+      const body = {
+        phone: phone,
+        otp: otp,
+      };
+
+      console.log('REQUEST BODY:', body);
+
+      console.log('PHONE:', phone);
+      console.log('OTP:', otp);
+
+      const response = await ApiManager.verifyOtp(body);
+
+      console.log('Verify response', response.data);
+
+      if (response.data.status === 'success') {
+        const user = response.data.data;
+        const token = response.data.token;
+
+        dispatch(setUser(user));
+        dispatch(setUserToken(token));
+
+        if (!user.name) {
+          navigation.replace('EnterName');
+        } else {
+          navigation.replace('CustmTabNav');
+        }
+      }
+    } catch (error) {
+      const status = error.response?.status;
+      const serverMessage = error.response?.data?.message;
+
+      console.log('STATUS:', status);
+      console.log('SERVER MESSAGE:', serverMessage);
+      if (serverMessage === 'Invalid OTP') {
+        setOtp('');
+      }
+
+      if (serverMessage) {
+        alert(serverMessage);
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    }
+  };
 
   return (
     <ImageBackground
@@ -33,10 +93,7 @@ const VerificationScreen = () => {
 
         <OTPInput length={6} onChangeOTP={value => setOtp(value)} />
 
-        <SecondaryButton
-          title="Verify"
-          onPress={() => navigation.navigate('CustmTabNav')}
-        />
+        <SecondaryButton title="Verify" onPress={handleVerifyOtp} />
         <View
           style={{
             marginTop: 20,

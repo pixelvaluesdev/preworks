@@ -17,6 +17,7 @@ import SearchHeader from '../../components/SearchHeader';
 import WhatWeDoSection from '../../components/CustomerUI/WhatWeDoSection';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
+import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 const professionals = [
   {
     id: '1',
@@ -102,7 +103,8 @@ const CustomerHomeScreen = () => {
       {/* Add Project Button */}
       <SecondaryButton
         title="Add Project Details"
-        style={{ marginHorizontal: WIDTH(2), marginVertical: HEIGHT(2) }}
+        style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
+        icon={<PlusIcon height={20} width={20} />}
       />
     </ScrollView>
   );
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONTSIZE(1.8),
     fontWeight: '600',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   cardRow: {
@@ -211,24 +214,27 @@ const styles = StyleSheet.create({
   },
 
   proName: {
-    fontWeight: '600',
+    fontWeight: '400',
     marginTop: 5,
+    fontSize: FONTSIZE(1.6),
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   proExp: {
-    fontSize: 12,
-    color: '#666',
+    fontWeight: '400',
+    fontSize: FONTSIZE(1.2),
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
   },
 
   proLocation: {
-    fontSize: 12,
-    marginLeft: 4,
+    fontWeight: '300',
+    fontSize: FONTSIZE(1.2),
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   addButton: {

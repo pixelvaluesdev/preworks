@@ -8,6 +8,7 @@ import ContractorIcon from '../../assets/svgs/Contractor.svg';
 import ArchitectIcon from '../../assets/svgs/Architect.svg';
 import { WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
+import { FONTSIZE } from '../../utils/responsive';
 
 const services = [
   {
@@ -65,9 +66,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 16,
+    fontSize: FONTSIZE(1.8),
     fontWeight: '600',
-    marginBottom: 10,
     fontFamily: FONT.POPPINS_SEMIBOLD,
+    marginBottom: 10,
   },
 });

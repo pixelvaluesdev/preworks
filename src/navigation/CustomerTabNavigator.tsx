@@ -1,8 +1,8 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CustomerHomeScreen from '../screens/CustomerScreens/CustomerHomeScreen';
-import ProjectScreen from '../screens/CustomerScreens/ProjectScreen';
-import NotificationScreen from '../screens/CustomerScreens/NotificationScreen';
-import SettingsScreen from '../screens/CustomerScreens/SettingsScreen';
+import NotificationScreen from '../screens/CommonScreens/NotificationScreen';
+import ProjectScreen from '../screens/CommonScreens/ProjectScreen';
+import SettingsScreen from '../screens/CommonScreens/SettingsScreen';
 import HomeIcon from '../assets/svgs/Home.svg';
 import NotificationIcon from '../assets/svgs/Notification.svg';
 import SettingsIcon from '../assets/svgs/Settings.svg';

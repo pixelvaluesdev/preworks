@@ -12,6 +12,8 @@ import CustomerTabNavigator from './CustomerTabNavigator';
 import ProfessionalTabNavigator from './ProffessionalTabNavigator';
 import CustomStatusBar from '../components/CustomStatusBar';
 import ProfessionalListScreen from '../screens/CustomerScreens/ProffesionalListScreen';
+import FirstLastName from '../screens/CommonScreens/FirstLastName';
+import GeneralEnquiryScreen from '../screens/ProfessionalsScreens/GeneralEnquiryScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,10 +36,13 @@ const AppNavigator = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="OtpVeri" component={VerificationScreen} />
         <Stack.Screen name="CustmTabNav" component={CustomerTabNavigator} />
+        <Stack.Screen name="ProfTabNav" component={ProfessionalTabNavigator} />
         <Stack.Screen
           name="ProfessionalList"
           component={ProfessionalListScreen}
         />
+        <Stack.Screen name="EnterName" component={FirstLastName} />
+        <Stack.Screen name="GeneralEnquiry" component={GeneralEnquiryScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

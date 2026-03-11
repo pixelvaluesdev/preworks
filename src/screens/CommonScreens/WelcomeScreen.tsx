@@ -7,9 +7,12 @@ import Professional from '../../assets/svgs/Professional.svg';
 import { useNavigation } from '@react-navigation/native';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
+import { setUserType } from '../../redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   return (
     <ImageBackground
@@ -26,13 +29,19 @@ const WelcomeScreen = () => {
         <PrimaryButton
           title="Customer"
           Icon={Customer}
-          onPress={() => navigation.navigate('Onboarding')}
+          onPress={() => {
+            dispatch(setUserType('customer'));
+            navigation.navigate('Onboarding');
+          }}
         />
 
         <PrimaryButton
           title="Professional"
           Icon={Professional}
-          onPress={() => navigation.navigate('ProfWelc')}
+          onPress={() => {
+            dispatch(setUserType('professional'));
+            navigation.navigate('ProfWelc');
+          }}
         />
       </View>
     </ImageBackground>

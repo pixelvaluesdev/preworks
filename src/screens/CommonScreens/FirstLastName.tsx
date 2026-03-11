@@ -1,59 +1,51 @@
+import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import CustomTextInput from '../../components/Inputs/CustomTextInput';
+import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
-import CustomTextInput from '../../components/Inputs/CustomTextInput';
-import PrimaryButton from '../../components/Buttons/PrimaryButton';
-import SecondaryButton from '../../components/Buttons/SecondaryBtn';
-import { useNavigation } from '@react-navigation/native';
 import { useSelector, UseSelector } from 'react-redux';
+import { RootState } from '@reduxjs/toolkit/query';
 import ApiManager from '../../apis/ApiManager';
+import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen = () => {
-  const [mobile, setMobile] = useState('');
-
+const FirstLastName = () => {
   const navigation = useNavigation();
 
-  const userType = useSelector(state => state.auth.userType);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const token = useSelector((state: RootState) => state.auth.userToken);
+  console.log('USerttttttt Token', token);
+  const userId = user?.id;
 
-  const handleGetOtp = async () => {
+  const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+  const handleNext = async () => {
     try {
-      const body = {
-        phone: mobile,
-        userType: userType,
-      };
-
-      const response = await ApiManager.phoneSignin(body);
-
-      console.log('Get Otp resp', response.data);
-      console.log('OTP :', response.data.data.otp);
-      if (mobile.length !== 10) {
-        Alert.alert('Please enter valid mobile number');
+      if (!name || !lastName) {
+        alert('Please enter your name');
         return;
       }
 
+      const body = {
+        firstName: name,
+        lastName: lastName,
+      };
+
+      const response = await ApiManager.shortProfile(userId, body, token);
+
+      console.log('Profile response:', response.data);
+
       if (response.data.status === 'success') {
-        navigation.navigate('OtpVeri', { phone: mobile });
+        navigation.replace('CustmTabNav');
       }
     } catch (error) {
-      console.log('Full error', error);
+      const serverMessage = error.response?.data?.message;
 
-      if (error.response) {
-        console.log('Server response', error.response.data);
-        console.log('Status code', error.response.status);
-      }
+      Alert.alert(serverMessage || 'Something went wrong');
     }
   };
-
   return (
     <ImageBackground
       source={require('../../assets/pngs/BGImg.png')}
@@ -61,32 +53,30 @@ const LoginScreen = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Text style={styles.title}>Log In</Text>
-        <Text style={styles.subtitle}>
-          Please enter your details to sign in
-        </Text>
-
         <CustomTextInput
-          label="Mobile number"
-          prefix="+91"
-          placeholder="Mobile number"
+          label="First Name"
+          //prefix="
+          placeholder="First Name"
           keyboardType="number-pad"
-          value={mobile}
-          onChangeText={setMobile}
+          value={name}
+          onChangeText={setName}
+        />
+        <CustomTextInput
+          label="Last Name"
+          //prefix="
+          placeholder="Last Name"
+          keyboardType="number-pad"
+          value={lastName}
+          onChangeText={setLastName}
         />
 
-        <SecondaryButton title="Get OTP" onPress={handleGetOtp} />
-
-        <SecondaryButton
-          title="Dummy Home"
-          onPress={() => navigation.navigate('CustmTabNav')}
-        />
+        <SecondaryButton title="Next" onPress={handleNext} />
       </View>
     </ImageBackground>
   );
 };
 
-export default LoginScreen;
+export default FirstLastName;
 
 const styles = StyleSheet.create({
   container: {

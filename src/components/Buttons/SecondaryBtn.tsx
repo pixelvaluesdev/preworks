@@ -2,6 +2,7 @@ import React from 'react';
 import {
   TouchableOpacity,
   Text,
+  View,
   StyleSheet,
   GestureResponderEvent,
   ViewStyle,
@@ -18,6 +19,7 @@ interface SecondaryButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   disabled?: boolean;
+  icon?: any;
 }
 
 const SecondaryButton: React.FC<SecondaryButtonProps> = ({
@@ -26,6 +28,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
   style,
   textStyle,
   disabled = false,
+  icon,
 }) => {
   return (
     <TouchableOpacity
@@ -34,6 +37,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       disabled={disabled}
       activeOpacity={0.8}
     >
+      <View style={styles.icon}>{icon}</View>
       <Text style={[styles.text, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
@@ -46,8 +50,10 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 10,
   },
 
   text: {
@@ -55,7 +61,7 @@ const styles = StyleSheet.create({
     fontSize: FONTSIZE(1.6),
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
-
+  icon: {},
   disabled: {
     opacity: 0.5,
   },
