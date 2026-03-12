@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,8 +18,11 @@ import ConstructionIcon from '../../assets/svgs/Construction.svg';
 import PhoneIcon from '../../assets/svgs/Phone.svg';
 import StairsIcon from '../../assets/svgs/Stairs.svg';
 import Phone2Icon from '../../assets/svgs/Phone2.svg';
+import Popup from '../../components/Popup';
 
 const GeneralEnquiryScreen = () => {
+  const [showPopup, setShowPopup] = useState(false);
+
   const DetailRow = ({ label, value, icon }) => {
     return (
       <View style={styles.detailRow}>
@@ -106,9 +109,18 @@ const GeneralEnquiryScreen = () => {
       </View>
 
       {/* Interested Button */}
-      <TouchableOpacity style={styles.interestedBtn}>
+      <TouchableOpacity
+        style={styles.interestedBtn}
+        onPress={() => setShowPopup(true)}
+      >
         <Text style={styles.interestedText}>I'm Interested</Text>
       </TouchableOpacity>
+
+      <Popup
+        visible={showPopup}
+        onClose={() => setShowPopup(false)}
+        showQuotation={true}
+      />
     </ScrollView>
   );
 };
