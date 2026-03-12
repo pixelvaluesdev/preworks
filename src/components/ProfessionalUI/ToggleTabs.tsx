@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
 
   tabText: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     color: '#333',
     fontWeight: '400',
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
 
   activeText: {
     color: '#FFFFFF',
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     fontWeight: '400',
   },

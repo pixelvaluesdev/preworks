@@ -104,7 +104,7 @@ const VerificationScreen = () => {
             style={{
               color: 'white',
               fontFamily: FONT.POPPINS_REGULAR,
-              fontSize: FONTSIZE(1.6),
+              fontSize: 16,
             }}
           >
             Didn't recive the OTP?
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 40,
@@ -157,6 +157,6 @@ const styles = StyleSheet.create({
 
   resendText: {
     color: Colors.primary,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
   },
 });

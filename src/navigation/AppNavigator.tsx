@@ -15,6 +15,8 @@ import ProffessionalListScreen from '../screens/CustomerScreens/HomeScreenPages/
 import FirstLastName from '../screens/CommonScreens/FirstLastName';
 import GeneralEnquiryScreen from '../screens/ProfessionalsScreens/GeneralEnquiryScreen';
 import HelpRequestSuccessScreen from '../screens/CustomerScreens/HomeScreenPages/HelpRequestSuccessScreen';
+import ProfessionalProfileScreen from '../screens/CustomerScreens/HomeScreenPages/ProfessionalProfileScreen';
+import ProfessionalsProjectDetails from '../screens/CustomerScreens/HomeScreenPages/ProfessionalsProjectDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +49,14 @@ const AppNavigator = () => {
         <Stack.Screen
           name="HelpRequestSuccess"
           component={HelpRequestSuccessScreen}
+        />
+        <Stack.Screen
+          name="ProfessionalProfile"
+          component={ProfessionalProfileScreen}
+        />
+        <Stack.Screen
+          name="ProjectDetails"
+          component={ProfessionalsProjectDetails}
         />
       </Stack.Navigator>
     </NavigationContainer>

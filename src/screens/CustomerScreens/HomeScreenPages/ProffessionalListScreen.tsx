@@ -108,7 +108,12 @@ const ProfessionalListScreen = () => {
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
           renderItem={({ item }) => (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate('ProfessionalProfile', { id: item.id })
+              }
+            >
               <Image source={{ uri: item.image }} style={styles.image} />
 
               <View
@@ -121,12 +126,10 @@ const ProfessionalListScreen = () => {
                 }}
               >
                 <Text style={styles.name}>{item.name}</Text>
-
                 <Text style={styles.exp}>{item.exp}</Text>
-
                 <Text style={styles.location}>{item.location}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
@@ -172,7 +175,7 @@ const styles = StyleSheet.create({
   },
 
   suggestionText: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 

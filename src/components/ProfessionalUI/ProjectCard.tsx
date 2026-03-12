@@ -69,13 +69,13 @@ const styles = StyleSheet.create({
 
   title: {
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontWeight: '600',
   },
 
   new: {
     color: '#0E77EF',
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
     fontWeight: '500',
   },

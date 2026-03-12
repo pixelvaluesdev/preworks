@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     color: '#333',
   },

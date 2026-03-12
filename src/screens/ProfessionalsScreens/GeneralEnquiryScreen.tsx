@@ -88,7 +88,7 @@ const GeneralEnquiryScreen = () => {
           <View>
             <Text
               style={{
-                fontSize: FONTSIZE(1.6),
+                fontSize: 16,
                 fontFamily: FONT.POPPINS_MEDIUM,
                 fontWeight: '400',
               }}
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 10,
     marginLeft: WIDTH(4),
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',
   },
@@ -151,14 +151,14 @@ const styles = StyleSheet.create({
   location: {
     marginLeft: WIDTH(4),
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontWeight: '400',
   },
 
   sectionTitle: {
     marginTop: 18,
     marginLeft: WIDTH(4),
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     fontWeight: '400',
   },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
 
   detailLabel: {
     color: 'grey',
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   },
 
   mobile: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
     fontWeight: '400',
     color: '#757575',

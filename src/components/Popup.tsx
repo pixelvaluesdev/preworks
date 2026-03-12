@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 20,
     fontWeight: '600',

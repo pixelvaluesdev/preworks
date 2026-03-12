@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   proName: {
     fontWeight: '400',
     marginTop: 5,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 

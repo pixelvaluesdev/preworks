@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 30,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 8,
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
   },
 
   inputContainer: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
 
   countryCode: {
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     marginRight: 10,
     color: '#333',
     fontFamily: FONT.POPPINS_REGULAR,
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     color: '#000',
   },
 
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
 
   buttonText: {
     color: '#FFFFFF',
-    fontSize: FONTSIZE(1.6),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',
   },

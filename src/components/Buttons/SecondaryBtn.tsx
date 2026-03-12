@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 
   text: {
     color: '#FFFFFF',
-    fontSize: FONTSIZE(1.6),
+    fontSize: 18,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
   icon: {},
