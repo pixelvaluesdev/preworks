@@ -11,9 +11,10 @@ import VerificationScreen from '../screens/CommonScreens/VerificationScreen';
 import CustomerTabNavigator from './CustomerTabNavigator';
 import ProfessionalTabNavigator from './ProffessionalTabNavigator';
 import CustomStatusBar from '../components/CustomStatusBar';
-import ProfessionalListScreen from '../screens/CustomerScreens/ProffesionalListScreen';
+import ProffessionalListScreen from '../screens/CustomerScreens/HomeScreenPages/ProffessionalListScreen';
 import FirstLastName from '../screens/CommonScreens/FirstLastName';
 import GeneralEnquiryScreen from '../screens/ProfessionalsScreens/GeneralEnquiryScreen';
+import HelpRequestSuccessScreen from '../screens/CustomerScreens/HomeScreenPages/HelpRequestSuccessScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,10 +40,14 @@ const AppNavigator = () => {
         <Stack.Screen name="ProfTabNav" component={ProfessionalTabNavigator} />
         <Stack.Screen
           name="ProfessionalList"
-          component={ProfessionalListScreen}
+          component={ProffessionalListScreen}
         />
         <Stack.Screen name="EnterName" component={FirstLastName} />
         <Stack.Screen name="GeneralEnquiry" component={GeneralEnquiryScreen} />
+        <Stack.Screen
+          name="HelpRequestSuccess"
+          component={HelpRequestSuccessScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

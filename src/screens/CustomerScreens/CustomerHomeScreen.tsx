@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import WhatWeDoSection from '../../components/CustomerUI/WhatWeDoSection';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../assets/svgs/PlusIcon.svg';
+import CustomPopup from '../../components/Popups/CustomPopup';
 const professionals = [
   {
     id: '1',
@@ -44,6 +45,8 @@ const professionals = [
 
 const CustomerHomeScreen = () => {
   const navigation = useNavigation();
+
+  const [helpPopupVisible, setHelpPopupVisible] = useState(false);
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Banner Section */}
@@ -62,6 +65,17 @@ const CustomerHomeScreen = () => {
           <Text style={styles.bannerSmall}>Make Your Dream House</Text>
         </View>
       </View>
+      <TouchableOpacity
+        style={styles.helpButton}
+        onPress={() => setHelpPopupVisible(true)}
+      >
+        <View style={styles.helpIconCircle}>
+          {/* Replace with your SVG if available */}
+          <Text style={{ fontSize: 16 }}>🎧</Text>
+        </View>
+
+        <Text style={styles.helpText}>Help Us</Text>
+      </TouchableOpacity>
 
       {/* What We Do */}
       <WhatWeDoSection />
@@ -105,6 +119,25 @@ const CustomerHomeScreen = () => {
         title="Add Project Details"
         style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
         icon={<PlusIcon height={20} width={20} />}
+      />
+
+      <CustomPopup
+        visible={helpPopupVisible}
+        message="Are you sure you want to create a help request?"
+        buttons={[
+          {
+            label: 'No, leave it.',
+            onPress: () => setHelpPopupVisible(false),
+          },
+          {
+            label: 'Yes, Create',
+            type: 'primary',
+            onPress: () => {
+              setHelpPopupVisible(false);
+              navigation.navigate('HelpRequestSuccess');
+            },
+          },
+        ]}
       />
     </ScrollView>
   );
@@ -251,5 +284,32 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  helpButton: {
+    position: 'absolute',
+    right: 20,
+    top: 120,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#3BA56A',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 30,
+  },
+
+  helpIconCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#E5F6EC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 6,
+  },
+
+  helpText: {
+    color: '#FFFFFF',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontSize: FONTSIZE(1.5),
   },
 });

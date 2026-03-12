@@ -5,16 +5,21 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  ViewStyle,
 } from 'react-native';
 
 import SearchIcon from '../assets/svgs/Search.svg';
 import { WIDTH } from '../utils/responsive';
 import Colors from '../constants/colors';
+
 interface Props {
   value?: string;
   onChangeText?: (text: string) => void;
   onProfilePress?: () => void;
   placeholder?: string;
+  showProfile?: boolean;
+  style?: ViewStyle;
+  containerStyle?: ViewStyle;
 }
 
 const SearchHeader: React.FC<Props> = ({
@@ -22,11 +27,20 @@ const SearchHeader: React.FC<Props> = ({
   onChangeText,
   onProfilePress,
   placeholder = 'Search',
+  showProfile = true,
+  style,
+  containerStyle,
 }) => {
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        !showProfile && styles.fullWidth,
+        containerStyle,
+      ]}
+    >
       {/* Search Bar */}
-      <View style={styles.searchBar}>
+      <View style={[styles.searchBar, style]}>
         <SearchIcon width={22} height={22} />
 
         <TextInput
@@ -39,14 +53,16 @@ const SearchHeader: React.FC<Props> = ({
       </View>
 
       {/* Profile Avatar */}
-      <TouchableOpacity onPress={onProfilePress}>
-        <Image
-          source={{
-            uri: 'https://randomuser.me/api/portraits/men/32.jpg',
-          }}
-          style={styles.avatar}
-        />
-      </TouchableOpacity>
+      {showProfile && (
+        <TouchableOpacity onPress={onProfilePress}>
+          <Image
+            source={{
+              uri: 'https://randomuser.me/api/portraits/men/32.jpg',
+            }}
+            style={styles.avatar}
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -59,6 +75,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 50,
     paddingHorizontal: WIDTH(5),
+  },
+
+  fullWidth: {
+    justifyContent: 'center',
   },
 
   searchBar: {
