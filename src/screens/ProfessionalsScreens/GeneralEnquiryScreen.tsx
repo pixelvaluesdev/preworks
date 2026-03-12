@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
 
   callText: {
     color: '#fff',
-    fontSize: FONTSIZE(1.8),
+    fontSize: 18,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',
   },

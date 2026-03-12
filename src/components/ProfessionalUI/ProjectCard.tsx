@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
 
   location: {
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: FONTSIZE(1.4),
+    fontSize: 14,
     fontWeight: '400',
   },
 

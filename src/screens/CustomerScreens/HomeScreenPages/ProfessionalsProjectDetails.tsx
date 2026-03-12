@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(2.4),
+    fontSize: 24,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 8,
     fontWeight: '600',
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    fontSize: FONTSIZE(1.4),
+    fontSize: 14,
     fontFamily: FONT.POPPINS_REGULAR,
     lineHeight: 22,
     color: '#444',

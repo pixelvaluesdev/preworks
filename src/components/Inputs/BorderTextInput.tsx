@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     left: 14,
     backgroundColor: '#fff',
     paddingHorizontal: 6,
-    fontSize: FONTSIZE(1.4),
+    fontSize: 14,
     color: '#333',
     zIndex: 1,
     fontFamily: FONT.POPPINS_MEDIUM,

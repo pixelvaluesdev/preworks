@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 
   bannerTitle: {
     color: '#FFFFFF',
-    fontSize: FONTSIZE(2.8),
+    fontSize: 28,
     fontWeight: '700',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: FONTSIZE(1.8),
+    fontSize: 18,
     fontWeight: '600',
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
 
   proExp: {
     fontWeight: '400',
-    fontSize: FONTSIZE(1.2),
+    fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
 
   proLocation: {
     fontWeight: '300',
-    fontSize: FONTSIZE(1.2),
+    fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 

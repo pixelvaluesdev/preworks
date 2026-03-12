@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(2.4),
+    fontSize: 24,
     fontWeight: '500',
     color: '#fff',
     textAlign: 'center',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: FONTSIZE(2.1),
+    fontSize: 20,
     color: '#fff',
     textAlign: 'center',
     marginTop: 10,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   skipText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: FONTSIZE(1.8),
+    fontSize: 18,
     fontWeight: '600',
   },
 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
 
   nextText: {
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: FONTSIZE(1.8),
+    fontSize: 18,
     fontWeight: '600',
     color: '#3AA171',
   },

@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: FONTSIZE(2),
+    fontSize: 20,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginLeft: WIDTH(3),
   },
@@ -197,16 +197,16 @@ const styles = StyleSheet.create({
   name: {
     marginTop: 6,
     fontFamily: FONT.POPPINS_MEDIUM,
-    fontSize: FONTSIZE(1.5),
+    fontSize: 15,
   },
 
   exp: {
-    fontSize: FONTSIZE(1.3),
+    fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
   location: {
-    fontSize: FONTSIZE(1.3),
+    fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 });

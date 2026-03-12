@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
 
   message: {
-    fontSize: FONTSIZE(2),
+    fontSize: 20,
     fontFamily: FONT.POPPINS_MEDIUM,
     marginTop: HEIGHT(2),
     textAlign: 'center',
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   },
 
   subMessage: {
-    fontSize: FONTSIZE(1.7),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
     textAlign: 'center',
     marginTop: HEIGHT(1),

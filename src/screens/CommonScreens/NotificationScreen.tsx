@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: FONTSIZE(1.8),
+    fontSize: 18,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
 
   message: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_REGULAR,
     color: 'black',
     marginTop: 4,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
 
   time: {
-    fontSize: 16,
+    fontSize: 12,
     color: 'grey',
     marginRight: 6,
     fontWeight: '400',

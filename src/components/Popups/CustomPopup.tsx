@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
 
   message: {
-    fontSize: FONTSIZE(1.7),
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     textAlign: 'center',
     color: Colors.text,

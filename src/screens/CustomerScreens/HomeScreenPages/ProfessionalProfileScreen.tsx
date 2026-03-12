@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: FONTSIZE(2),
+    fontSize: 20,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
 
   actionText: {
-    fontSize: FONTSIZE(1.2),
+    fontSize: 12,
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
