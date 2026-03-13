@@ -17,6 +17,13 @@ import GeneralEnquiryScreen from '../screens/ProfessionalsScreens/GeneralEnquiry
 import HelpRequestSuccessScreen from '../screens/CustomerScreens/HomeScreenPages/HelpRequestSuccessScreen';
 import ProfessionalProfileScreen from '../screens/CustomerScreens/HomeScreenPages/ProfessionalProfileScreen';
 import ProfessionalsProjectDetails from '../screens/CustomerScreens/HomeScreenPages/ProfessionalsProjectDetails';
+import ProjectsScreen from '../screens/CommonScreens/ProjectTabPages/ProjectsScreen';
+import CommonProjectDetailsScreen from '../screens/CommonScreens/ProjectTabPages/CommonProjectDetailsScreen';
+import QuoteListScreen from '../screens/CustomerScreens/QuoteOrIntresetedListPAge/QuoteScreen';
+import CandidateDetailScreen from '../screens/CustomerScreens/QuoteOrIntresetedListPAge/CandidateDetailScreen';
+import ProfileScreen from '../screens/CommonScreens/SettingsTabPages/ProfileScreen';
+import EditProfileScreen from '../screens/CommonScreens/SettingsTabPages/EditProfileScreen';
+import AddProjectInformationScreen from '../screens/CustomerScreens/AddProjectPages/AddProjectInformationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -54,9 +61,26 @@ const AppNavigator = () => {
           name="ProfessionalProfile"
           component={ProfessionalProfileScreen}
         />
+        {/* Project details Screen from Professinal profile page when click on the portfolio project */}
+        <Stack.Screen name="ProjectDetails" component={ProjectsScreen} />
+
+        {/* Project Detail screen of Projects tab in bottom navigation for both customer and proffesional (C) */}
         <Stack.Screen
-          name="ProjectDetails"
-          component={ProfessionalsProjectDetails}
+          name="CommonProjectDetails"
+          component={CommonProjectDetailsScreen}
+        />
+
+        <Stack.Screen name="Quote/IntrestedList" component={QuoteListScreen} />
+        <Stack.Screen
+          name="CandidateDetail"
+          component={CandidateDetailScreen}
+        />
+        {/* Common Profile Screen for All user Type */}
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+
+        <Stack.Screen
+          name="AddProjectInformation"
+          component={AddProjectInformationScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

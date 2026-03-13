@@ -1,13 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CustomerHomeScreen from '../screens/CustomerScreens/CustomerHomeScreen';
 import NotificationScreen from '../screens/CommonScreens/NotificationScreen';
-import ProjectScreen from '../screens/CommonScreens/ProjectScreen';
 import SettingsScreen from '../screens/CommonScreens/SettingsScreen';
 import HomeIcon from '../assets/svgs/Home.svg';
 import NotificationIcon from '../assets/svgs/Notification.svg';
 import SettingsIcon from '../assets/svgs/Settings.svg';
 import ProjectIcon from '../assets/svgs/Project.svg';
 import Colors from '../constants/colors';
+import ProjectsScreen from '../screens/CommonScreens/ProjectTabPages/ProjectsScreen';
 const Tab = createBottomTabNavigator();
 
 const CustomerTabNavigator = () => {
@@ -37,7 +37,7 @@ const CustomerTabNavigator = () => {
       />
       <Tab.Screen
         name="Projects"
-        component={ProjectScreen}
+        component={ProjectsScreen}
         options={{
           tabBarIcon: ({ color }) => (
             <ProjectIcon widht={22} height={22} fill={color} />

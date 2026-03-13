@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ProfessionalHomeScreen from '../screens/ProfessionalsScreens/ProfessionalHomeScreen';
-import ProjectScreen from '../screens/CommonScreens/ProjectScreen';
+import ProjectsScreen from '../screens/CommonScreens/ProjectTabPages/ProjectsScreen';
 import PortfolioScreen from '../screens/ProfessionalsScreens/PortfolioScreen';
 import NotificationScreen from '../screens/CommonScreens/NotificationScreen';
 import SettingsScreen from '../screens/CommonScreens/SettingsScreen';
@@ -41,7 +41,7 @@ const ProfessionalTabNavigator = () => {
 
       <Tab.Screen
         name="Projects"
-        component={ProjectScreen}
+        component={ProjectsScreen}
         options={{
           tabBarIcon: ({ color }) => (
             <ProjectIcon width={22} height={22} fill={color} />

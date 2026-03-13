@@ -75,7 +75,7 @@ const LoginScreen = () => {
           onChangeText={setMobile}
         />
 
-        <SecondaryButton title="Get OTP" onPress={handleGetOtp} />
+        {/* <SecondaryButton title="Get OTP" onPress={handleGetOtp} /> */}
 
         <SecondaryButton
           title="Dummy Home"

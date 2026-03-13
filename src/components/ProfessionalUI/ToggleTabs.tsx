@@ -31,16 +31,14 @@ const ToggleTabs = ({ selectedTab, setSelectedTab }) => {
         ]}
         onPress={() => setSelectedTab('enquiry')}
       >
-        <TouchableOpacity>
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === 'enquiry' && styles.activeText,
-            ]}
-          >
-            General Enquiry
-          </Text>
-        </TouchableOpacity>
+        <Text
+          style={[
+            styles.tabText,
+            selectedTab === 'enquiry' && styles.activeText,
+          ]}
+        >
+          General Enquiry
+        </Text>
       </TouchableOpacity>
     </View>
   );

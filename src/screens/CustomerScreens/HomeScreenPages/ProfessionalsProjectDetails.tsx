@@ -1,3 +1,5 @@
+//Professional's Project Details Screen when click on Project from Professional Profile
+
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { useRoute } from '@react-navigation/native';

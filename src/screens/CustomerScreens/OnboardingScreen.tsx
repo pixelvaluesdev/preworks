@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -34,9 +35,11 @@ const slides = [
   },
 ];
 
-const OnboardingScreen = ({ navigation }) => {
+const OnboardingScreen = () => {
   const flatListRef = useRef();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const navigation = useNavigation();
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
