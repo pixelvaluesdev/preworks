@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,9 +20,33 @@ import { useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import ToggleTabs from '../../components/ProfessionalUI/ToggleTabs';
 import ProjectCard from '../../components/ProfessionalUI/ProjectCard';
+import ApiManager from '../../apis/ApiManager';
+import { useSelector } from 'react-redux';
 
 const ProfessionalHomeScreen = () => {
   const navigation = useNavigation();
+  const token = useSelector(state => state.auth.userToken);
+
+  const [banners, setBanners] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (token) {
+      fetchBanners();
+    }
+  }, [token]);
+
+  const fetchBanners = async () => {
+    try {
+      const response = await ApiManager.getBanners(token);
+
+      if (response?.data?.status === 'success') {
+        setBanners(response.data.data);
+      }
+    } catch (error) {
+      console.log('Banner error', error);
+    }
+  };
 
   const projectList = [
     {
@@ -59,14 +83,48 @@ const ProfessionalHomeScreen = () => {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Banner Section */}
+
       <View style={styles.banner}>
-        <Image
-          source={require('../../assets/pngs/BannerImg.png')}
-          style={styles.bannerImage}
+        <FlatList
+          data={banners}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={item => item._id}
+          onMomentumScrollEnd={e => {
+            const index = Math.round(
+              e.nativeEvent.contentOffset.x / WIDTH(100),
+            );
+            setCurrentIndex(index);
+          }}
+          renderItem={({ item }) => (
+            <Image
+              source={{ uri: item.image }}
+              style={styles.bannerImage}
+              resizeMode="cover"
+            />
+          )}
         />
 
         {/* Search Bar */}
-        <SearchHeader />
+        <SearchHeader containerStyle={styles.searchHeader} />
+
+        {/* Text */}
+        <View style={styles.bannerTextContainer}>
+          <Text style={styles.bannerSmall}>Your Trusted</Text>
+          <Text style={styles.bannerTitle}>Construction</Text>
+          <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+        </View>
+
+        {/* Dots */}
+        <View style={styles.dotContainer}>
+          {banners.map((_, index) => (
+            <View
+              key={index}
+              style={[styles.dot, currentIndex === index && styles.activeDot]}
+            />
+          ))}
+        </View>
 
         <View style={styles.bannerTextContainer}>
           <Text style={styles.bannerSmall}>Your Trusted</Text>
@@ -87,6 +145,7 @@ const ProfessionalHomeScreen = () => {
             location={item.location}
             image={item.image}
             selectedTab={selectedTab}
+            item={item}
           />
         )}
       />
@@ -100,16 +159,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-  },
-
-  banner: {
-    height: 300,
-  },
-
-  bannerImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
   },
 
   searchBar: {
@@ -126,11 +175,6 @@ const styles = StyleSheet.create({
   searchInput: {
     marginLeft: 10,
     flex: 1,
-  },
-
-  bannerTextContainer: {
-    marginTop: 80,
-    marginLeft: 20,
   },
 
   bannerSmall: {
@@ -235,5 +279,49 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  banner: {
+    height: 300,
+    width: WIDTH(100),
+    position: 'relative',
+  },
+
+  bannerImage: {
+    width: WIDTH(100),
+    height: 300,
+  },
+
+  bannerTextContainer: {
+    position: 'absolute',
+    top: 150,
+    left: 20,
+    zIndex: 10,
+  },
+
+  dotContainer: {
+    position: 'absolute',
+    bottom: 15,
+    alignSelf: 'center',
+    flexDirection: 'row',
+  },
+
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'white',
+    marginHorizontal: 4,
+  },
+
+  activeDot: {
+    backgroundColor: Colors.primary,
+  },
+
+  searchHeader: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    zIndex: 20,
   },
 });

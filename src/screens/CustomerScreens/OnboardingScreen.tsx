@@ -57,6 +57,7 @@ const OnboardingScreen = () => {
         <Image
           source={require('../../assets/pngs/bottomCircle.png')}
           style={styles.bottomBg}
+          resizeMode="stretch"
         />
 
         <View style={styles.content}>
@@ -120,15 +121,15 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: '80%',
-    height: 300,
+    width: '100%',
+    height: 400,
     alignSelf: 'center',
     marginTop: 80,
   },
 
   bottomSection: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -30,
     height: HEIGHT(40),
     width: '100%',
   },
@@ -147,15 +148,15 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: '500',
+    fontSize: 20,
+    //fontWeight: '500',
     color: '#fff',
     textAlign: 'center',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   subtitle: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#fff',
     textAlign: 'center',
     marginTop: 10,

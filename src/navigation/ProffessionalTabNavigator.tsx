@@ -21,7 +21,7 @@ const ProfessionalTabNavigator = () => {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: 'grey',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
         },
         tabBarStyle: {
           height: 60,
@@ -30,12 +30,10 @@ const ProfessionalTabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="ProfessionalHome"
+        name="Home"
         component={ProfessionalHomeScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <HomeIcon width={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ color }) => <HomeIcon height={22} fill={color} />,
         }}
       />
 
@@ -43,19 +41,15 @@ const ProfessionalTabNavigator = () => {
         name="Projects"
         component={ProjectsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <ProjectIcon width={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ color }) => <ProjectIcon height={22} fill={color} />,
         }}
       />
 
       <Tab.Screen
-        name="AddPortfolio"
+        name="Add Work"
         component={PortfolioScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <AddIcon width={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ color }) => <AddIcon height={22} fill={color} />,
         }}
       />
 
@@ -64,7 +58,7 @@ const ProfessionalTabNavigator = () => {
         component={NotificationScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <NotificationIcon width={22} height={22} fill={color} />
+            <NotificationIcon height={22} fill={color} />
           ),
         }}
       />
@@ -73,9 +67,7 @@ const ProfessionalTabNavigator = () => {
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <SettingsIcon width={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ color }) => <SettingsIcon height={22} fill={color} />,
         }}
       />
     </Tab.Navigator>

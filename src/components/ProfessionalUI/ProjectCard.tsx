@@ -5,7 +5,7 @@ import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
 
-const ProjectCard = ({ title, location, image, selectedTab }) => {
+const ProjectCard = ({ title, location, image, selectedTab, item }) => {
   const navigation = useNavigation();
   return (
     <View style={styles.card}>
@@ -21,8 +21,13 @@ const ProjectCard = ({ title, location, image, selectedTab }) => {
 
         {selectedTab == 'project' ? (
           <>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>Send Quotation</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() =>
+                navigation.navigate('CommonProjectDetails', { project: item })
+              }
+            >
+              <Text style={styles.buttonText}>View Details</Text>
             </TouchableOpacity>
           </>
         ) : (

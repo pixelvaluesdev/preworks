@@ -7,7 +7,7 @@ import { FONTSIZE, HEIGHT } from '../utils/responsive';
 import SecondaryButton from './Buttons/SecondaryBtn';
 import BorderTextInput from './Inputs/BorderTextInput';
 
-const Popup = ({ visible, onClose, showQuotation = true }) => {
+const Popup = ({ title, visible, onClose, showQuotation = true }) => {
   const [quotation, setQuotation] = useState('');
   const [message, setMessage] = useState('');
 
@@ -15,7 +15,7 @@ const Popup = ({ visible, onClose, showQuotation = true }) => {
     <Modal transparent animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.container}>
-          <Text style={styles.title}>Submit your Quotation</Text>
+          <Text style={styles.title}>{title}</Text>
 
           {/* Quotation Input */}
           {showQuotation && (
@@ -34,7 +34,11 @@ const Popup = ({ visible, onClose, showQuotation = true }) => {
             multiline
           />
 
-          <SecondaryButton title="Submit" style={styles.submitBtn} />
+          <SecondaryButton
+            title="Submit"
+            style={styles.submitBtn}
+            onPress={onClose}
+          />
         </View>
       </View>
     </Modal>

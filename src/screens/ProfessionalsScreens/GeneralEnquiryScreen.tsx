@@ -88,7 +88,7 @@ const GeneralEnquiryScreen = () => {
           <View>
             <Text
               style={{
-                fontSize: 16,
+                fontSize: 14,
                 fontFamily: FONT.POPPINS_MEDIUM,
                 fontWeight: '400',
               }}
@@ -113,13 +113,14 @@ const GeneralEnquiryScreen = () => {
         style={styles.interestedBtn}
         onPress={() => setShowPopup(true)}
       >
-        <Text style={styles.interestedText}>I'm Interested</Text>
+        <Text style={styles.interestedText}>Show Your Intrest</Text>
       </TouchableOpacity>
 
       <Popup
+        title={'I am Intrested'}
         visible={showPopup}
         onClose={() => setShowPopup(false)}
-        showQuotation={true}
+        showQuotation={false}
       />
     </ScrollView>
   );
@@ -130,7 +131,7 @@ export default GeneralEnquiryScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: 'white',
   },
 
   image: {
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   detailLabel: {
     color: 'grey',
     fontSize: 16,
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   detailValue: {
@@ -219,7 +220,7 @@ const styles = StyleSheet.create({
   callBtn: {
     backgroundColor: Colors.primary,
     paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingVertical: 8,
     borderRadius: 8,
   },
 
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
   interestedBtn: {
     backgroundColor: Colors.primary,
     marginHorizontal: WIDTH(4),
-    marginTop: 20,
+    margin: 20,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',

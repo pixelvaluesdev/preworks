@@ -18,7 +18,7 @@ const CustomerTabNavigator = () => {
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: 'grey',
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
         },
         tabBarStyle: {
           height: 60,
@@ -27,7 +27,7 @@ const CustomerTabNavigator = () => {
       }}
     >
       <Tab.Screen
-        name="CustomerHome"
+        name="Home"
         component={CustomerHomeScreen}
         options={{
           tabBarIcon: ({ color }) => (

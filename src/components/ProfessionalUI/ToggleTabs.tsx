@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#E5E5E5',
-    borderRadius: 20,
+    borderRadius: 22,
     marginHorizontal: WIDTH(4),
     marginVertical: HEIGHT(2),
     padding: 6,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 
   tabButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 20,
     alignItems: 'center',
   },

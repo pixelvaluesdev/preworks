@@ -14,6 +14,7 @@ import { FONT } from '../../../theme/fonts';
 
 import QuoteIcon from '../../../assets/svgs/Quote.svg';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 const images = [
   require('../../../assets/pngs/BannerImg.png'),
@@ -29,7 +30,9 @@ const attachments = [
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, userType = 'customer' } = route.params || {};
 
-  const isCustomer = userType === 'customer';
+  const userTypeRed = useSelector(state => state.auth.userType);
+  const isCustomer = userTypeRed === 'customer';
+  const isProfessional = userTypeRed === 'professional';
 
   const navigation = useNavigation();
 
@@ -47,13 +50,15 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           />
 
           {/* Quote badge */}
-          <TouchableOpacity
-            style={styles.quoteBadge}
-            onPress={() => navigation.navigate('Quote/IntrestedList')}
-          >
-            <QuoteIcon width={30} height={30} />
-            <Text style={styles.quoteLabel}>Quotes</Text>
-          </TouchableOpacity>
+          {isCustomer && (
+            <TouchableOpacity
+              style={styles.quoteBadge}
+              onPress={() => navigation.navigate('Quote/IntrestedList')}
+            >
+              <QuoteIcon width={30} height={30} />
+              <Text style={styles.quoteLabel}>Quotes</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Image Thumbnails */}
@@ -71,8 +76,24 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
         {/* Details Card */}
         <View style={styles.detailsCard}>
-          <Text style={styles.sectionTitle}>Mobile Number</Text>
-          <Text style={styles.valueText}>3438545685</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <View>
+              <Text style={styles.sectionTitle}>Mobile Number</Text>
+              <Text style={styles.valueText}>3438545685</Text>
+            </View>
+
+            {isProfessional && (
+              <TouchableOpacity style={styles.callBtn}>
+                <Text style={styles.callText}>Call</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           <View style={styles.divider} />
 
@@ -326,5 +347,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: FONT.POPPINS_MEDIUM,
     fontSize: 15,
+  },
+  callBtn: {
+    backgroundColor: '#3BA56A',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+  },
+
+  callText: {
+    color: '#fff',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontSize: 14,
   },
 });
