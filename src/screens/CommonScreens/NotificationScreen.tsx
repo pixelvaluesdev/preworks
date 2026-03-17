@@ -13,6 +13,7 @@ import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
 
 import BackIcon from '../../assets/svgs/Back.svg';
+import ScreenHeader from '../../components/ScreenHeader';
 
 const notifications = [
   {
@@ -68,15 +69,8 @@ const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          {/* <BackIcon width={22} height={22} /> */}
-        </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Notifications</Text>
-
-        <View style={{ width: 22 }} />
-      </View>
+      <ScreenHeader title={'Notifications'} showBack />
 
       {/* List */}
       <FlatList
@@ -95,7 +89,7 @@ export default NotificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
 
   header: {

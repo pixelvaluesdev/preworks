@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(3.2),
+    fontSize: 32,
     color: '#fff',
     marginBottom: 10,
     fontFamily: FONT.POPPINS_BOLD,

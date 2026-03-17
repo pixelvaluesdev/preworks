@@ -81,7 +81,7 @@ const ProfessionalListScreen = () => {
         style={{
           borderWidth: 0.75,
           borderColor: 'grey',
-          marginTop: -25,
+          marginTop: 10,
           marginBottom: 15,
         }}
       />

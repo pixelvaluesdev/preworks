@@ -30,13 +30,13 @@ export default ServiceCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: WIDTH(45),
-    height: HEIGHT(8),
+    width: WIDTH(55),
+    height: HEIGHT(9),
     backgroundColor: Colors.lightGreen,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: 10,
+    padding: 10,
     marginRight: 14,
   },
 
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     padding: 8,
     borderRadius: 6,
-    margin: 10,
+    marginRight: 10,
   },
 
   title: {

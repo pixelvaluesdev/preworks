@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 
   projectName: {
     fontSize: 16,
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   projectCode: {

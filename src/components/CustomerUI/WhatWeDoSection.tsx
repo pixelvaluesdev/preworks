@@ -15,19 +15,19 @@ const services = [
     title: 'Contractor',
     Icon: ContractorIcon,
     type: 'contractor',
-    subtitle: 'superwomen',
+    subtitle: 'Plan your Project',
   },
   {
     title: 'Interior',
     Icon: ArchitectIcon,
     type: 'interior',
-    subtitle: 'superwomen',
+    subtitle: 'Plan your Project',
   },
   {
     title: 'Architect',
     Icon: ArchitectIcon,
     type: 'architect',
-    subtitle: 'superwomen',
+    subtitle: 'Plan your Project',
   },
 ];
 
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 10,

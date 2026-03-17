@@ -99,7 +99,7 @@ const ProfessionalProfileScreen = () => {
                 key={index}
                 style={styles.gridItem}
                 onPress={() =>
-                  navigation.navigate('ProjectDetails', {
+                  navigation.navigate('ProfessionalsProject', {
                     projectId: index + 1,
                   })
                 }
@@ -148,25 +148,26 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 20,
+    marginTop: 10,
+    fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   role: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_MEDIUM,
     color: '#777',
   },
 
   phone: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_MEDIUM,
     color: Colors.primary,
   },
 
   description: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_REGULAR,
     marginTop: 10,
     lineHeight: 20,
@@ -191,8 +192,8 @@ const styles = StyleSheet.create({
 
   iconCircle: {
     backgroundColor: '#3BA56A',
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   },
 
   actionText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 

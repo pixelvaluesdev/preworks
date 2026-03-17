@@ -170,7 +170,7 @@ const CustomerHomeScreen = () => {
       {/* Add Project Button */}
       <SecondaryButton
         title="Add Project Details"
-        style={{ marginHorizontal: WIDTH(3), marginVertical: HEIGHT(2) }}
+        style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
         icon={<PlusIcon height={20} width={20} />}
       />
 
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
@@ -285,6 +285,8 @@ const styles = StyleSheet.create({
 
   seeAll: {
     color: '#3BA56A',
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   proCard: {

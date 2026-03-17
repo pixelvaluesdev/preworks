@@ -13,7 +13,7 @@ const PrimaryButton = ({ title, Icon, onPress, disabled = false }: any) => {
       disabled={disabled}
     >
       <View style={styles.blurContainer}>
-        {Icon && <Icon width={30} height={30} />}
+        {Icon && <Icon width={40} height={40} />}
         <Text style={styles.text}>{title}</Text>
       </View>
     </TouchableOpacity>
@@ -24,9 +24,9 @@ export default PrimaryButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: WIDTH(50),
+    width: WIDTH(60),
     borderRadius: 15,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.7)',
     overflow: 'hidden',
     marginBottom: 20,
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
 
   blurContainer: {
-    padding: 10,
+    padding: 5,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',

@@ -21,7 +21,7 @@ const WelcomeScreen = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Logo width={180} height={180} />
+        <Logo width={200} height={200} />
 
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Please Select Your User Type</Text>
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(3.2),
+    fontSize: 32,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 10,

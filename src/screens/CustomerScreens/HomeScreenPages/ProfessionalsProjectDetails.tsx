@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
 
   projectImage: {
     width: '100%',
-    height: HEIGHT(40),
+    height: HEIGHT(50),
     borderRadius: 12,
   },
 

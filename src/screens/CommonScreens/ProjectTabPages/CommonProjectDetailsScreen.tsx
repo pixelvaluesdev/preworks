@@ -182,9 +182,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: WIDTH(2),
     paddingHorizontal: WIDTH(5),
-    backgroundColor: 'rgba(171,166,166,0.85)',
+    backgroundColor: 'rgba(210, 202, 202, 0.85)',
     justifyContent: 'center',
     borderRadius: 15,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: -4,
+      height: 4,
+    },
+    shadowOpacity: 0.08,
+
+    elevation: 6,
   },
 
   thumbnail: {

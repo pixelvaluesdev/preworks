@@ -11,6 +11,7 @@ import {
 import SearchIcon from '../assets/svgs/Search.svg';
 import { WIDTH } from '../utils/responsive';
 import Colors from '../constants/colors';
+import { FONT } from '../theme/fonts';
 
 interface Props {
   value?: string;
@@ -48,7 +49,7 @@ const SearchHeader: React.FC<Props> = ({
           value={value}
           onChangeText={onChangeText}
           style={styles.input}
-          placeholderTextColor="#777"
+          placeholderTextColor="#757575"
         />
       </View>
 
@@ -94,6 +95,8 @@ const styles = StyleSheet.create({
   input: {
     marginLeft: 8,
     flex: 1,
+    fontSize: 16,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   avatar: {

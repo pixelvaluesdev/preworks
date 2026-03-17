@@ -82,6 +82,10 @@ const AppNavigator = () => {
           name="AddProjectInformation"
           component={AddProjectInformationScreen}
         />
+        <Stack.Screen
+          name="ProfessionalsProject"
+          component={ProfessionalsProjectDetails}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
