@@ -19,7 +19,7 @@ const ProfessionalWelcomeScreen = ({ navigation }) => {
         </Text>
 
         <PrimaryButton
-          title="Builder"
+          title="Contractor"
           Icon={Architect}
           //   onPress={() => navigation.navigate('BuilderRegister')}
           onPress={() => navigation.navigate('ProfTabNav')}

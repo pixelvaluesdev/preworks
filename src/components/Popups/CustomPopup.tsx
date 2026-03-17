@@ -59,10 +59,11 @@ const styles = StyleSheet.create({
   },
 
   popupContainer: {
-    width: WIDTH(85),
+    width: WIDTH(90),
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
+    elevation: 6,
   },
 
   message: {
@@ -75,7 +76,9 @@ const styles = StyleSheet.create({
 
   buttonRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+
+    gap: 12,
+    marginTop: 10,
   },
 
   singleButtonRow: {
@@ -83,9 +86,9 @@ const styles = StyleSheet.create({
   },
 
   button: {
+    flex: 1,
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: '#E5E5E5',
     minWidth: 100,
     alignItems: 'center',

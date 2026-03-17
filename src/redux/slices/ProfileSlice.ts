@@ -1,8 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Profile {
-  name: string;
-  image: string;
+  _id?: string;
+  phone?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  name?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  userType?: string;
+  status?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface ProfileState {
@@ -20,11 +32,13 @@ const profileSlice = createSlice({
     setProfile: (state, action: PayloadAction<Profile>) => {
       state.profile = action.payload;
     },
+
     updateProfile: (state, action: PayloadAction<Partial<Profile>>) => {
       if (state.profile) {
         state.profile = { ...state.profile, ...action.payload };
       }
     },
+
     clearProfile: state => {
       state.profile = null;
     },

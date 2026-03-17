@@ -19,6 +19,11 @@ import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import CustomPopup from '../../components/Popups/CustomPopup';
+import { useEffect } from 'react';
+import ApiManager from '../../apis/ApiManager';
+import { useSelector, UseSelector } from 'react-redux';
+import HelpIcon from '../../assets/svgs/HelpUs.svg';
+
 const professionals = [
   {
     id: '1',
@@ -45,33 +50,81 @@ const professionals = [
 
 const CustomerHomeScreen = () => {
   const navigation = useNavigation();
+  const token = useSelector(state => state.auth.userToken);
 
   const [helpPopupVisible, setHelpPopupVisible] = useState(false);
+  const [banners, setBanners] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (token) {
+      fetchBanners();
+    }
+  }, [token]);
+
+  const fetchBanners = async () => {
+    try {
+      const response = await ApiManager.getBanners(token);
+      console.log('BANNER API RESPONSE', response?.data);
+
+      if (response?.data?.status === 'success') {
+        setBanners(response.data.data);
+      }
+    } catch (error) {
+      console.log('Banner error', error);
+    }
+  };
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Banner Section */}
       <View style={styles.banner}>
-        <Image
-          source={require('../../assets/pngs/BannerImg.png')}
-          style={styles.bannerImage}
+        <FlatList
+          data={banners}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={item => item._id}
+          onMomentumScrollEnd={e => {
+            const index = Math.round(
+              e.nativeEvent.contentOffset.x / WIDTH(100),
+            );
+            setCurrentIndex(index);
+          }}
+          renderItem={({ item }) => (
+            <Image
+              source={{ uri: item.image }}
+              style={styles.bannerImage}
+              resizeMode="cover"
+            />
+          )}
         />
-
         {/* Search Bar */}
-        <SearchHeader />
+        <SearchHeader containerStyle={styles.searchHeader} />
 
         <View style={styles.bannerTextContainer}>
           <Text style={styles.bannerSmall}>Your Trusted</Text>
           <Text style={styles.bannerTitle}>Construction</Text>
           <Text style={styles.bannerSmall}>Make Your Dream House</Text>
         </View>
+        <View style={styles.dotContainer}>
+          {banners.map((_, index) => (
+            <View
+              key={index}
+              style={[styles.dot, currentIndex === index && styles.activeDot]}
+            />
+          ))}
+        </View>
       </View>
+
       <TouchableOpacity
         style={styles.helpButton}
         onPress={() => setHelpPopupVisible(true)}
       >
         <View style={styles.helpIconCircle}>
           {/* Replace with your SVG if available */}
-          <Text style={{ fontSize: 16 }}>🎧</Text>
+          <Text style={{ fontSize: 16 }}>
+            <HelpIcon />
+          </Text>
         </View>
 
         <Text style={styles.helpText}>Help Us</Text>
@@ -117,7 +170,7 @@ const CustomerHomeScreen = () => {
       {/* Add Project Button */}
       <SecondaryButton
         title="Add Project Details"
-        style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
+        style={{ marginHorizontal: WIDTH(3), marginVertical: HEIGHT(2) }}
         icon={<PlusIcon height={20} width={20} />}
       />
 
@@ -153,12 +206,13 @@ const styles = StyleSheet.create({
 
   banner: {
     height: 300,
+    width: WIDTH(100),
+    position: 'relative',
   },
 
   bannerImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
+    width: WIDTH(100),
+    height: 300,
   },
 
   searchBar: {
@@ -178,8 +232,10 @@ const styles = StyleSheet.create({
   },
 
   bannerTextContainer: {
-    marginTop: 80,
-    marginLeft: 20,
+    position: 'absolute',
+    top: 150,
+    left: 20,
+    zIndex: 10,
   },
 
   bannerSmall: {
@@ -286,13 +342,16 @@ const styles = StyleSheet.create({
   helpButton: {
     position: 'absolute',
     right: 20,
-    top: 120,
+    top: 105,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3BA56A',
+    backgroundColor: Colors.primary,
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 30,
+    paddingHorizontal: 8,
+    borderTopLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
+    zIndex: 10,
   },
 
   helpIconCircle: {
@@ -308,6 +367,32 @@ const styles = StyleSheet.create({
   helpText: {
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 15,
+    fontSize: 16,
+  },
+  dotContainer: {
+    position: 'absolute',
+    bottom: 15,
+    alignSelf: 'center',
+    flexDirection: 'row',
+  },
+
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'white',
+    marginHorizontal: 4,
+  },
+
+  activeDot: {
+    backgroundColor: Colors.primary,
+    width: 8,
+  },
+  searchHeader: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    zIndex: 20,
   },
 });

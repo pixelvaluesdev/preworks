@@ -12,11 +12,40 @@ import { WIDTH, HEIGHT } from '../../utils/responsive';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { useNavigation } from '@react-navigation/native';
+import { clearUser } from '../../redux/slices/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import CustomPopup from '../../components/Popups/CustomPopup';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
+  const [showLogout, setShowLogout] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const fName = useSelector(state => state.auth.user?.firstName);
+  const lName = useSelector(state => state.auth.user?.LastName);
+
+  const handleLogout = async () => {
+    try {
+      setLoading(true);
+
+      await AsyncStorage.removeItem('persist:root');
+
+      dispatch(clearUser());
+
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Welcome' }],
+      });
+    } catch (error) {
+      console.log('Logout error', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -35,7 +64,9 @@ const SettingsScreen = () => {
           // source={require('../../assets/pngs/profile.png')}
           style={styles.profileImage}
         />
-        <Text style={styles.name}>Pratik Shah</Text>
+        <Text style={styles.name}>
+          {fName} {lName}
+        </Text>
       </View>
 
       {/* SETTINGS LIST */}
@@ -103,11 +134,36 @@ const SettingsScreen = () => {
         </TouchableOpacity>
 
         {/* Logout */}
-        <TouchableOpacity style={styles.logoutRow}>
+        <TouchableOpacity
+          style={styles.logoutRow}
+          onPress={() => setShowLogout(true)}
+        >
           {/* <Ionicons name="log-out-outline" size={20} color="red" /> */}
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
+
+      <CustomPopup
+        visible={showLogout}
+        message="Are you sure you want to Logout?"
+        buttons={[
+          {
+            label: 'Logout',
+            type: 'primary',
+            onPress: () => {
+              handleLogout();
+              setShowLogout(false);
+            },
+          },
+          {
+            label: 'Cancel',
+
+            onPress: () => {
+              setShowLogout(false);
+            },
+          },
+        ]}
+      />
     </View>
   );
 };

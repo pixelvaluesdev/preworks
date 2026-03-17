@@ -2,16 +2,39 @@ import { View, Text, StyleSheet } from 'react-native';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 const SplashScreen = () => {
   const navigation = useNavigation<any>();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Welcome');
-    }, 2500);
+  const token = useSelector(state => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
+  const userType = useSelector(state => state.auth.userType);
 
-    return () => clearTimeout(timer);
+  console.log('USerrrrr', user);
+  console.log('Token', token);
+  console.log('userTypew', userType);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!token) {
+        navigation.replace('Welcome');
+        return;
+      }
+
+      if (token && !user?.firstName) {
+        navigation.replace('ShortProfile');
+        return;
+      }
+
+      if (token && user?.firstName) {
+        if (userType === 'professional') {
+          navigation.replace('ProfTabNav');
+        } else {
+          navigation.replace('CustmTabNav');
+        }
+      }
+    }, 1500);
   }, []);
   return (
     <View style={styles.container}>

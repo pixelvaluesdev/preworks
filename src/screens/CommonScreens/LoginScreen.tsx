@@ -15,42 +15,48 @@ import CustomTextInput from '../../components/Inputs/CustomTextInput';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector, UseSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
+import { useSnackbar } from '../../hooks/SnackbarProvider';
 
 const LoginScreen = () => {
   const [mobile, setMobile] = useState('');
 
   const navigation = useNavigation();
 
+  const showSnackbar = useSnackbar();
+
   const userType = useSelector(state => state.auth.userType);
 
   const handleGetOtp = async () => {
+    const trimmedMobile = mobile.trim();
+
+    if (trimmedMobile.length !== 10) {
+      showSnackbar('Phone number must be exactly 10 digits', 'error');
+      return;
+    }
+
     try {
       const body = {
-        phone: mobile,
+        phone: trimmedMobile,
         userType: userType,
       };
 
       const response = await ApiManager.phoneSignin(body);
 
-      console.log('Get Otp resp', response.data);
-      console.log('OTP :', response.data.data.otp);
-      if (mobile.length !== 10) {
-        Alert.alert('Please enter valid mobile number');
-        return;
-      }
-
       if (response.data.status === 'success') {
-        navigation.navigate('OtpVeri', { phone: mobile });
+        showSnackbar(response.data.message, 'success');
+        console.log(response.data, 'success');
+
+        setTimeout(() => {
+          navigation.navigate('OtpVeri', { phone: trimmedMobile });
+        }, 1500);
       }
     } catch (error) {
-      console.log('Full error', error);
+      const serverMessage =
+        error?.response?.data?.message || 'Something went wrong';
 
-      if (error.response) {
-        console.log('Server response', error.response.data);
-        console.log('Status code', error.response.status);
-      }
+      showSnackbar(serverMessage, 'error');
     }
   };
 
@@ -75,12 +81,12 @@ const LoginScreen = () => {
           onChangeText={setMobile}
         />
 
-        {/* <SecondaryButton title="Get OTP" onPress={handleGetOtp} /> */}
+        <SecondaryButton title="Get OTP" onPress={handleGetOtp} />
 
-        <SecondaryButton
+        {/* <SecondaryButton
           title="Dummy Home"
           onPress={() => navigation.navigate('CustmTabNav')}
-        />
+        /> */}
       </View>
     </ImageBackground>
   );

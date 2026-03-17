@@ -12,7 +12,7 @@ import CustomerTabNavigator from './CustomerTabNavigator';
 import ProfessionalTabNavigator from './ProffessionalTabNavigator';
 import CustomStatusBar from '../components/CustomStatusBar';
 import ProffessionalListScreen from '../screens/CustomerScreens/HomeScreenPages/ProffessionalListScreen';
-import FirstLastName from '../screens/CommonScreens/FirstLastName';
+import ShortProfileScreen from '../screens/CommonScreens/ShortProfileScreen';
 import GeneralEnquiryScreen from '../screens/ProfessionalsScreens/GeneralEnquiryScreen';
 import HelpRequestSuccessScreen from '../screens/CustomerScreens/HomeScreenPages/HelpRequestSuccessScreen';
 import ProfessionalProfileScreen from '../screens/CustomerScreens/HomeScreenPages/ProfessionalProfileScreen';
@@ -51,7 +51,7 @@ const AppNavigator = () => {
           name="ProfessionalList"
           component={ProffessionalListScreen}
         />
-        <Stack.Screen name="EnterName" component={FirstLastName} />
+        <Stack.Screen name="ShortProfile" component={ShortProfileScreen} />
         <Stack.Screen name="GeneralEnquiry" component={GeneralEnquiryScreen} />
         <Stack.Screen
           name="HelpRequestSuccess"

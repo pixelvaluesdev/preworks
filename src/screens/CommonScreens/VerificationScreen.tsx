@@ -49,13 +49,17 @@ const VerificationScreen = () => {
 
       if (response.data.status === 'success') {
         const user = response.data.data;
+        console.log(
+          response.data.data,
+          'USerrrrrr from theee verification redux',
+        );
         const token = response.data.token;
 
         dispatch(setUser(user));
         dispatch(setUserToken(token));
 
-        if (!user.name) {
-          navigation.replace('EnterName');
+        if (!user.firstName) {
+          navigation.replace('ShortProfile');
         } else {
           navigation.replace('CustmTabNav');
         }

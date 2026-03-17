@@ -55,11 +55,18 @@ const requests = {
 const requestPath = {
   phoneSignin: '/auth/phone-signin',
   verifyOtp: '/auth/verify-otp',
-  shortProfile: `/auth/short-Profile`,
   resendOtp: 'auth/resendOtp',
+  shortProfile: '/auth/short-Profile',
+  banners: '/customer/banners',
+  professionalList: '/customer/prof-list',
 };
 
 const ApiManager = {
+  getBanners: token => requests.get(requestPath.banners, token),
+
+  getProfessionals: (type = 'all', token?: string) => {
+    return requests.get(`${requestPath.professionalList}/${type}`, token);
+  },
   phoneSignin: params => requests.post(requestPath.phoneSignin, params),
 
   verifyOtp: params => requests.post(requestPath.verifyOtp, params),
@@ -67,7 +74,6 @@ const ApiManager = {
   shortProfile: (id: string, params: any, token?: string) => {
     return requests.put(`${requestPath.shortProfile}/${id}`, params, token);
   },
-
   resendOtp: params => requests.post(requestPath.resendOtp, params),
 };
 
