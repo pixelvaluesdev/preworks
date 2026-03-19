@@ -46,11 +46,7 @@ const LoginScreen = () => {
 
       if (response.data.status === 'success') {
         showSnackbar(response.data.message, 'success');
-        console.log(response.data, 'success');
-
-        setTimeout(() => {
-          navigation.navigate('OtpVeri', { phone: trimmedMobile });
-        }, 1500);
+        navigation.navigate('OtpVeri', { phone: trimmedMobile });
       }
     } catch (error) {
       const serverMessage =
@@ -107,10 +103,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(3.2),
+    fontSize: 24,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_REGULAR,
-    fontWeight: '700',
+    fontFamily: FONT.POPPINS_BOLD,
     marginBottom: 5,
     textAlign: 'center',
   },

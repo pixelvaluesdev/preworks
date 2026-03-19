@@ -4,15 +4,13 @@ import {
   Text,
   StyleSheet,
   Image,
-  TextInput,
   FlatList,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
+import { HEIGHT, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import SearchHeader from '../../components/SearchHeader';
 import WhatWeDoSection from '../../components/CustomerUI/WhatWeDoSection';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
@@ -21,7 +19,7 @@ import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import { useEffect } from 'react';
 import ApiManager from '../../apis/ApiManager';
-import { useSelector, UseSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
 
 const professionals = [
@@ -50,7 +48,7 @@ const professionals = [
 
 const CustomerHomeScreen = () => {
   const navigation = useNavigation();
-  const token = useSelector(state => state.auth.userToken);
+  const token = useSelector((state: any) => state.auth.userToken);
 
   const [helpPopupVisible, setHelpPopupVisible] = useState(false);
   const [banners, setBanners] = useState([]);
@@ -65,7 +63,6 @@ const CustomerHomeScreen = () => {
   const fetchBanners = async () => {
     try {
       const response = await ApiManager.getBanners(token);
-      console.log('BANNER API RESPONSE', response?.data);
 
       if (response?.data?.status === 'success') {
         setBanners(response.data.data);
@@ -83,29 +80,31 @@ const CustomerHomeScreen = () => {
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item._id}
+          keyExtractor={(item: any) => item._id}
           onMomentumScrollEnd={e => {
             const index = Math.round(
               e.nativeEvent.contentOffset.x / WIDTH(100),
             );
             setCurrentIndex(index);
           }}
-          renderItem={({ item }) => (
-            <Image
-              source={{ uri: item.image }}
-              style={styles.bannerImage}
-              resizeMode="cover"
-            />
+          renderItem={({ item }: any) => (
+            <>
+              <Image
+                source={{ uri: item?.image }}
+                style={styles.bannerImage}
+                resizeMode="cover"
+              />
+              <View style={styles.bannerTextContainer}>
+                <Text style={styles.bannerSmall}>Your Trusted</Text>
+                <Text style={styles.bannerTitle}>Construction</Text>
+                <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+              </View>
+            </>
           )}
         />
         {/* Search Bar */}
         <SearchHeader containerStyle={styles.searchHeader} />
 
-        <View style={styles.bannerTextContainer}>
-          <Text style={styles.bannerSmall}>Your Trusted</Text>
-          <Text style={styles.bannerTitle}>Construction</Text>
-          <Text style={styles.bannerSmall}>Make Your Dream House</Text>
-        </View>
         <View style={styles.dotContainer}>
           {banners.map((_, index) => (
             <View
@@ -151,18 +150,22 @@ const CustomerHomeScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.proCard}>
+          renderItem={({ item }: any) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('ProfessionalProfile', { id: item.id })
+              }
+              style={styles.proCard}
+            >
               <Image source={{ uri: item.image }} style={styles.proImage} />
 
               <Text style={styles.proName}>{item.name}</Text>
               <Text style={styles.proExp}>{item.exp}</Text>
 
               <View style={styles.locationRow}>
-                {/* <LocationIcon width={14} height={14} /> */}
                 <Text style={styles.proLocation}>{item.location}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
@@ -172,6 +175,7 @@ const CustomerHomeScreen = () => {
         title="Add Project Details"
         style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
         icon={<PlusIcon height={20} width={20} />}
+        onPress={() => navigation.navigate('AddProjectInformation')}
       />
 
       <CustomPopup
@@ -205,14 +209,14 @@ const styles = StyleSheet.create({
   },
 
   banner: {
-    height: 300,
+    height: 360,
     width: WIDTH(100),
     position: 'relative',
   },
 
   bannerImage: {
     width: WIDTH(100),
-    height: 300,
+    height: 360,
   },
 
   searchBar: {
@@ -233,7 +237,7 @@ const styles = StyleSheet.create({
 
   bannerTextContainer: {
     position: 'absolute',
-    top: 150,
+    top: 200,
     left: 20,
     zIndex: 10,
   },
@@ -248,8 +252,7 @@ const styles = StyleSheet.create({
   bannerTitle: {
     color: '#FFFFFF',
     fontSize: 28,
-    fontWeight: '700',
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 
   section: {
@@ -259,7 +262,6 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
@@ -286,7 +288,7 @@ const styles = StyleSheet.create({
   seeAll: {
     color: '#3BA56A',
     fontSize: 14,
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 
   proCard: {
@@ -296,6 +298,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 15,
     marginTop: 15,
+    borderWidth: 0.5,
+    borderColor: '#c7c7c7',
   },
 
   proImage: {
@@ -321,9 +325,8 @@ const styles = StyleSheet.create({
   },
 
   proLocation: {
-    fontWeight: '300',
     fontSize: 12,
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 
   addButton: {

@@ -9,6 +9,7 @@ import { FONTSIZE, HEIGHT } from '../../utils/responsive';
 interface BorderTextInputProps {
   label: string;
   value: string;
+  placeholder?: string;
   onChangeText: (text: string) => void;
   multiline?: boolean;
   height?: number;
@@ -18,6 +19,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   label,
   value,
   onChangeText,
+  placeholder,
   multiline = false,
   height,
 }) => {
@@ -29,6 +31,8 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
         mode="outlined"
         value={value}
         onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#a6a6a6"
         multiline={multiline}
         numberOfLines={multiline ? 3 : 1}
         outlineColor="#757575"
@@ -52,12 +56,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     left: 14,
-    backgroundColor: '#fff',
-    paddingHorizontal: 6,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
     fontSize: 14,
     color: '#333',
     zIndex: 1,
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   input: {
@@ -65,7 +69,7 @@ const styles = StyleSheet.create({
   },
 
   outline: {
-    borderRadius: 14,
+    borderRadius: 10,
     borderWidth: 0.75,
   },
 });

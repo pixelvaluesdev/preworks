@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 import { FONT } from '../../theme/fonts';
 import { WIDTH } from '../../utils/responsive';
+import Colors from '../../constants/colors';
 
 const PrimaryButton = ({ title, Icon, onPress, disabled = false }: any) => {
   return (
@@ -10,10 +11,10 @@ const PrimaryButton = ({ title, Icon, onPress, disabled = false }: any) => {
       activeOpacity={0.8}
       style={[styles.container, disabled && { opacity: 0.5 }]}
       onPress={onPress}
-      disabled={disabled}
+      // disabled={disabled}
     >
       <View style={styles.blurContainer}>
-        {Icon && <Icon width={40} height={40} />}
+        {Icon && <Icon width={44} height={44} />}
         <Text style={styles.text}>{title}</Text>
       </View>
     </TouchableOpacity>
@@ -27,14 +28,13 @@ const styles = StyleSheet.create({
     width: WIDTH(60),
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.7)',
-    overflow: 'hidden',
+    borderColor: Colors.primary,
     marginBottom: 20,
     backgroundColor: 'rgba(255,255,255,0.3)',
   },
 
   blurContainer: {
-    padding: 5,
+    padding: 2,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontWeight: '600',
+    fontFamily: FONT.POPPINS_BOLD,
   },
 });

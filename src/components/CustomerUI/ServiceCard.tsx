@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     textAlign: 'left',
-    fontWeight: '600',
     flexShrink: 1,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },

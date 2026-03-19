@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -29,7 +30,7 @@ const VerificationScreen = () => {
   const handleVerifyOtp = async () => {
     try {
       if (otp.length !== 6) {
-        alert('Please enter valid OTP');
+        Alert.alert('Please enter valid OTP');
         return;
       }
 
@@ -38,22 +39,12 @@ const VerificationScreen = () => {
         otp: otp,
       };
 
-      console.log('REQUEST BODY:', body);
-
-      console.log('PHONE:', phone);
-      console.log('OTP:', otp);
-
       const response = await ApiManager.verifyOtp(body);
-
-      console.log('Verify response', response.data);
 
       if (response.data.status === 'success') {
         const user = response.data.data;
-        console.log(
-          response.data.data,
-          'USerrrrrr from theee verification redux',
-        );
         const token = response.data.token;
+        console.log('12112', user);
 
         dispatch(setUser(user));
         dispatch(setUserToken(token));
@@ -65,19 +56,17 @@ const VerificationScreen = () => {
         }
       }
     } catch (error) {
-      const status = error.response?.status;
-      const serverMessage = error.response?.data?.message;
+      const status = error?.response?.status;
+      const serverMessage = error?.response?.data?.message;
 
-      console.log('STATUS:', status);
-      console.log('SERVER MESSAGE:', serverMessage);
       if (serverMessage === 'Invalid OTP') {
         setOtp('');
       }
 
       if (serverMessage) {
-        alert(serverMessage);
+        Alert.alert(serverMessage);
       } else {
-        alert('Something went wrong. Please try again.');
+        Alert.alert('Something went wrong. Please try again.');
       }
     }
   };
@@ -94,8 +83,9 @@ const VerificationScreen = () => {
         <Text style={styles.subtitle}>
           Enter the OTP sent to your mobile number
         </Text>
-
-        <OTPInput length={6} onChangeOTP={value => setOtp(value)} />
+        <View style={{ marginTop: 10 }}>
+          <OTPInput length={6} onChangeOTP={value => setOtp(value)} />
+        </View>
 
         <SecondaryButton title="Verify" onPress={handleVerifyOtp} />
         <View
@@ -138,10 +128,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTSIZE(3.2),
+    fontSize: 24,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_REGULAR,
-    fontWeight: '700',
+    fontFamily: FONT.POPPINS_BOLD,
     marginBottom: 5,
     textAlign: 'center',
   },
@@ -150,17 +139,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 40,
+    marginVertical: 10,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
   resendContainer: {
-    marginTop: 20,
+    marginTop: 10,
     alignItems: 'center',
   },
 
   resendText: {
     color: Colors.primary,
     fontSize: 16,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 });

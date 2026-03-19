@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
-import { FONTSIZE } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
-
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import Architect from '../../assets/svgs/Architect.svg';
-const ProfessionalWelcomeScreen = ({ navigation }) => {
+import { useNavigation } from '@react-navigation/native';
+
+const ProfessionalWelcomeScreen = () => {
+  const navigation = useNavigation();
+
   return (
     <ImageBackground
       source={require('../../assets/pngs/BGImg.png')}

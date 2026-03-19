@@ -16,6 +16,7 @@ import { clearUser } from '../../redux/slices/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -50,18 +51,23 @@ const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       {/* HEADER */}
-      <View style={styles.header}>
+      <LinearGradient
+        colors={['#53d78e', '#166850']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.header}
+      >
         <TouchableOpacity style={styles.backBtn}>
           {/* <Ionicons name="arrow-back" size={22} color="#fff" /> */}
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Settings</Text>
-      </View>
+      </LinearGradient>
 
       {/* PROFILE IMAGE */}
       <View style={styles.profileContainer}>
         <Image
-          // source={require('../../assets/pngs/profile.png')}
+          source={require('../../assets/pngs/BannerImg.png')}
           style={styles.profileImage}
         />
         <Text style={styles.name}>
@@ -70,7 +76,6 @@ const SettingsScreen = () => {
       </View>
 
       {/* SETTINGS LIST */}
-
       <View style={styles.listContainer}>
         {/* Profile */}
         <TouchableOpacity
@@ -177,8 +182,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    height: HEIGHT(22),
-    backgroundColor: '#2E8B6F',
+    height: HEIGHT(25),
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
     alignItems: 'center',

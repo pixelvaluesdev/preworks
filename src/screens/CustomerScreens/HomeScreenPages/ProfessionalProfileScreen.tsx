@@ -28,7 +28,7 @@ const portfolioImages = [
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  const { id } = route.params;
+  const { id } = route.params as { id: any };
 
   const navigation = useNavigation();
 
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: '#fff',
-    marginTop: -HEIGHT(7),
+    marginTop: HEIGHT(-2),
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
     paddingTop: HEIGHT(6),
@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
   },
 
   actionItem: {
+    width: WIDTH(30),
     alignItems: 'center',
     paddingHorizontal: 15,
     alignSelf: 'center',
@@ -192,8 +193,8 @@ const styles = StyleSheet.create({
 
   iconCircle: {
     backgroundColor: '#3BA56A',
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 28,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -201,7 +202,8 @@ const styles = StyleSheet.create({
   },
 
   actionText: {
-    fontSize: 14,
+    marginTop: 5,
+    fontSize: 12,
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 

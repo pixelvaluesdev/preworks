@@ -12,8 +12,9 @@ import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import { WIDTH, HEIGHT } from '../../../utils/responsive';
 import { FONT } from '../../../theme/fonts';
 import Colors from '../../../constants/colors';
+import LinearGradient from 'react-native-linear-gradient';
 
-const EditProfileScreen = () => {
+const EditProfileScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
@@ -24,35 +25,35 @@ const EditProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* HEADER */}
-        <View style={styles.header}>
-          <Image
-            // source={require('../../assets/pngs/profileBanner.png')}
-            style={styles.coverImage}
-          />
-
+        <LinearGradient
+          colors={['#53d78e', '#166850']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.header}
+        >
           <TouchableOpacity style={styles.backBtn}>
-            {/* <Ionicons name="arrow-back" size={22} color="#fff" /> */}
+            {/* Back Icon */}
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
 
         {/* PROFILE IMAGE */}
+        <View style={styles.profileWrapper}>
+          <View style={styles.profileSection}>
+            <Image
+              style={styles.profileImage}
+              source={require('../../../assets/pngs/BannerImg.png')}
+            />
 
-        <View style={styles.profileSection}>
-          <Image
-            // source={require('../../assets/pngs/profile.png')}
-            style={styles.profileImage}
-          />
-
-          <TouchableOpacity style={styles.cameraBtn}>
-            {/* <Ionicons name="camera" size={18} color="#fff" /> */}
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.cameraBtn}>
+              {/* Camera Icon */}
+            </TouchableOpacity>
+          </View>
         </View>
 
-        {/* FORM */}
-
-        <View style={styles.formContainer}>
+        {/* FORM CARD */}
+        <View style={styles.card}>
           <BorderTextInput label="Name" value={name} onChangeText={setName} />
 
           <BorderTextInput
@@ -67,8 +68,9 @@ const EditProfileScreen = () => {
             onChangeText={setEmail}
           />
 
+          {/* ROW */}
           <View style={styles.row}>
-            <View style={{ width: '48%' }}>
+            <View style={styles.col}>
               <BorderTextInput
                 label="City"
                 value={city}
@@ -76,7 +78,7 @@ const EditProfileScreen = () => {
               />
             </View>
 
-            <View style={{ width: '48%' }}>
+            <View style={styles.col}>
               <BorderTextInput
                 label="Pin code"
                 value={pin}
@@ -99,7 +101,6 @@ const EditProfileScreen = () => {
           />
 
           {/* SAVE BUTTON */}
-
           <TouchableOpacity style={styles.saveBtn}>
             <Text style={styles.saveText}>Save</Text>
           </TouchableOpacity>
@@ -114,48 +115,51 @@ export default EditProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
   },
 
   header: {
-    height: HEIGHT(22),
-  },
-
-  coverImage: {
-    width: '100%',
-    height: '100%',
+    height: HEIGHT(24),
   },
 
   backBtn: {
     position: 'absolute',
-    top: HEIGHT(5),
+    top: HEIGHT(6),
     left: WIDTH(5),
   },
 
-  profileSection: {
+  profileWrapper: {
     alignItems: 'center',
     marginTop: -60,
+  },
+
+  profileSection: {
+    position: 'relative',
   },
 
   profileImage: {
     width: 110,
     height: 110,
     borderRadius: 60,
-    borderWidth: 5,
+    borderWidth: 4,
     borderColor: '#fff',
   },
 
   cameraBtn: {
     position: 'absolute',
-    bottom: 0,
-    right: WIDTH(38),
+    bottom: 5,
+    right: -5,
     backgroundColor: Colors.primary,
     padding: 8,
     borderRadius: 20,
   },
 
-  formContainer: {
-    padding: WIDTH(6),
+  card: {
+    padding: WIDTH(5),
+    borderRadius: 14,
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 4,
   },
 
   row: {
@@ -163,12 +167,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
+  col: {
+    width: '48%',
+  },
+
   saveBtn: {
     backgroundColor: Colors.primary,
-    padding: 15,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 20,
   },
 
   saveText: {

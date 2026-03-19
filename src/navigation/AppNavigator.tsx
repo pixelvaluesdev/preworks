@@ -77,7 +77,7 @@ const AppNavigator = () => {
         />
         {/* Common Profile Screen for All user Type */}
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
         <Stack.Screen
           name="AddProjectInformation"
           component={AddProjectInformationScreen}

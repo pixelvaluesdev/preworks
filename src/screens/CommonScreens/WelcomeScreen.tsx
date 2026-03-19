@@ -5,7 +5,7 @@ import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import Customer from '../../assets/svgs/Customer.svg';
 import Professional from '../../assets/svgs/Professional.svg';
 import { useNavigation } from '@react-navigation/native';
-import { FONTSIZE, WIDTH } from '../../utils/responsive';
+import { WIDTH } from '../../utils/responsive';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { setUserType } from '../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
@@ -21,7 +21,7 @@ const WelcomeScreen = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Logo width={200} height={200} />
+        <Logo />
 
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Please Select Your User Type</Text>
@@ -66,10 +66,10 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 32,
-    fontWeight: '700',
     color: '#fff',
+    marginTop: 20,
     marginBottom: 10,
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 
   subtitle: {
@@ -77,8 +77,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     marginBottom: 40,
-    fontFamily: FONT.POPPINS_REGULAR,
-    fontWeight: '500',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   button: {

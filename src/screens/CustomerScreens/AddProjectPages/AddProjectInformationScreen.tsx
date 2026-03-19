@@ -7,91 +7,136 @@ import {
   ScrollView,
 } from 'react-native';
 
-import StepIndicator from 'react-native-step-indicator';
-
-import BorderTextInput from '../../../components/Inputs/BorderTextInput';
-import PrimaryButton from '../../../components/Buttons/PrimaryButton';
-
-import Colors from '../../../constants/colors';
+import CustomStepIndicator from '../../../components/CustomStepIndicator';
 import { FONT } from '../../../theme/fonts';
-import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
+import { HEIGHT, WIDTH } from '../../../utils/responsive';
+import ProjectInfo from './ProjectInfo';
+import PlotWorkDetails from './PlotWorkDetails';
+import ProjectTimeline from './ProjectTimeline';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
+import Projectfiles from './Projectfiles';
+import AppButton from '../../../components/Buttons/AppButton';
 
-const labels = ['', '', '', ''];
+const TOTAL_STEPS = 4;
 
 const AddProjectInformationScreen = ({ navigation }: any) => {
-  const [projectName, setProjectName] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [pinCode, setPinCode] = useState('');
+  const [step, setStep] = useState<number>(0);
 
-  const stepStyles = {
-    stepIndicatorSize: 20,
-    currentStepIndicatorSize: 22,
-    separatorStrokeWidth: 3,
-    currentStepStrokeWidth: 3,
-    stepStrokeCurrentColor: Colors.primary,
-    stepStrokeWidth: 3,
-    stepStrokeFinishedColor: Colors.primary,
-    stepStrokeUnFinishedColor: '#D3D3D3',
-    separatorFinishedColor: Colors.primary,
-    separatorUnFinishedColor: '#D3D3D3',
-    stepIndicatorFinishedColor: Colors.primary,
-    stepIndicatorUnFinishedColor: '#fff',
-    stepIndicatorCurrentColor: Colors.primary,
+  const [form, setForm] = useState({
+    projectName: '',
+    address: '',
+    city: '',
+    pinCode: '',
+    selectedType: '',
+    area: '',
+    floors: '',
+    quoteType: '',
+    startDate: '',
+    lastDate: '',
+    description: '',
+    budget: '',
+    siteImage: '',
+    archDrawing: '',
+  });
 
-    // FIX
-    stepIndicatorLabelFontSize: 1,
+  const handleChange = (key: string, value: string) => {
+    setForm(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const handleNext = () => {
+    if (step < TOTAL_STEPS - 1) {
+      setStep(prev => prev + 1);
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 0) {
+      navigation.goBack();
+    } else {
+      setStep(prev => prev - 1);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          {/* <Ionicons name="arrow-back" size={22} /> */}
-        </TouchableOpacity>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+            <Text>{'←'}</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Project Information</Text>
+          <Text style={styles.headerTitle}>
+            {step == 0 && 'Project Information'}
+            {step == 1 && 'Plot & Work Details'}
+            {step == 2 && 'Project Timeline & Scope'}
+            {step == 3 && 'Project File & Drawings'}
+          </Text>
+        </View>
+
+        <View style={styles.stepContainer}>
+          <CustomStepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
+        </View>
+
+        <View style={styles.content}>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.formContainer}
+          >
+            {step === 0 && (
+              <ProjectInfo data={form} handleChange={handleChange} />
+            )}
+
+            {step === 1 && (
+              <PlotWorkDetails data={form} handleChange={handleChange} />
+            )}
+
+            {step === 2 && (
+              <ProjectTimeline data={form} handleChange={handleChange} />
+            )}
+            {step === 3 && (
+              <Projectfiles data={form} handleChange={handleChange} />
+            )}
+          </ScrollView>
+
+          <View style={styles.buttonContainer}>
+            {step == 0 && (
+              <SecondaryButton
+                title={step === TOTAL_STEPS - 1 ? 'Submit' : 'Continue'}
+                style={{
+                  marginHorizontal: WIDTH(4),
+                  marginVertical: HEIGHT(2),
+                }}
+                onPress={handleNext}
+              />
+            )}
+
+            {step !== 0 && (
+              <View style={styles.row}>
+                <AppButton
+                  title="Back"
+                  type="outline"
+                  onPress={handleBack}
+                  style={{ flex: 1 }}
+                />
+
+                <AppButton
+                  title={step === TOTAL_STEPS - 1 ? 'Submit' : 'Continue'}
+                  onPress={handleNext}
+                  style={{ flex: 1 }}
+                />
+              </View>
+            )}
+          </View>
+        </View>
       </View>
-
-      {/* STEP INDICATOR */}
-      <View style={styles.stepContainer}>
-        <StepIndicator
-          customStyles={stepStyles}
-          currentPosition={0}
-          stepCount={4}
-          labels={labels}
-        />
-      </View>
-
-      <ScrollView contentContainerStyle={styles.formContainer}>
-        <BorderTextInput
-          label="Project Name"
-          value={projectName}
-          onChangeText={setProjectName}
-        />
-
-        <BorderTextInput
-          label="Full Plot Address"
-          value={address}
-          onChangeText={setAddress}
-        />
-
-        <BorderTextInput label="City" value={city} onChangeText={setCity} />
-
-        <BorderTextInput
-          label="PIN Code"
-          value={pinCode}
-          onChangeText={setPinCode}
-        />
-
-        <PrimaryButton
-          title="Continue"
-          onPress={() => {}}
-          style={styles.button}
-        />
-      </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -100,33 +145,52 @@ export default AddProjectInformationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: WIDTH(5),
     marginTop: 20,
   },
 
+  backBtn: {
+    position: 'absolute',
+    left: WIDTH(5),
+  },
+
   headerTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    marginLeft: 15,
   },
 
   stepContainer: {
-    marginTop: 20,
-    paddingHorizontal: WIDTH(8),
+    marginTop: 25,
+    paddingHorizontal: WIDTH(10),
+  },
+
+  content: {
+    flex: 1,
+    justifyContent: 'space-between', // ✅ key fix
   },
 
   formContainer: {
-    paddingHorizontal: WIDTH(6),
-    marginTop: 25,
+    paddingHorizontal: WIDTH(4),
+    marginTop: 30,
+    paddingBottom: 20,
+    gap: 18,
   },
 
-  button: {
-    marginTop: 40,
+  buttonContainer: {
+    paddingBottom: 20,
+  },
+
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+    marginHorizontal: WIDTH(4),
+    marginVertical: HEIGHT(2),
   },
 });

@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { FONT } from '../../theme/fonts';
-import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
+import { HEIGHT, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
@@ -36,20 +36,20 @@ const slides = [
 ];
 
 const OnboardingScreen = () => {
-  const flatListRef = useRef();
+  const flatListRef = useRef<FlatList<any>>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const navigation = useNavigation();
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
-      flatListRef.current.scrollToIndex({ index: currentIndex + 1 });
+      flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
       navigation.replace('Login');
     }
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: any) => (
     <View style={styles.slide}>
       <Image source={item.image} style={styles.image} resizeMode="contain" />
 
@@ -124,12 +124,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 400,
     alignSelf: 'center',
-    marginTop: 80,
+    marginTop: HEIGHT(10),
   },
 
   bottomSection: {
     position: 'absolute',
-    bottom: -30,
+    bottom: 0,
     height: HEIGHT(40),
     width: '100%',
   },
@@ -148,8 +148,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 20,
-    //fontWeight: '500',
+    fontSize: 24,
     color: '#fff',
     textAlign: 'center',
     fontFamily: FONT.POPPINS_MEDIUM,
@@ -184,7 +183,7 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '100%',
+    width: WIDTH(88),
     marginTop: 25,
   },
 
@@ -198,9 +197,8 @@ const styles = StyleSheet.create({
 
   skipText: {
     color: '#fff',
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_BOLD,
     fontSize: 18,
-    fontWeight: '600',
   },
 
   nextBtn: {
@@ -211,9 +209,8 @@ const styles = StyleSheet.create({
   },
 
   nextText: {
-    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontFamily: FONT.POPPINS_BOLD,
     fontSize: 18,
-    fontWeight: '600',
     color: '#3AA171',
   },
 });

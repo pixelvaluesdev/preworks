@@ -121,7 +121,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontWeight: '500',
   },
 
   message: {
