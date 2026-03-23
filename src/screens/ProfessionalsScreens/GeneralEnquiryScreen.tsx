@@ -23,7 +23,7 @@ import Popup from '../../components/Popup';
 const GeneralEnquiryScreen = () => {
   const [showPopup, setShowPopup] = useState(false);
 
-  const DetailRow = ({ label, value, icon }) => {
+  const DetailRow = ({ label, value, icon }: any) => {
     return (
       <View style={styles.detailRow}>
         <View style={{ flexDirection: 'row', gap: 10 }}>

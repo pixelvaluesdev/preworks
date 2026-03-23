@@ -120,6 +120,8 @@ const styles = StyleSheet.create({
 
   header: {
     height: HEIGHT(24),
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
 
   backBtn: {
@@ -157,9 +159,9 @@ const styles = StyleSheet.create({
   card: {
     padding: WIDTH(5),
     borderRadius: 14,
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 4,
+    // shadowOpacity: 0.05,
+    // shadowRadius: 10,
+    // elevation: 4,
   },
 
   row: {

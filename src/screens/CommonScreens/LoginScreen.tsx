@@ -26,7 +26,7 @@ const LoginScreen = () => {
 
   const showSnackbar = useSnackbar();
 
-  const userType = useSelector(state => state.auth.userType);
+  const userType = useSelector((state: any) => state.auth.userType);
 
   const handleGetOtp = async () => {
     const trimmedMobile = mobile.trim();
@@ -48,7 +48,7 @@ const LoginScreen = () => {
         showSnackbar(response.data.message, 'success');
         navigation.navigate('OtpVeri', { phone: trimmedMobile });
       }
-    } catch (error) {
+    } catch (error: any) {
       const serverMessage =
         error?.response?.data?.message || 'Something went wrong';
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';

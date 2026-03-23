@@ -113,12 +113,14 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: '#F4F6F8',
+    backgroundColor: '#F4F6F8',
   },
 
   header: {
     height: HEIGHT(24),
     backgroundColor: '#3BA56A',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
 
   coverImage: {
@@ -183,10 +185,10 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
     padding: WIDTH(5),
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 4,
+    // shadowColor: '#000',
+    // shadowOpacity: 0.05,
+    // shadowRadius: 10,
+    // elevation: 4,
   },
 
   row: {

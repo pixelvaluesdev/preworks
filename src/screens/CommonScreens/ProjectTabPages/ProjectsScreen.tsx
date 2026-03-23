@@ -7,8 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { FONTSIZE, HEIGHT, WIDTH } from '../../../utils/responsive';
+import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 import { useNavigation } from '@react-navigation/native';

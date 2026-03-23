@@ -73,16 +73,14 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontFamily: FONT.POPPINS_BOLD,
     fontSize: 16,
-    fontWeight: '600',
   },
 
   new: {
     color: '#0E77EF',
     fontSize: 16,
-    fontFamily: FONT.POPPINS_REGULAR,
-    fontWeight: '500',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   location: {

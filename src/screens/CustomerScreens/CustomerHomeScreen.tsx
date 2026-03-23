@@ -21,6 +21,7 @@ import { useEffect } from 'react';
 import ApiManager from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
+import { useBackExit } from '../../hooks/useBackExit';
 
 const professionals = [
   {
@@ -71,6 +72,9 @@ const CustomerHomeScreen = () => {
       console.log('Banner error', error);
     }
   };
+
+  useBackExit();
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Banner Section */}

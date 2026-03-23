@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
-  icon: {},
+
   disabled: {
     opacity: 0.5,
   },
