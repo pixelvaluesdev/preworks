@@ -61,7 +61,13 @@ const ProjectsScreen = ({ route }: any) => {
         }
       >
         <View style={styles.card}>
-          <Image source={item.image} style={styles.projectImage} />
+          <Image
+            source={item.image}
+            style={[
+              styles.projectImage,
+              item.status === 'Closed' && styles.closedImage,
+            ]}
+          />
 
           {isCustomer && (
             <TouchableOpacity
@@ -125,7 +131,7 @@ const ProjectsScreen = ({ route }: any) => {
 
       <CustomPopup
         visible={deletePopupVisible}
-        message="Are you sure you want to delete this project?"
+        message="Are you sure you want to delete the project?"
         onClose={() => setDeletePopupVisible(false)}
         buttons={[
           {
@@ -205,7 +211,8 @@ const styles = StyleSheet.create({
   },
 
   activeStatus: {
-    color: '#3BA56A',
+    color: '#0E77EF',
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   closedStatus: {
@@ -219,9 +226,13 @@ const styles = StyleSheet.create({
     width: 55,
     height: 55,
     borderRadius: 12,
-    backgroundColor: '#3BA56A',
+    backgroundColor: '#3AA171',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
+  },
+  closedImage: {
+    opacity: 0.5,
+    // tintColor: 'gray',
   },
 });

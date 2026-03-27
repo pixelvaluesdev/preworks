@@ -8,7 +8,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { HEIGHT, WIDTH } from '../../utils/responsive';
+import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
 import SearchHeader from '../../components/SearchHeader';
@@ -22,6 +22,7 @@ import ApiManager from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
 import { useBackExit } from '../../hooks/useBackExit';
+import LocationIcon from '../../assets/svgs/LocationIcon.svg';
 
 const professionals = [
   {
@@ -167,6 +168,7 @@ const CustomerHomeScreen = () => {
               <Text style={styles.proExp}>{item.exp}</Text>
 
               <View style={styles.locationRow}>
+                <LocationIcon height={14} width={14} />
                 <Text style={styles.proLocation}>{item.location}</Text>
               </View>
             </TouchableOpacity>
@@ -178,6 +180,7 @@ const CustomerHomeScreen = () => {
       <SecondaryButton
         title="Add Project Details"
         style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
+        textStyle={{ fontSize: 18 }}
         icon={<PlusIcon height={20} width={20} />}
         onPress={() => navigation.navigate('AddProjectInformation')}
       />
@@ -248,14 +251,14 @@ const styles = StyleSheet.create({
 
   bannerSmall: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '400',
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
   bannerTitle: {
     color: '#FFFFFF',
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: FONT.POPPINS_BOLD,
   },
 
@@ -292,7 +295,7 @@ const styles = StyleSheet.create({
   seeAll: {
     color: '#3BA56A',
     fontSize: 14,
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   proCard: {
@@ -301,7 +304,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 10,
     marginRight: 15,
-    marginTop: 15,
+    marginTop: 8,
     borderWidth: 0.5,
     borderColor: '#c7c7c7',
   },
@@ -326,11 +329,12 @@ const styles = StyleSheet.create({
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: -2,
   },
 
   proLocation: {
     fontSize: 12,
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   addButton: {

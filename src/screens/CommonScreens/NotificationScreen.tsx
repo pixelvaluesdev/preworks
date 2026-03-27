@@ -51,18 +51,26 @@ const NotificationScreen = () => {
 
   const renderItem = ({ item }: any) => {
     return (
-      <View style={styles.notificationCard}>
-        <View style={styles.row}>
-          <Text style={styles.title}>{item.title}</Text>
+      <>
+        <View
+          style={[
+            styles.notificationCard,
+            { backgroundColor: item.unread ? '#F3F3F3' : 'white' },
+          ]}
+        >
+          <View style={styles.row}>
+            <Text style={styles.title}>{item.title}</Text>
 
-          <View style={styles.timeRow}>
-            <Text style={styles.time}>{item.time}</Text>
-            {item.unread && <View style={styles.dot} />}
+            <View style={styles.timeRow}>
+              <Text style={styles.time}>{item.time}</Text>
+              {item.unread && <View style={styles.dot} />}
+            </View>
           </View>
-        </View>
 
-        <Text style={styles.message}>{item.message}</Text>
-      </View>
+          <Text style={styles.message}>{item.message}</Text>
+        </View>
+        <View style={styles.divider} />
+      </>
     );
   };
 
@@ -77,7 +85,7 @@ const NotificationScreen = () => {
         data={notifications}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        ItemSeparatorComponent={() => <View style={styles.divider} />}
+        // ItemSeparatorComponent={() => <View style={styles.divider} />}
         contentContainerStyle={{ paddingBottom: HEIGHT(5) }}
       />
     </View>
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: WIDTH(4),
-    paddingVertical: HEIGHT(2),
+    // paddingVertical: HEIGHT(2),
     backgroundColor: '#fff',
   },
 
@@ -107,20 +115,20 @@ const styles = StyleSheet.create({
   },
 
   notificationCard: {
-    backgroundColor: '#F2F2F2',
-    paddingHorizontal: WIDTH(4),
     paddingVertical: HEIGHT(1.8),
+    marginHorizontal: WIDTH(4),
   },
 
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginHorizontal: 10,
   },
 
   title: {
     fontSize: 16,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   message: {
@@ -129,10 +137,11 @@ const styles = StyleSheet.create({
     color: 'black',
     marginTop: 4,
     fontWeight: '400',
+    marginHorizontal: 10,
   },
 
   timeRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
   },
 
@@ -141,13 +150,17 @@ const styles = StyleSheet.create({
     color: 'grey',
     marginRight: 6,
     fontWeight: '400',
+    marginBottom: 6,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'green',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#22D73D',
+    alignSelf: 'flex-end',
+    marginRight: 6,
   },
 
   divider: {

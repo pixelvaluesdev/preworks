@@ -1,9 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FONT } from '../../../theme/fonts';
+import UploadIcon from '../../../assets/svgs/UploadIcon.svg';
+import { Switch } from 'react-native';
+import Colors from '../../../constants/colors';
 
 const Projectfile = ({ data, handleChange }: any) => {
   const hasDrawing = data?.hasDrawing ?? false;
+  const services = data?.services || [];
+
+  const toggleService = service => {
+    let updated = [...services];
+
+    if (updated.includes(service)) {
+      updated = updated.filter(item => item !== service);
+    } else {
+      updated.push(service);
+    }
+
+    handleChange('services', updated);
+  };
 
   return (
     <View style={styles.container}>
@@ -11,6 +27,7 @@ const Projectfile = ({ data, handleChange }: any) => {
         label="Upload Site image (Required)"
         value={data.siteImage}
         onPress={() => {}}
+        rightComponent={<UploadIcon />}
       />
 
       <View style={styles.questionContainer}>
@@ -46,7 +63,59 @@ const Projectfile = ({ data, handleChange }: any) => {
           label="Upload architectural drawing (Preferred PDF)"
           value={data.archDrawing}
           onPress={() => {}}
+          textStyle={{ fontSize: 10 }}
+          rightComponent={<UploadIcon />}
         />
+      )}
+      {!hasDrawing && (
+        <>
+          {/* SERVICES */}
+          <View>
+            <Text style={styles.questionText}>What services do you need?</Text>
+
+            {[
+              'Architectural Design',
+              'Plan Sanctioning',
+              'Structural Design',
+              'Construction',
+              'Interior Design',
+              'Renovation',
+            ].map((item, index) => {
+              const isSelected = services.includes(item);
+
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.checkboxRow}
+                  onPress={() => toggleService(item)}
+                >
+                  <View style={styles.checkbox}>
+                    {isSelected && <View style={styles.checkboxInner} />}
+                  </View>
+                  <Text style={styles.checkboxLabel}>{item}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* HIDE NUMBER */}
+          <View style={styles.toggleContainer}>
+            <Text style={styles.questionText}>
+              Do you want to hide your number?
+            </Text>
+            <Switch
+              value={data?.hideNumber || false}
+              onValueChange={val => handleChange('hideNumber', val)}
+              trackColor={{ false: '#ccc', true: Colors.primary }}
+              thumbColor="#fff"
+            />
+          </View>
+
+          <Text style={styles.note}>
+            Note : IF you choose to hide you will not receive any calls from
+            professional.
+          </Text>
+        </>
       )}
     </View>
   );
@@ -54,15 +123,28 @@ const Projectfile = ({ data, handleChange }: any) => {
 
 export default Projectfile;
 
-const UploadBox = ({ label, value, onPress }: any) => {
+const UploadBox = ({
+  label,
+  style,
+  value,
+  onPress,
+  rightComponent,
+  textStyle,
+}: any) => {
   return (
     <View style={styles.inputWrapper}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, textStyle]}>{label}</Text>
 
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
-        <Text style={{ color: value ? '#000' : '#a6a6a6' }}>
+        <Text
+          style={{
+            color: value ? '#000' : '#a6a6a6',
+            fontFamily: FONT.POPPINS_REGULAR,
+          }}
+        >
           {value || 'Browse image'}
         </Text>
+        {rightComponent && <View>{rightComponent}</View>}
       </TouchableOpacity>
     </View>
   );
@@ -71,6 +153,7 @@ const UploadBox = ({ label, value, onPress }: any) => {
 const styles = StyleSheet.create({
   container: {
     gap: 20,
+    paddingBottom: 50,
   },
 
   inputWrapper: {
@@ -107,7 +190,7 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 14,
     marginBottom: 10,
-    color: '#333',
+    color: '#757575',
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
@@ -127,7 +210,7 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 10,
     borderWidth: 1.5,
-    borderColor: '#999',
+    borderColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -136,12 +219,61 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#2DBE7F',
+    backgroundColor: Colors.primary,
   },
-
   radioLabel: {
     fontSize: 14,
     color: '#000',
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+
+  checkbox: {
+    width: 18,
+    height: 18,
+    borderWidth: 1.5,
+    borderColor: '#999',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff', // always white
+  },
+
+  checkboxInner: {
+    width: 10,
+    height: 10,
+    backgroundColor: Colors.primary,
+    borderRadius: 2,
+  },
+
+  checkboxLabel: {
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  toggleContainer: {
+    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  toggle: {
+    width: 40,
+    height: 22,
+    borderRadius: 20,
+    backgroundColor: '#ccc',
+  },
+
+  note: {
+    fontSize: 14,
+    color: '#757575',
+    marginTop: 10,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 });

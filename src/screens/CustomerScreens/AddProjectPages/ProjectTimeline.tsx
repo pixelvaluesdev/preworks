@@ -5,6 +5,8 @@ import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import Colors from '../../../constants/colors';
 import Slider from '@react-native-community/slider';
 import { FONT } from '../../../theme/fonts';
+import { HEIGHT } from '../../../utils/responsive';
+import CalenderIcon from '../../../assets/svgs/CalenderIcon.svg';
 
 const ProjectTimeline = ({ data, handleChange }: any) => {
   return (
@@ -16,6 +18,14 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
           placeholder="Enter your start date"
           value={data.startDate}
           onChangeText={text => handleChange('startDate', text)}
+          height={HEIGHT(7)}
+          rightComponent={
+            <>
+              <TouchableOpacity>
+                <CalenderIcon />
+              </TouchableOpacity>
+            </>
+          }
         />
       </TouchableOpacity>
 
@@ -26,6 +36,14 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
           placeholder="Enter your Last Date"
           value={data.lastDate}
           onChangeText={text => handleChange('lastDate', text)}
+          height={HEIGHT(7)}
+          rightComponent={
+            <>
+              <TouchableOpacity>
+                <CalenderIcon />
+              </TouchableOpacity>
+            </>
+          }
         />
       </TouchableOpacity>
 
@@ -36,7 +54,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         value={data.description}
         onChangeText={text => handleChange('description', text)}
         multiline
-        height={120}
+        height={HEIGHT(10)}
       />
 
       {/* PRICE RANGE */}

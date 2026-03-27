@@ -47,25 +47,22 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    justifyContent: 'center',
+    marginVertical: HEIGHT(14),
     alignItems: 'center',
-    paddingHorizontal: WIDTH(8),
+    paddingHorizontal: WIDTH(2),
   },
 
   message: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
     marginTop: HEIGHT(2),
     textAlign: 'center',
-    color: Colors.text,
   },
 
   subMessage: {
     fontSize: 16,
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_MEDIUM,
     textAlign: 'center',
-    marginTop: HEIGHT(1),
-    color: Colors.text,
   },
 
   button: {

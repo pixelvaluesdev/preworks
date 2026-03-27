@@ -13,6 +13,8 @@ import { WIDTH, HEIGHT } from '../../../utils/responsive';
 import { FONT } from '../../../theme/fonts';
 import Colors from '../../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
+import Camera from '../../../assets/svgs/CameraSvg.svg';
+import Back from '../../../assets/svgs/whiteBackIcon.svg';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
@@ -34,7 +36,10 @@ const EditProfileScreen = ({ navigation }: any) => {
           style={styles.header}
         >
           <TouchableOpacity style={styles.backBtn}>
-            {/* Back Icon */}
+            <Back />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.cameraCvrBtn}>
+            <Camera width={35} />
           </TouchableOpacity>
         </LinearGradient>
 
@@ -47,25 +52,32 @@ const EditProfileScreen = ({ navigation }: any) => {
             />
 
             <TouchableOpacity style={styles.cameraBtn}>
-              {/* Camera Icon */}
+              <Camera width={35} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* FORM CARD */}
         <View style={styles.card}>
-          <BorderTextInput label="Name" value={name} onChangeText={setName} />
+          <BorderTextInput
+            label="Name"
+            value={name}
+            onChangeText={setName}
+            placeholder="Enter your name"
+          />
 
           <BorderTextInput
             label="Mobile Number"
             value={mobile}
             onChangeText={setMobile}
+            placeholder="Enter your mobile number"
           />
 
           <BorderTextInput
             label="Email"
             value={email}
             onChangeText={setEmail}
+            placeholder="Enter your email"
           />
 
           {/* ROW */}
@@ -75,6 +87,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                 label="City"
                 value={city}
                 onChangeText={setCity}
+                placeholder="City"
               />
             </View>
 
@@ -83,6 +96,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                 label="Pin code"
                 value={pin}
                 onChangeText={setPin}
+                placeholder="Pincode"
               />
             </View>
           </View>
@@ -91,13 +105,15 @@ const EditProfileScreen = ({ navigation }: any) => {
             label="State"
             value={state}
             onChangeText={setState}
+            placeholder="Enter your State"
           />
 
           <BorderTextInput
             label="Address"
             value={address}
             onChangeText={setAddress}
-            multiline
+            //multiline
+            placeholder="Enter your Address"
           />
 
           {/* SAVE BUTTON */}
@@ -149,9 +165,9 @@ const styles = StyleSheet.create({
 
   cameraBtn: {
     position: 'absolute',
-    bottom: 5,
-    right: -5,
-    backgroundColor: Colors.primary,
+    bottom: -2,
+    right: -20,
+
     padding: 8,
     borderRadius: 20,
   },
@@ -175,7 +191,7 @@ const styles = StyleSheet.create({
 
   saveBtn: {
     backgroundColor: Colors.primary,
-    padding: 16,
+    padding: 10,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 20,
@@ -185,5 +201,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 16,
+  },
+  cameraCvrBtn: {
+    position: 'absolute',
+    top: 110,
+    right: 10,
+
+    padding: 8,
+    borderRadius: 20,
   },
 });

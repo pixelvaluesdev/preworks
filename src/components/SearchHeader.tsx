@@ -97,6 +97,10 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
+    justifyContent: 'center',
+    paddingVertical: 0,
+    includeFontPadding: false, // Android fix
+    textAlignVertical: 'center',
   },
 
   avatar: {

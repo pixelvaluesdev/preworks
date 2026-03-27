@@ -2,15 +2,28 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import BorderDropdown from '../../../components/Inputs/BorderDropdown';
+import { FONT } from '../../../theme/fonts';
+import { HEIGHT } from '../../../utils/responsive';
 
 const PlotWorkDetails = ({ data, handleChange }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.infoBox}>
-        <Text style={styles.infoText}>
-          For New Construction Select Plot Size.{'\n'}
-          For Renovation and Interior Work Select Floor Area.
-        </Text>
+        <View style={styles.row}>
+          <Text style={styles.infoText}>For New Construction Select </Text>
+          <TouchableOpacity>
+            <Text style={[styles.infoText, styles.linkText]}>Plot Size.</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.infoText}>
+            For Renovation and Interior Work Select{' '}
+          </Text>
+          <TouchableOpacity>
+            <Text style={[styles.infoText, styles.linkText]}>Floor Area.</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.toggleRow}>
@@ -24,7 +37,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
               data.selectedType === 'floor' && styles.radioActive,
             ]}
           />
-          <Text>Floor area</Text>
+          <Text style={styles.toggletext}>Floor area</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -37,15 +50,28 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
               data.selectedType === 'plot' && styles.radioActive,
             ]}
           />
-          <Text>Plot size</Text>
+          <Text style={styles.toggletext}>Plot size</Text>
         </TouchableOpacity>
       </View>
 
       <BorderTextInput
         label={data.selectedType === 'floor' ? 'Floor area' : 'Plot size'}
-        placeholder={`Enter your ${data.selectedType}`}
+        placeholder={`Enter your ${
+          data.selectedType === 'floor' ? 'Floor area' : 'Plot size'
+        }`}
         value={data.area}
         onChangeText={text => handleChange('area', text)}
+        height={HEIGHT(7)}
+        rightComponent={
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: FONT.POPPINS_REGULAR,
+            }}
+          >
+            sq.ft
+          </Text>
+        }
       />
 
       <BorderDropdown
@@ -84,8 +110,9 @@ const styles = StyleSheet.create({
   },
 
   infoText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#555',
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   toggleRow: {
@@ -111,5 +138,17 @@ const styles = StyleSheet.create({
   radioActive: {
     backgroundColor: '#2DBE7F',
     borderColor: '#2DBE7F',
+  },
+  toggletext: {
+    fontSize: 16,
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+  linkText: {
+    textDecorationLine: 'underline',
+  },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
   },
 });

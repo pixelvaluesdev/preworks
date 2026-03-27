@@ -119,10 +119,10 @@ const ProfessionalListScreen = () => {
               <View
                 style={{
                   backgroundColor: '#F0F0F0',
-                  borderBottomRightRadius: 10,
-                  borderBottomLeftRadius: 10,
+                  borderBottomRightRadius: 5,
+                  borderBottomLeftRadius: 5,
                   paddingHorizontal: 14,
-                  paddingVertical: 2,
+                  paddingVertical: 0,
                 }}
               >
                 <Text style={styles.name}>{item.name}</Text>
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     marginHorizontal: WIDTH(4),
     marginVertical: HEIGHT(1),
     backgroundColor: '#F2F2F2',
-    borderRadius: 25,
+    borderRadius: 5,
     paddingHorizontal: 15,
   },
 
@@ -181,17 +181,17 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: HEIGHT(2),
+    borderRadius: 5,
+    padding: 8,
+    marginBottom: HEIGHT(0.2),
     width: '50%',
   },
 
   image: {
     width: '100%',
     height: HEIGHT(18),
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
   },
 
   name: {

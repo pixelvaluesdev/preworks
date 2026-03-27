@@ -17,6 +17,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import BackIcon from '../../assets/svgs/whiteBackIcon.svg';
+import ProfileIcon from '../../assets/svgs/ProfileIcon.svg';
+import NotifiIcon from '../../assets/svgs/NotifiIcon.svg';
+import PrivacyIcon from '../../assets/svgs/PrivacyIcon.svg';
+import PolicyIcon from '../../assets/svgs/PolicyIcon.svg';
+import DeleteIcon from '../../assets/svgs/DeleteActIcon.svg';
+import Logoutcon from '../../assets/svgs/LogoutIcon.svg';
+import RightIcon from '../../assets/svgs/whiteBackIcon.svg';
+import ForwardIcon from '../../assets/svgs/ForwardArrow.svg';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -58,7 +67,7 @@ const SettingsScreen = () => {
         style={styles.header}
       >
         <TouchableOpacity style={styles.backBtn}>
-          {/* <Ionicons name="arrow-back" size={22} color="#fff" /> */}
+          <RightIcon />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Settings</Text>
@@ -83,17 +92,16 @@ const SettingsScreen = () => {
           onPress={() => navigation.navigate('ProfileScreen')}
         >
           <View style={styles.rowLeft}>
-            {/* <Ionicons name="person-outline" size={20} color="#3BA56A" /> */}
+            <ProfileIcon />
             <Text style={styles.rowText}>Profile</Text>
           </View>
-          {/* 
-          <Ionicons name="chevron-forward" size={20} color="#999" /> */}
+          <ForwardIcon />
         </TouchableOpacity>
 
         {/* Notification */}
         <View style={styles.row}>
           <View style={styles.rowLeft}>
-            {/* <Ionicons name="notifications-outline" size={20} color="#3BA56A" /> */}
+            <NotifiIcon />
             <Text style={styles.rowText}>Notification</Text>
           </View>
 
@@ -107,35 +115,31 @@ const SettingsScreen = () => {
         {/* Privacy */}
         <TouchableOpacity style={styles.row}>
           <View style={styles.rowLeft}>
-            {/* <Ionicons
-              name="shield-checkmark-outline"
-              size={20}
-              color="#3BA56A"
-            /> */}
+            <PrivacyIcon />
             <Text style={styles.rowText}>Privacy Policy</Text>
           </View>
 
-          {/* <Ionicons name="chevron-forward" size={20} color="#999" /> */}
+          <ForwardIcon />
         </TouchableOpacity>
 
         {/* Terms */}
         <TouchableOpacity style={styles.row}>
           <View style={styles.rowLeft}>
-            {/* <Ionicons name="document-text-outline" size={20} color="#3BA56A" /> */}
+            <PolicyIcon />
             <Text style={styles.rowText}>Terms & Condition</Text>
           </View>
 
-          {/* <Ionicons name="chevron-forward" size={20} color="#999" /> */}
+          <ForwardIcon />
         </TouchableOpacity>
 
         {/* Delete Account */}
         <TouchableOpacity style={styles.row}>
           <View style={styles.rowLeft}>
-            {/* <Ionicons name="trash-outline" size={20} color="#3BA56A" /> */}
+            <DeleteIcon />
             <Text style={styles.rowText}>Delete My Account</Text>
           </View>
 
-          {/* <Ionicons name="chevron-forward" size={20} color="#999" /> */}
+          <ForwardIcon />
         </TouchableOpacity>
 
         {/* Logout */}
@@ -143,7 +147,7 @@ const SettingsScreen = () => {
           style={styles.logoutRow}
           onPress={() => setShowLogout(true)}
         >
-          {/* <Ionicons name="log-out-outline" size={20} color="red" /> */}
+          <Logoutcon />
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -241,7 +245,7 @@ const styles = StyleSheet.create({
 
   rowText: {
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_REGULAR,
     color: '#333',
   },

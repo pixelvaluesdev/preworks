@@ -4,8 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 
 import ServiceCard from './ServiceCard';
 
-import ContractorIcon from '../../assets/svgs/Contractor.svg';
-import ArchitectIcon from '../../assets/svgs/Architect.svg';
+import ContractorIcon from '../../assets/svgs/ContractorIcon.svg';
+import ArchitectIcon from '../../assets/svgs/ArchitectIcon.svg';
+import InteriorIcon from '../../assets/svgs/InteriorIcon.svg';
+
 import { WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE } from '../../utils/responsive';
@@ -15,19 +17,19 @@ const services = [
     title: 'Contractor',
     Icon: ContractorIcon,
     type: 'contractor',
-    subtitle: 'Plan your Project',
-  },
-  {
-    title: 'Interior',
-    Icon: ArchitectIcon,
-    type: 'interior',
-    subtitle: 'Plan your Project',
+    subtitle: 'Hire Professional',
   },
   {
     title: 'Architect',
     Icon: ArchitectIcon,
     type: 'architect',
     subtitle: 'Plan your Project',
+  },
+  {
+    title: 'Interior Designer',
+    Icon: InteriorIcon,
+    type: 'interior',
+    subtitle: 'Design Your Space',
   },
 ];
 
@@ -68,6 +70,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    marginBottom: 10,
+    marginBottom: 2,
   },
 });

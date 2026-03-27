@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     color: '#000',
   },

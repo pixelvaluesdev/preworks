@@ -75,21 +75,21 @@ const ShortProfileScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/pngs/BGImg.png')}
+      source={require('../../assets/pngs/BGImg3.png')}
       style={styles.container}
       resizeMode="cover"
     >
       <View style={styles.overlay}>
         <CustomTextInput
           label="First Name"
-          placeholder="Enter First Name"
+          placeholder="First Name"
           value={firstName}
           onChangeText={setFirstName}
         />
 
         <CustomTextInput
           label="Last Name"
-          placeholder="Enter Last Name"
+          placeholder="Last Name"
           value={lastName}
           onChangeText={setLastName}
         />

@@ -9,8 +9,10 @@ import {
   Dimensions,
 } from 'react-native';
 import { FONT } from '../../theme/fonts';
-import { HEIGHT, WIDTH } from '../../utils/responsive';
+import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
+import BackIcon from '../../assets/svgs/LeftArrow.svg';
+import NextIcon from '../../assets/svgs/NextIcon.svg';
 
 const { width } = Dimensions.get('window');
 
@@ -25,7 +27,7 @@ const slides = [
     id: '2',
     image: require('../../assets/pngs/Walkthrough2.png'),
     title: 'Compare Transparent Quotes',
-    subtitle: 'View detailed contractor profile, pricing, and scope.',
+    subtitle: 'View Detailed contractor profile, pricing, and scope.',
   },
   {
     id: '3',
@@ -51,6 +53,13 @@ const OnboardingScreen = () => {
 
   const renderItem = ({ item }: any) => (
     <View style={styles.slide}>
+      <TouchableOpacity
+        style={styles.backBtn}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.7}
+      >
+        <BackIcon width={20} height={20} />
+      </TouchableOpacity>
       <Image source={item.image} style={styles.image} resizeMode="contain" />
 
       <View style={styles.bottomSection}>
@@ -85,9 +94,19 @@ const OnboardingScreen = () => {
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-              <Text style={styles.nextText}>
-                {currentIndex === 2 ? 'Start →' : 'Next →'}
-              </Text>
+              <View style={styles.nextContent}>
+                <Text style={styles.nextText}>
+                  {currentIndex === 2 ? 'Start' : 'Next'}
+                </Text>
+
+                <View style={{ justifyContent: 'center' }}>
+                  <NextIcon
+                    width={20}
+                    height={20}
+                    style={{ marginBottom: 3 }}
+                  />
+                </View>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -122,7 +141,7 @@ const styles = StyleSheet.create({
 
   image: {
     width: '100%',
-    height: 400,
+    height: HEIGHT(50),
     alignSelf: 'center',
     marginTop: HEIGHT(10),
   },
@@ -130,7 +149,7 @@ const styles = StyleSheet.create({
   bottomSection: {
     position: 'absolute',
     bottom: 0,
-    height: HEIGHT(40),
+    height: HEIGHT(42),
     width: '100%',
   },
 
@@ -148,14 +167,14 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 24,
+    fontSize: FONTSIZE(2.6),
     color: '#fff',
     textAlign: 'center',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   subtitle: {
-    fontSize: 16,
+    fontSize: FONTSIZE(2.2),
     color: '#fff',
     textAlign: 'center',
     marginTop: 10,
@@ -191,26 +210,44 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fff',
     paddingHorizontal: 30,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderRadius: 20,
   },
 
   skipText: {
     color: '#fff',
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 18,
   },
 
   nextBtn: {
     backgroundColor: '#fff',
-    paddingHorizontal: 30,
+    paddingHorizontal: 25,
     paddingVertical: 8,
     borderRadius: 20,
   },
 
   nextText: {
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 18,
     color: '#3AA171',
+  },
+  backBtn: {
+    position: 'absolute',
+    top: HEIGHT(4),
+    left: WIDTH(2),
+    height: 40,
+    width: 40,
+
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  nextContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    justifyContent: 'center',
   },
 });

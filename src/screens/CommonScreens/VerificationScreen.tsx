@@ -73,17 +73,17 @@ const VerificationScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/pngs/BGImg.png')}
+      source={require('../../assets/pngs/BGImg2.png')}
       style={styles.container}
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Text style={styles.title}>Verification</Text>
+        <Text style={styles.title}>Verification OTP</Text>
 
         <Text style={styles.subtitle}>
           Enter the OTP sent to your mobile number
         </Text>
-        <View style={{ marginTop: 10 }}>
+        <View style={{ marginTop: 5 }}>
           <OTPInput length={6} onChangeOTP={value => setOtp(value)} />
         </View>
 
@@ -101,7 +101,7 @@ const VerificationScreen = () => {
               fontSize: 16,
             }}
           >
-            Didn't recive the OTP?
+            Didn't receive the OTP?
           </Text>
         </View>
 
@@ -130,16 +130,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_BOLD,
-    marginBottom: 5,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    marginBottom: 4,
     textAlign: 'center',
   },
 
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginVertical: 10,
+    marginBottom: 6,
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
@@ -149,8 +149,8 @@ const styles = StyleSheet.create({
   },
 
   resendText: {
-    color: Colors.primary,
-    fontSize: 16,
-    fontFamily: FONT.POPPINS_BOLD,
+    color: '#3AA171',
+    fontSize: 18,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

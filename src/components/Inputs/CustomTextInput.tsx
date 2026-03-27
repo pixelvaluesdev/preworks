@@ -22,7 +22,7 @@ const CustomTextInput = ({
         <TextInput
           style={styles.input}
           placeholder={placeholder}
-          placeholderTextColor="#999"
+          placeholderTextColor="#757575"
           value={value}
           onChangeText={onChangeText}
           keyboardType={keyboardType}
@@ -42,29 +42,33 @@ const styles = StyleSheet.create({
 
   label: {
     color: '#FFFFFF',
-    marginBottom: 6,
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: 16,
+    fontSize: 14,
   },
 
   inputContainer: {
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 15,
     height: 55,
   },
 
   prefix: {
-    marginRight: 10,
-    color: '#333',
+    marginRight: 2,
+    color: '#757575',
     fontFamily: FONT.POPPINS_REGULAR,
+    justifyContent: 'center',
+    fontSize: 16,
   },
 
   input: {
     flex: 1,
     fontSize: 16,
     color: '#000',
+    paddingVertical: 0,
+    textAlignVertical: 'center',
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 });

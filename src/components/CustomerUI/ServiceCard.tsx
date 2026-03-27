@@ -15,7 +15,7 @@ const ServiceCard: React.FC<Props> = ({ title, Icon, subtitle, onPress }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
       <View style={styles.iconWrapper}>
-        <Icon width={40} height={40} />
+        <Icon width={60} height={60} />
       </View>
 
       <View style={styles.textcontainer}>
@@ -30,19 +30,19 @@ export default ServiceCard;
 
 const styles = StyleSheet.create({
   card: {
-    width: WIDTH(55),
-    height: HEIGHT(9),
+    //width: WIDTH(55),
+    //height: HEIGHT(9),
     backgroundColor: Colors.lightGreen,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    padding: 8,
     marginRight: 14,
   },
 
   iconWrapper: {
     backgroundColor: Colors.background,
-    padding: 8,
+
     borderRadius: 6,
     marginRight: 10,
   },

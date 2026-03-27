@@ -13,6 +13,8 @@ interface BorderTextInputProps {
   onChangeText: (text: string) => void;
   multiline?: boolean;
   height?: number;
+  containerStyle?: any;
+  rightComponent?: React.ReactNode;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -22,24 +24,45 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   placeholder,
   multiline = false,
   height,
+  containerStyle,
+  rightComponent,
 }) => {
   return (
-    <View style={styles.inputWrapper}>
+    <View style={[styles.inputWrapper, containerStyle]}>
       <Text style={styles.floatingLabel}>{label}</Text>
 
-      <TextInput
-        mode="outlined"
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#a6a6a6"
-        multiline={multiline}
-        numberOfLines={multiline ? 3 : 1}
-        outlineColor="#757575"
-        activeOutlineColor={Colors.primary}
-        style={[styles.input, multiline && { height: height || HEIGHT(10) }]}
-        outlineStyle={styles.outline}
-      />
+      <View style={[styles.inputWrapper, containerStyle]}>
+        <Text style={styles.floatingLabel}>{label}</Text>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            mode="outlined"
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+            placeholderTextColor="#a6a6a6"
+            multiline={multiline}
+            numberOfLines={multiline ? 3 : 1}
+            outlineColor="#757575"
+            activeOutlineColor={Colors.primary}
+            style={[
+              styles.input,
+              {
+                height: height || HEIGHT(6),
+                paddingRight: 50,
+                fontSize: 14,
+                fontFamily: FONT.POPPINS_REGULAR,
+              },
+            ]}
+            outlineStyle={styles.outline}
+          />
+
+          {/* RIGHT COMPONENT */}
+          {rightComponent && (
+            <View style={styles.rightComponent}>{rightComponent}</View>
+          )}
+        </View>
+      </View>
     </View>
   );
 };
@@ -55,7 +78,7 @@ const styles = StyleSheet.create({
   floatingLabel: {
     position: 'absolute',
     top: -8,
-    left: 14,
+    left: 16,
     backgroundColor: '#ffffff',
     paddingHorizontal: 10,
     fontSize: 14,
@@ -71,5 +94,17 @@ const styles = StyleSheet.create({
   outline: {
     borderRadius: 10,
     borderWidth: 0.75,
+  },
+  inputContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+
+  rightComponent: {
+    position: 'absolute',
+    right: 16,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

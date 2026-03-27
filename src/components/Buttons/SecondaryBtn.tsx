@@ -48,7 +48,7 @@ export default SecondaryButton;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.primary,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',

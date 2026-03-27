@@ -12,6 +12,13 @@ import { WIDTH, HEIGHT } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 import LinearGradient from 'react-native-linear-gradient';
+import MobileIcon from '../../../assets/svgs/PhoneIcon.svg';
+import City from '../../../assets/svgs/CityIcon.svg';
+import EmailIcon from '../../../assets/svgs/MailIcon.svg';
+import Pincode from '../../../assets/svgs/GreenLocation.svg';
+import Building from '../../../assets/svgs/BuildingIcon.svg';
+import Address from '../../../assets/svgs/AddressIcon.svg';
+import Back from '../../../assets/svgs/whiteBackIcon.svg';
 
 const ProfileScreen = ({ navigation }: any) => {
   return (
@@ -27,7 +34,7 @@ const ProfileScreen = ({ navigation }: any) => {
           <Image style={styles.coverImage} />
 
           <TouchableOpacity style={styles.backBtn}>
-            {/* <Ionicons name="arrow-back" size={22} color="#fff" /> */}
+            <Back />
           </TouchableOpacity>
         </LinearGradient>
 
@@ -54,53 +61,80 @@ const ProfileScreen = ({ navigation }: any) => {
         {/* DETAILS CARD */}
         <View style={styles.card}>
           <View style={styles.row}>
-            <View>
-              <Text style={styles.label}>Mobile Number</Text>
-              <Text style={styles.value}>+91 9595965161</Text>
+            <View style={styles.rowLeft}>
+              <MobileIcon />
+
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.label}>Mobile number</Text>
+                <Text style={styles.value}>+91 9595965161</Text>
+              </View>
             </View>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <View>
-              <Text style={styles.label}>Email</Text>
-              <Text style={styles.value}>Ron19@gmail.com</Text>
+            <View style={styles.rowLeft}>
+              <EmailIcon />
+
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.label}>Email</Text>
+                <Text style={styles.value}>ron@gmail.com</Text>
+              </View>
             </View>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.rowBetween}>
-            <View style={styles.col}>
-              <Text style={styles.label}>City</Text>
-              <Text style={styles.value}>Mumbai</Text>
+            <View style={styles.row}>
+              <View style={styles.rowLeft}>
+                <EmailIcon />
+
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.label}>City</Text>
+                  <Text style={styles.value}>Mumbai</Text>
+                </View>
+              </View>
             </View>
 
-            <View style={styles.col}>
-              <Text style={styles.label}>Pin Code</Text>
-              <Text style={styles.value}>400050</Text>
+            <View style={styles.row}>
+              <View style={styles.rowLeft}>
+                <Pincode />
+
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.label}>Pincode</Text>
+                  <Text style={styles.value}>440024</Text>
+                </View>
+              </View>
             </View>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <View>
-              <Text style={styles.label}>State</Text>
-              <Text style={styles.value}>Maharashtra</Text>
+            <View style={styles.rowLeft}>
+              <Building />
+
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.label}>State</Text>
+                <Text style={styles.value}>Maharashtra</Text>
+              </View>
             </View>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.row}>
-            <View>
-              <Text style={styles.label}>Address</Text>
-              <Text style={styles.value}>
-                302, Sea View Apartments, Bandra West, Mumbai - 400050
-              </Text>
+            <View style={styles.rowLeft}>
+              <Address />
+
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.label}>Address</Text>
+                <Text style={styles.value}>ueeu, wuewiu</Text>
+              </View>
             </View>
+            <View style={styles.divider} />
           </View>
         </View>
       </ScrollView>
@@ -156,17 +190,17 @@ const styles = StyleSheet.create({
   editBtn: {
     position: 'absolute',
     bottom: 0,
-    right: -10,
-    backgroundColor: '#3BA56A',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
+    right: -100,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 5,
   },
 
   editText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 12,
+    fontSize: 14,
   },
 
   name: {
@@ -178,8 +212,7 @@ const styles = StyleSheet.create({
 
   id: {
     fontSize: 14,
-    color: '#888',
-    marginTop: 2,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   card: {
@@ -197,19 +230,19 @@ const styles = StyleSheet.create({
 
   rowBetween: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: WIDTH(20),
   },
 
   label: {
     fontSize: 13,
-    color: '#888',
+
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
   value: {
-    fontSize: 16,
-    color: '#222',
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontSize: 15,
+    color: '#757575',
+    fontFamily: FONT.POPPINS_REGULAR,
     marginTop: 2,
   },
 
@@ -221,5 +254,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#c3c3c3',
     marginVertical: 12,
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

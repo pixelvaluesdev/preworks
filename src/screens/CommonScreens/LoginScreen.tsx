@@ -58,7 +58,7 @@ const LoginScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/pngs/BGImg.png')}
+      source={require('../../assets/pngs/BGImg2.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -70,7 +70,7 @@ const LoginScreen = () => {
 
         <CustomTextInput
           label="Mobile number"
-          prefix="+91"
+          prefix="+91-"
           placeholder="Mobile number"
           keyboardType="number-pad"
           value={mobile}
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 5,
     textAlign: 'center',
   },
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 8,
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: 16,
+    fontSize: 14,
   },
 
   inputContainer: {

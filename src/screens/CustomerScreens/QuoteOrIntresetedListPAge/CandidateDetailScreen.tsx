@@ -11,6 +11,8 @@ import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 import ScreenHeader from '../../../components/ScreenHeader';
+import CallIcon from '../../../assets/svgs/WhitePhone.svg';
+import Download from '../../../assets/svgs/DownloadIcon.svg';
 
 const CandidateDetailScreen = ({ route }: any) => {
   const { candidate } = route.params || {};
@@ -26,6 +28,7 @@ const CandidateDetailScreen = ({ route }: any) => {
           <Text style={styles.name}>{candidate?.name}</Text>
 
           <TouchableOpacity style={styles.callBtn}>
+            <CallIcon width={25} height={25} />
             <Text style={styles.callText}>Call</Text>
           </TouchableOpacity>
         </View>
@@ -61,6 +64,7 @@ const CandidateDetailScreen = ({ route }: any) => {
 
         <TouchableOpacity style={styles.fileBtn}>
           <Text style={styles.fileText}>Quotation.PDF</Text>
+          <Download />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.profileBtn}>
@@ -98,15 +102,17 @@ const styles = StyleSheet.create({
   },
 
   callBtn: {
-    backgroundColor: '#3BA56A',
-    paddingHorizontal: 25,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
+    flexDirection: 'row',
+    gap: 6,
   },
 
   callText: {
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 18,
+    fontSize: 16,
     color: '#fff',
   },
 
@@ -149,20 +155,23 @@ const styles = StyleSheet.create({
 
   fileBtn: {
     borderWidth: 1,
-    borderColor: '#3BA56A',
+    borderColor: Colors.primary,
     borderRadius: 8,
     padding: 12,
     marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   fileText: {
-    color: '#3BA56A',
+    color: Colors.primary,
     fontFamily: FONT.POPPINS_MEDIUM,
     fontSize: 16,
   },
 
   profileBtn: {
-    backgroundColor: '#3BA56A',
+    backgroundColor: Colors.primary,
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',

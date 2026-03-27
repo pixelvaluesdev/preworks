@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FONT } from '../../theme/fonts';
+import DownArrow from '../../assets/svgs/downArrow.svg';
 
 interface BorderDropdownProps {
   label: string;
@@ -27,7 +28,7 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
         <Text style={{ color: value ? '#000' : '#a6a6a6' }}>
           {value || 'Select'}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <DownArrow />
       </TouchableOpacity>
 
       {/* OPTIONS */}

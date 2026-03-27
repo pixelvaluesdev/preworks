@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import OTPTextInput from 'react-native-otp-textinput';
 import { WIDTH } from '../../utils/responsive';
 import Colors from '../../constants/colors';
+import { FONT } from '../../theme/fonts';
 
 interface OTPInputProps {
   length?: number;
@@ -24,7 +25,7 @@ const OTPInput: React.FC<OTPInputProps> = ({ length = 5, onChangeOTP }) => {
         containerStyle={styles.row}
         textInputStyle={styles.input}
         tintColor={Colors.primary}
-        offTintColor="#ccc"
+        offTintColor="transparent"
       />
     </View>
   );
@@ -45,12 +46,19 @@ const styles = StyleSheet.create({
   input: {
     width: WIDTH(11),
     height: WIDTH(12),
-    borderWidth: 1,
-    borderColor: '#ccc',
+    // borderWidth: 1,
+
     borderRadius: 8,
     textAlign: 'center',
     fontSize: 18,
     marginHorizontal: 6,
     backgroundColor: '#FFFFFF',
+    // fontFamily: FONT.POPPINS_REGULAR,
+    color: Colors.primary,
+    elevation: 0,
+    shadowColor: 'transparent',
+    padding: 0,
+    lineHeight: 20,
+    textAlignVertical: 'center',
   },
 });
