@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -63,42 +63,32 @@ const aa = [
 const ProfessionalHomeScreen = () => {
   const token = useSelector(state => state.auth.userToken);
 
-  const [banners, setBanners] = useState(aa);
+  const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTab, setSelectedTab] = useState('project');
 
-  // useEffect(() => {
-  //   fetchBanners();
-  // }, []);
+  useEffect(() => {
+    if (token) {
+      fetchBanners();
+    }
+  }, [token]);
 
   const fetchBanners = async () => {
     try {
-      const res = await ApiManager.getBanners(token);
-      if (res?.data?.status === 'success') {
-        setBanners(res.data.data);
+      const response = await ApiManager.getBanners(token);
+
+      if (response?.data?.status === 'success') {
+        setBanners(response.data.data);
       }
-    } catch (err) {
-      console.log('Banner error', err);
+    } catch (error) {
+      console.log('Banner error', error);
     }
   };
 
-  // ✅ memoized list data
   const listData = useMemo(() => {
     return selectedTab === 'project' ? projectList : enquiryList;
   }, [selectedTab]);
 
-  // ✅ banner render
-  const renderBanner = useCallback(({ item }) => {
-    return (
-      <Image
-        source={item.image}
-        style={styles.bannerImage}
-        resizeMode="cover"
-      />
-    );
-  }, []);
-
-  // ✅ project render
   const renderProject = useCallback(
     ({ item }) => {
       return (
@@ -125,25 +115,32 @@ const ProfessionalHomeScreen = () => {
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => item?._id || index.toString()}
-          renderItem={renderBanner}
+          keyExtractor={(item: any) => item._id}
           onMomentumScrollEnd={e => {
             const index = Math.round(
               e.nativeEvent.contentOffset.x / WIDTH(100),
             );
             setCurrentIndex(index);
           }}
+          renderItem={({ item }: any) => (
+            <>
+              <Image
+                source={{ uri: item?.image }}
+                style={styles.bannerImage}
+                resizeMode="cover"
+              />
+
+              <View style={styles.bannerTextContainer}>
+                <Text style={styles.bannerSmall}>Your Trusted</Text>
+                <Text style={styles.bannerTitle}>Construction</Text>
+                <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+              </View>
+            </>
+          )}
         />
 
-        {/* Search Header */}
+        {/* Search Bar (keep if already exists) */}
         <SearchHeader containerStyle={styles.searchHeader} />
-
-        {/* Banner Text */}
-        <View style={styles.bannerTextContainer}>
-          <Text style={styles.bannerSmall}>Your Trusted</Text>
-          <Text style={styles.bannerTitle}>Construction</Text>
-          <Text style={styles.bannerSmall}>Make Your Dream House</Text>
-        </View>
 
         {/* Dots */}
         <View style={styles.dotContainer}>
@@ -179,8 +176,9 @@ const styles = StyleSheet.create({
   },
 
   banner: {
-    height: 300,
+    height: 360,
     width: WIDTH(100),
+    position: 'relative',
   },
 
   bannerImage: {
@@ -190,20 +188,22 @@ const styles = StyleSheet.create({
 
   bannerTextContainer: {
     position: 'absolute',
-    top: 150,
+    top: 200,
     left: 20,
+    zIndex: 10,
   },
 
   bannerSmall: {
-    color: '#FFF',
-    fontSize: FONTSIZE(2),
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '400',
     fontFamily: FONT.POPPINS_REGULAR,
   },
 
   bannerTitle: {
-    color: '#FFF',
-    fontSize: 28,
-    fontFamily: FONT.POPPINS_MEDIUM,
+    color: '#FFFFFF',
+    fontSize: 26,
+    fontFamily: FONT.POPPINS_BOLD,
   },
 
   dotContainer: {

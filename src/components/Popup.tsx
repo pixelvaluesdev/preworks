@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
 import { FONTSIZE, HEIGHT } from '../utils/responsive';
 import SecondaryButton from './Buttons/SecondaryBtn';
 import BorderTextInput from './Inputs/BorderTextInput';
+import UploadIcon from '../assets/svgs/UploadIcon.svg';
 
 const Popup = ({ title, visible, onClose, showQuotation = true }) => {
   const [quotation, setQuotation] = useState('');
@@ -23,6 +24,12 @@ const Popup = ({ title, visible, onClose, showQuotation = true }) => {
               label="Quotation"
               value={quotation}
               onChangeText={setQuotation}
+              placeholder="Select"
+              rightComponent={
+                <TouchableOpacity>
+                  <UploadIcon />
+                </TouchableOpacity>
+              }
             />
           )}
 
@@ -32,6 +39,7 @@ const Popup = ({ title, visible, onClose, showQuotation = true }) => {
             value={message}
             onChangeText={setMessage}
             multiline
+            placeholder="Type here..."
           />
 
           <SecondaryButton
@@ -84,15 +92,6 @@ const styles = StyleSheet.create({
     color: '#333',
     zIndex: 1,
     fontFamily: FONT.POPPINS_MEDIUM,
-  },
-
-  input: {
-    backgroundColor: '#fff',
-  },
-
-  inputMessage: {
-    backgroundColor: '#fff',
-    height: HEIGHT(10),
   },
 
   outline: {

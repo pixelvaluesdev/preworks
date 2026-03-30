@@ -16,6 +16,7 @@ import Colors from '../../../constants/colors';
 import CallIcon from '../../../assets/svgs/Call.svg';
 import ChatIcon from '../../../assets/svgs/Chat.svg';
 import LinkIcon from '../../../assets/svgs/Links.svg';
+import Back from '../../../assets/svgs/whiteBackIcon.svg';
 
 const portfolioImages = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
@@ -28,7 +29,7 @@ const portfolioImages = [
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  const { id } = route.params as { id: any };
+  // const { id } = route.params as { id: any };
 
   const navigation = useNavigation();
 
@@ -50,6 +51,13 @@ const ProfessionalProfileScreen = () => {
             source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
             style={styles.profileImage}
           />
+
+          <TouchableOpacity
+            style={styles.editBtn}
+            onPress={() => navigation.navigate('EditProfileScreen')}
+          >
+            <Text style={styles.editText}>Edit</Text>
+          </TouchableOpacity>
 
           <Text style={styles.name}>Rajendra singh</Text>
           <Text style={styles.role}>Contractor</Text>
@@ -135,6 +143,9 @@ const styles = StyleSheet.create({
     paddingTop: HEIGHT(6),
     paddingHorizontal: WIDTH(5),
     alignItems: 'center',
+    paddingBottom: 10,
+    borderBottomRightRadius: 25,
+    borderBottomLeftRadius: 25,
   },
 
   profileImage: {
@@ -238,5 +249,20 @@ const styles = StyleSheet.create({
   gridItem: {
     width: '31%',
     marginBottom: 10,
+  },
+  editBtn: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+
+  editText: {
+    color: '#fff',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontSize: 14,
   },
 });

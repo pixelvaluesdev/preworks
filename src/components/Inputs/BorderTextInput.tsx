@@ -45,6 +45,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
             numberOfLines={multiline ? 3 : 1}
             outlineColor="#757575"
             activeOutlineColor={Colors.primary}
+            textColor="black"
             style={[
               styles.input,
               {
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
 
   input: {
     backgroundColor: '#fff',
+    color: 'black',
   },
 
   outline: {

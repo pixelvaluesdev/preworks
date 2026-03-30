@@ -33,7 +33,10 @@ const ProfileScreen = ({ navigation }: any) => {
         >
           <Image style={styles.coverImage} />
 
-          <TouchableOpacity style={styles.backBtn}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
             <Back />
           </TouchableOpacity>
         </LinearGradient>

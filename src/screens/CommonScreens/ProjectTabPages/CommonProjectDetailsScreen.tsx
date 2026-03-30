@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  ImageBackground,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -15,6 +16,19 @@ import { FONT } from '../../../theme/fonts';
 import QuoteIcon from '../../../assets/svgs/Quote.svg';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+import GreyMobile from '../../../assets/svgs/greyMobile.svg';
+import GreyAdress from '../../../assets/svgs/GreyAdress.svg';
+import Area from '../../../assets/svgs/GreyArea.svg';
+import Stairs from '../../../assets/svgs/GreyStairs.svg';
+import Construction from '../../../assets/svgs/GreyConstruction.svg';
+import Calender from '../../../assets/svgs/GreyCalender.svg';
+import Money from '../../../assets/svgs/GreyMoney.svg';
+import BorderTextInput from '../../../components/Inputs/BorderTextInput';
+import DownloadIcon from '../../../assets/svgs/DownloadIcon.svg';
+import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
+import Popup from '../../../components/Popup';
+import CallIcon from '../../../assets/svgs/Call.svg';
+import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 
 const images = [
   require('../../../assets/pngs/BannerImg.png'),
@@ -36,6 +50,8 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
   const navigation = useNavigation();
 
+  const [showPopup, setShowPopup] = useState(false);
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -44,10 +60,17 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       >
         {/* Banner Image */}
         <View>
-          <Image
+          <ImageBackground
             source={require('../../../assets/pngs/BannerImg.png')}
             style={styles.banner}
           />
+
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <BackArrow width={25} height={25} />
+          </TouchableOpacity>
 
           {/* Quote badge */}
           {isCustomer && (
@@ -76,57 +99,111 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
         {/* Details Card */}
         <View style={styles.detailsCard}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <View>
-              <Text style={styles.sectionTitle}>Mobile Number</Text>
-              <Text style={styles.valueText}>3438545685</Text>
-            </View>
+          <View>
+            <View style={styles.row}>
+              {/* LEFT SIDE */}
+              <View style={styles.rowLeft}>
+                <GreyMobile width={25} height={25} />
 
-            {isProfessional && (
-              <TouchableOpacity style={styles.callBtn}>
-                <Text style={styles.callText}>Call</Text>
-              </TouchableOpacity>
-            )}
+                <View style={{ marginLeft: 10, margin: 10 }}>
+                  <Text style={styles.sectionTitle}>Mobile Number</Text>
+                  <Text style={styles.valueText}>3438545685</Text>
+                </View>
+              </View>
+
+              {/* RIGHT SIDE */}
+              {!isCustomer && (
+                <TouchableOpacity style={styles.callBtn}>
+                  <CallIcon height={40} width={40} />
+                  <Text style={styles.callText}>Call</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={styles.dashedDivider} />
 
-          <Text style={styles.sectionTitle}>Full Plot Address</Text>
-          <Text style={styles.valueText}>Mumbai Maharashtra ,India</Text>
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <GreyAdress width={25} height={25} />
+
+              <View style={{ marginLeft: 10, margin: 10 }}>
+                <Text style={styles.sectionTitle}>Full Plot Address</Text>
+                <Text style={styles.valueText}>Mumbai Maharashtra, India</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.dashedDivider} />
 
           <View style={styles.projectDetailSection}>
             <Text style={styles.heading}>Project Detail</Text>
 
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Plot Area</Text>
+              {/* LEFT SIDE */}
+              <View style={styles.rowLeft}>
+                <Area width={25} height={25} />
+
+                <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
+                  Plot Size
+                </Text>
+              </View>
+
+              {/* RIGHT SIDE */}
               <Text style={styles.value}>2782.0 sq.ft</Text>
             </View>
 
             <View style={styles.dashedDivider} />
 
+            {/* No Of Floors */}
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>No Of Floors</Text>
+              <View style={styles.rowLeft}>
+                <Stairs width={25} height={25} />
+                <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
+                  No Of Floors
+                </Text>
+              </View>
+
               <Text style={styles.value}>1 Floor</Text>
             </View>
 
             <View style={styles.dashedDivider} />
 
+            {/* Quote Last Date */}
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Quote Last Date</Text>
+              <View style={styles.rowLeft}>
+                <Calender width={25} height={25} />
+                <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
+                  Quote Last Date
+                </Text>
+              </View>
+
               <Text style={styles.value}>12 Aug 2026</Text>
             </View>
 
             <View style={styles.dashedDivider} />
 
+            {/* Type Of Quote */}
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Type Of Quote</Text>
+              <View style={styles.rowLeft}>
+                <Construction width={25} height={25} />
+                <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
+                  Type Of Quote
+                </Text>
+              </View>
+
               <Text style={styles.value}>Labour Only</Text>
+            </View>
+            <View style={styles.dashedDivider} />
+            {/* Price Range */}
+            <View style={styles.rowBetween}>
+              <View style={styles.rowLeft}>
+                <Money width={25} height={25} />
+                <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
+                  Price Range
+                </Text>
+              </View>
+
+              <Text style={styles.value}>5-10 Lakh</Text>
             </View>
           </View>
 
@@ -150,15 +227,46 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               </View>
             )}
           />
+          {!isCustomer && (
+            <>
+              <View style={{ marginTop: 15 }}>
+                <BorderTextInput
+                  label="Architectural Drawing"
+                  placeholder="Architectural Drawing.PDF"
+                  // value={data.lastDate}
+                  // onChangeText={text => handleChange('lastDate', text)}
+                  height={HEIGHT(7)}
+                  rightComponent={
+                    <>
+                      <TouchableOpacity>
+                        <DownloadIcon />
+                      </TouchableOpacity>
+                    </>
+                  }
+                />
+
+                <SecondaryButton
+                  title="Send Your Quotation"
+                  onPress={() => setShowPopup(true)}
+                />
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
 
-      {/* Floating Edit Button */}
+      {/* Floating Edit Button for customers if there customers project */}
       {isCustomer && (
         <TouchableOpacity style={styles.floatingEditBtn}>
           <Text style={styles.editText}>Edit Your Project</Text>
         </TouchableOpacity>
       )}
+
+      <Popup
+        title="Send your Quotation"
+        visible={showPopup}
+        onClose={() => setShowPopup(false)}
+      />
     </View>
   );
 };
@@ -278,7 +386,13 @@ const styles = StyleSheet.create({
   rowBetween: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center', // important for vertical alignment
     paddingVertical: 10,
+  },
+
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   dashedDivider: {
@@ -317,7 +431,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F4F4F4',
     padding: 12,
     borderRadius: 10,
-    marginTop: 10,
+    marginBottom: 10,
   },
 
   fileIcon: {
@@ -336,7 +450,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 30,
-    backgroundColor: '#3BA56A',
+    backgroundColor: Colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 25,
     borderRadius: 12,
@@ -349,15 +463,44 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   callBtn: {
-    backgroundColor: '#3BA56A',
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
   callText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 14,
+    fontSize: 18,
+  },
+  rowWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // for call button
+    alignItems: 'center',
+  },
+
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: 'rgba(222, 221, 221, 0.88)',
+    padding: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -24,6 +24,7 @@ import CandidateDetailScreen from '../screens/CustomerScreens/QuoteOrIntresetedL
 import ProfileScreen from '../screens/CommonScreens/SettingsTabPages/ProfileScreen';
 import EditProfileScreen from '../screens/CommonScreens/SettingsTabPages/EditProfileScreen';
 import AddProjectInformationScreen from '../screens/CustomerScreens/AddProjectPages/AddProjectInformationScreen';
+import AppliedProjectsScreen from '../screens/ProfessionalsScreens/AppliedProjectsListScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -85,6 +86,10 @@ const AppNavigator = () => {
         <Stack.Screen
           name="ProfessionalsProject"
           component={ProfessionalsProjectDetails}
+        />
+        <Stack.Screen
+          name="AppliedProjects"
+          component={AppliedProjectsScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

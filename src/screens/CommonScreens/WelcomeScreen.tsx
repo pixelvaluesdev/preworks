@@ -39,7 +39,7 @@ const WelcomeScreen = () => {
           title="Professional"
           Icon={Professional}
           onPress={() => {
-            dispatch(setUserType('professional'));
+            // dispatch(setUserType('professional'));
             navigation.navigate('ProfWelc');
           }}
         />

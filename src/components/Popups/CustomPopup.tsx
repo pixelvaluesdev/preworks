@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
 
   primaryBtn: {
-    backgroundColor: '#3BA56A',
+    backgroundColor: Colors.primary,
   },
 
   buttonText: {

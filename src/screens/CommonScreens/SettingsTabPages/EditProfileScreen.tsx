@@ -35,7 +35,10 @@ const EditProfileScreen = ({ navigation }: any) => {
           end={{ x: 0, y: 1 }}
           style={styles.header}
         >
-          <TouchableOpacity style={styles.backBtn}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
             <Back />
           </TouchableOpacity>
           <TouchableOpacity style={styles.cameraCvrBtn}>

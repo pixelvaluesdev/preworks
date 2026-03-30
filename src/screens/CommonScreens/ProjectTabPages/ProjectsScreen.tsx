@@ -16,6 +16,7 @@ import PlusIcon from '../../../assets/svgs/PlusIcon.svg';
 import DeleteIcon from '../../../assets/svgs/Delete.svg';
 import ScreenHeader from '../../../components/ScreenHeader';
 import CustomPopup from '../../../components/Popups/CustomPopup';
+import { useSelector } from 'react-redux';
 
 const projects = [
   {
@@ -45,7 +46,7 @@ const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
 
   // coming from API
-  const userType = 'customer'; // 'professional'
+  const userType = useSelector((state: any) => state.auth.userType);
 
   const isCustomer = userType === 'customer';
 

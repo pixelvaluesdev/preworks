@@ -16,6 +16,7 @@ import { FONT } from '../../../theme/fonts';
 import Colors from '../../../constants/colors';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SearchHeader from '../../../components/SearchHeader';
+import Location from '../../../assets/svgs/LocationIcon.svg';
 
 const professionals = [
   {
@@ -127,7 +128,10 @@ const ProfessionalListScreen = () => {
               >
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.exp}>{item.exp}</Text>
-                <Text style={styles.location}>{item.location}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                  <Location width={16} height={16} />
+                  <Text style={styles.location}>{item.location}</Text>
+                </View>
               </View>
             </TouchableOpacity>
           )}

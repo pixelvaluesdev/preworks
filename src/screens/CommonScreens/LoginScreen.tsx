@@ -42,6 +42,8 @@ const LoginScreen = () => {
         userType: userType,
       };
 
+      console.log(body, 'In proffessional ligu');
+
       const response = await ApiManager.phoneSignin(body);
 
       if (response.data.status === 'success') {

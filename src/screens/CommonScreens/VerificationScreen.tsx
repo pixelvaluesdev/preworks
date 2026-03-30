@@ -18,6 +18,7 @@ import ApiManager from '../../apis/ApiManager';
 import { useRoute } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { setUser, setUserToken } from '../../redux/slices/authSlice';
+import { useSelector } from 'react-redux';
 
 const VerificationScreen = () => {
   const [otp, setOtp] = useState('');
@@ -26,10 +27,12 @@ const VerificationScreen = () => {
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const userType = useSelector((state: any) => state.auth.userType);
+  console.log(userType, 'user type from selector');
 
   const handleVerifyOtp = async () => {
     try {
-      if (otp.length !== 6) {
+      if (otp.length !== 5) {
         Alert.alert('Please enter valid OTP');
         return;
       }
@@ -44,19 +47,28 @@ const VerificationScreen = () => {
       if (response.data.status === 'success') {
         const user = response.data.data;
         const token = response.data.token;
-        console.log('12112', user);
 
         dispatch(setUser(user));
         dispatch(setUserToken(token));
 
-        if (!user.firstName) {
+        // ✅ FIRST CHECK PROFILE COMPLETION
+        if (!user.firstName || !user.lastName) {
           navigation.replace('ShortProfile');
+          return; // ❗ VERY IMPORTANT (stop here)
+        }
+
+        // ✅ THEN CHECK USER TYPE
+        if (
+          userType === 'contractor' ||
+          userType === 'architect' ||
+          userType === 'designer'
+        ) {
+          navigation.replace('ProfTabNav');
         } else {
           navigation.replace('CustmTabNav');
         }
       }
     } catch (error) {
-      const status = error?.response?.status;
       const serverMessage = error?.response?.data?.message;
 
       if (serverMessage === 'Invalid OTP') {
@@ -84,7 +96,7 @@ const VerificationScreen = () => {
           Enter the OTP sent to your mobile number
         </Text>
         <View style={{ marginTop: 5 }}>
-          <OTPInput length={6} onChangeOTP={value => setOtp(value)} />
+          <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
         </View>
 
         <SecondaryButton title="Verify" onPress={handleVerifyOtp} />

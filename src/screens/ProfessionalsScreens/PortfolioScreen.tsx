@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +10,7 @@ import AppButton from '../../components/Buttons/AppButton';
 
 import Colors from '../../constants/colors';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
+import UploadIcon from '../../assets/svgs/UploadIcon.svg';
 
 const PortfolioScreen = () => {
   const navigation = useNavigation();
@@ -55,21 +56,21 @@ const PortfolioScreen = () => {
           <>
             <BorderTextInput
               label="Project Name / Client Name"
-              placeholder="Please enter name"
+              placeholder="Enter your Project Name"
               value={form.projectName}
               onChangeText={text => handleChange('projectName', text)}
             />
 
             <BorderTextInput
               label="Site Address"
-              placeholder="Please enter site name"
+              placeholder="Enter address of site"
               value={form.siteName}
               onChangeText={text => handleChange('siteName', text)}
             />
 
             <BorderTextInput
               label="Budget"
-              placeholder="Please enter budget"
+              placeholder="Enter your Budget"
               value={form.budget}
               onChangeText={text => handleChange('budget', text)}
             />
@@ -81,6 +82,11 @@ const PortfolioScreen = () => {
               placeholder="Browse image"
               value={form.image}
               onChangeText={text => handleChange('image', text)}
+              rightComponent={
+                <TouchableOpacity>
+                  <UploadIcon />
+                </TouchableOpacity>
+              }
             />
 
             <Image

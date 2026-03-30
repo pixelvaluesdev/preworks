@@ -113,11 +113,11 @@ const GeneralEnquiryScreen = () => {
         style={styles.interestedBtn}
         onPress={() => setShowPopup(true)}
       >
-        <Text style={styles.interestedText}>Show Your Intrest</Text>
+        <Text style={styles.interestedText}>I'm Intrested</Text>
       </TouchableOpacity>
 
       <Popup
-        title={'I am Intrested'}
+        title={'Show Your Interest'}
         visible={showPopup}
         onClose={() => setShowPopup(false)}
         showQuotation={false}

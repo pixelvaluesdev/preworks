@@ -4,6 +4,7 @@ import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
+import Location from '../../assets/svgs/LocationIcon.svg';
 
 const ProjectCard = ({ title, location, image, selectedTab, item }) => {
   const navigation = useNavigation();
@@ -16,8 +17,10 @@ const ProjectCard = ({ title, location, image, selectedTab, item }) => {
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.new}>New</Text>
         </View>
-
-        <Text style={styles.location}>{location}</Text>
+        <View style={{ flexDirection: 'row', gap: 6 }}>
+          <Location width={18} height={18} />
+          <Text style={styles.location}>{location}</Text>
+        </View>
 
         {selectedTab == 'project' ? (
           <>
@@ -27,7 +30,7 @@ const ProjectCard = ({ title, location, image, selectedTab, item }) => {
                 navigation.navigate('CommonProjectDetails', { project: item })
               }
             >
-              <Text style={styles.buttonText}>View Details</Text>
+              <Text style={styles.buttonText}>View Full Details</Text>
             </TouchableOpacity>
           </>
         ) : (
@@ -36,7 +39,7 @@ const ProjectCard = ({ title, location, image, selectedTab, item }) => {
               style={styles.button}
               onPress={() => navigation.navigate('GeneralEnquiry')}
             >
-              <Text style={styles.buttonText}>View Full Enquiry</Text>
+              <Text style={styles.buttonText}>View Enquiry</Text>
             </TouchableOpacity>
           </>
         )}
@@ -80,7 +83,7 @@ const styles = StyleSheet.create({
   new: {
     color: '#0E77EF',
     fontSize: 16,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   location: {

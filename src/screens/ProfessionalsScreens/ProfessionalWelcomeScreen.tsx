@@ -4,9 +4,14 @@ import { FONT } from '../../theme/fonts';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import Architect from '../../assets/svgs/Architect.svg';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, UseDispatch } from 'react-redux';
+import { setUserType } from '../../redux/slices/authSlice';
+import Architect2 from '../../assets/svgs/Architect2 (2).svg';
+import Interior from '../../assets/svgs/Interior2.svg';
 
 const ProfessionalWelcomeScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   return (
     <ImageBackground
@@ -16,27 +21,33 @@ const ProfessionalWelcomeScreen = () => {
     >
       <View style={styles.overlay}>
         <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.subtitle}>
-          Please select your Professional Role.
-        </Text>
+        <Text style={styles.subtitle}>Please select a Professional Role.</Text>
 
         <PrimaryButton
           title="Contractor"
           Icon={Architect}
-          //   onPress={() => navigation.navigate('BuilderRegister')}
-          onPress={() => navigation.navigate('ProfTabNav')}
+          onPress={() => {
+            dispatch(setUserType('contractor'));
+            navigation.navigate('Login');
+          }}
         />
 
         <PrimaryButton
           title="Architect"
-          Icon={Architect}
-          //   onPress={() => navigation.navigate('ArchitectRegister')}
+          Icon={Architect2}
+          onPress={() => {
+            dispatch(setUserType('architect'));
+            navigation.navigate('Login');
+          }}
         />
 
         <PrimaryButton
           title="Interior Designer"
-          Icon={Architect}
-          //   onPress={() => navigation.navigate('DesignerRegister')}
+          Icon={Interior}
+          onPress={() => {
+            dispatch(setUserType('designer'));
+            navigation.navigate('Login');
+          }}
         />
       </View>
     </ImageBackground>

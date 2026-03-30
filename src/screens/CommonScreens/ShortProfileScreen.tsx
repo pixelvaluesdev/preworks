@@ -17,6 +17,8 @@ const ShortProfileScreen = () => {
 
   const user = useSelector(state => state.auth.user);
   const token = useSelector(state => state.auth.userToken);
+  const userType = useSelector((state: any) => state.auth.userType);
+  const isCustomer = userType === 'customer';
 
   const userId = user?._id;
 
@@ -50,7 +52,8 @@ const ShortProfileScreen = () => {
           [
             {
               text: 'OK',
-              onPress: () => navigation.replace('CustmTabNav'),
+              onPress: () =>
+                navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav'),
             },
           ],
         );

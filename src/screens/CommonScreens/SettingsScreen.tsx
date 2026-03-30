@@ -26,17 +26,23 @@ import DeleteIcon from '../../assets/svgs/DeleteActIcon.svg';
 import Logoutcon from '../../assets/svgs/LogoutIcon.svg';
 import RightIcon from '../../assets/svgs/whiteBackIcon.svg';
 import ForwardIcon from '../../assets/svgs/ForwardArrow.svg';
+import YesIcon from '../../assets/svgs/YesIcon.svg';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
   const fName = useSelector(state => state.auth.user?.firstName);
   const lName = useSelector(state => state.auth.user?.LastName);
+
+  const userType = useSelector((state: any) => state.auth.userType);
+  console.log('userType:', userType);
+  const isCustomer = userType === 'customer';
 
   const handleLogout = async () => {
     try {
@@ -89,7 +95,11 @@ const SettingsScreen = () => {
         {/* Profile */}
         <TouchableOpacity
           style={styles.row}
-          onPress={() => navigation.navigate('ProfileScreen')}
+          onPress={() =>
+            navigation.navigate(
+              isCustomer ? 'ProfileScreen' : 'ProfessionalProfile',
+            )
+          }
         >
           <View style={styles.rowLeft}>
             <ProfileIcon />
@@ -97,6 +107,20 @@ const SettingsScreen = () => {
           </View>
           <ForwardIcon />
         </TouchableOpacity>
+
+        {/* Applied Projects (only for professionals) */}
+        {!isCustomer && (
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => navigation.navigate('AppliedProjects')}
+          >
+            <View style={styles.rowLeft}>
+              <YesIcon />
+              <Text style={styles.rowText}>Applied Projects</Text>
+            </View>
+            <ForwardIcon />
+          </TouchableOpacity>
+        )}
 
         {/* Notification */}
         <View style={styles.row}>
@@ -133,7 +157,10 @@ const SettingsScreen = () => {
         </TouchableOpacity>
 
         {/* Delete Account */}
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() => setShowDeletePopup(true)}
+        >
           <View style={styles.rowLeft}>
             <DeleteIcon />
             <Text style={styles.rowText}>Delete My Account</Text>
@@ -170,6 +197,25 @@ const SettingsScreen = () => {
             onPress: () => {
               setShowLogout(false);
             },
+          },
+        ]}
+      />
+
+      <CustomPopup
+        visible={showDeletePopup}
+        message="Are you sure you want to delete your account?"
+        buttons={[
+          {
+            label: 'Delete',
+            type: 'primary',
+            onPress: () => {
+              console.log('Delete API call here');
+              setShowDeletePopup(false);
+            },
+          },
+          {
+            label: 'Cancel',
+            onPress: () => setShowDeletePopup(false),
           },
         ]}
       />
@@ -245,7 +291,7 @@ const styles = StyleSheet.create({
 
   rowText: {
     marginLeft: 10,
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: FONT.POPPINS_REGULAR,
     color: '#333',
   },

@@ -10,6 +10,11 @@ import SettingsIcon from '../assets/svgs/Settings.svg';
 import ProjectIcon from '../assets/svgs/Project.svg';
 import AddIcon from '../assets/svgs/AddIcon.svg';
 import Colors from '../constants/colors';
+import ActAdd from '../assets/svgs/ActAddIcon.svg';
+import ActProject from '../assets/svgs/ActProjectIcon.svg';
+import ActHome from '../assets/svgs/ActHomeIcon.svg';
+import ActNotifi from '../assets/svgs/ActNotifiIcon.svg';
+import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,7 +38,8 @@ const ProfessionalTabNavigator = () => {
         name="Home"
         component={ProfessionalHomeScreen}
         options={{
-          tabBarIcon: ({ color }) => <HomeIcon height={22} fill={color} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActHome height={22} /> : <HomeIcon height={22} />,
         }}
       />
 
@@ -41,7 +47,8 @@ const ProfessionalTabNavigator = () => {
         name="Projects"
         component={ProjectsScreen}
         options={{
-          tabBarIcon: ({ color }) => <ProjectIcon height={22} fill={color} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActProject /> : <ProjectIcon height={22} />,
         }}
       />
 
@@ -49,7 +56,8 @@ const ProfessionalTabNavigator = () => {
         name="Add Work"
         component={PortfolioScreen}
         options={{
-          tabBarIcon: ({ color }) => <AddIcon height={22} fill={color} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActAdd height={22} /> : <AddIcon height={22} />,
         }}
       />
 
@@ -57,9 +65,12 @@ const ProfessionalTabNavigator = () => {
         name="Notifications"
         component={NotificationScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <NotificationIcon height={22} fill={color} />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <ActNotifi height={22} />
+            ) : (
+              <NotificationIcon height={22} />
+            ),
         }}
       />
 
@@ -67,7 +78,8 @@ const ProfessionalTabNavigator = () => {
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarIcon: ({ color }) => <SettingsIcon height={22} fill={color} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActSetting height={22} /> : <SettingsIcon height={22} />,
         }}
       />
     </Tab.Navigator>

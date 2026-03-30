@@ -8,6 +8,12 @@ import SettingsIcon from '../assets/svgs/Settings.svg';
 import ProjectIcon from '../assets/svgs/Project.svg';
 import Colors from '../constants/colors';
 import ProjectsScreen from '../screens/CommonScreens/ProjectTabPages/ProjectsScreen';
+
+import ActProject from '../assets/svgs/ActProjectIcon.svg';
+import ActHome from '../assets/svgs/ActHomeIcon.svg';
+import ActNotifi from '../assets/svgs/ActNotifiIcon.svg';
+import ActSetting from '../assets/svgs/ActSettingIcon.svg';
+
 const Tab = createBottomTabNavigator();
 
 const CustomerTabNavigator = () => {
@@ -30,36 +36,36 @@ const CustomerTabNavigator = () => {
         name="Home"
         component={CustomerHomeScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <HomeIcon widht={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActHome height={22} /> : <HomeIcon height={22} />,
         }}
       />
       <Tab.Screen
         name="Projects"
         component={ProjectsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <ProjectIcon widht={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActProject /> : <ProjectIcon height={22} />,
         }}
       />
       <Tab.Screen
         name="Notifications"
         component={NotificationScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <NotificationIcon widht={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <ActNotifi height={22} />
+            ) : (
+              <NotificationIcon height={22} />
+            ),
         }}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarIcon: ({ color }) => (
-            <SettingsIcon widht={22} height={22} fill={color} />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? <ActSetting height={22} /> : <SettingsIcon height={22} />,
         }}
       />
     </Tab.Navigator>

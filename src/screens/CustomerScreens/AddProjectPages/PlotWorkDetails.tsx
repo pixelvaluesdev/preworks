@@ -82,6 +82,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
           'Ground + 1 Floor',
           'Ground + 2 Floor',
           'Ground + 3 Floor',
+          'Custom _______',
         ]}
         onSelect={val => handleChange('floors', val)}
       />
