@@ -207,6 +207,8 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
             </View>
           </View>
 
+          <View style={styles.dashedDivider} />
+
           {/* Scope */}
           <Text style={styles.scopeTitle}>Scope Of Work Description</Text>
           <Text style={styles.scopeText}>

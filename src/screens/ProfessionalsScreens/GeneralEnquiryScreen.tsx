@@ -61,22 +61,26 @@ const GeneralEnquiryScreen = () => {
       {/* Details */}
       <Text style={styles.sectionTitle}>Project Detail</Text>
 
-      <DetailRow icon={<AreaIcon />} label="Plot Area" value="2782.0 sq.ft" />
+      <DetailRow icon={<AreaIcon />} label="Plot Size" value="2782.0 sq.ft" />
+      <View style={styles.dashedDivider} />
       <DetailRow
         icon={<StairsIcon />}
         label="No Of Floors"
         value="Ground Floor & 1 Floor"
       />
+      <View style={styles.dashedDivider} />
       <DetailRow
         icon={<CalenderIcon />}
         label="Quote Last Date"
         value="09/08/2025"
       />
+      <View style={styles.dashedDivider} />
       <DetailRow
         icon={<ConstructionIcon />}
         label="Type Of Quote"
         value="Laboure Only"
       />
+      <View style={styles.dashedDivider} />
 
       {/* Call */}
       <View style={styles.callRow}>
@@ -107,6 +111,8 @@ const GeneralEnquiryScreen = () => {
           </View>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.dashedDivider} />
 
       {/* Interested Button */}
       <TouchableOpacity
@@ -186,8 +192,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginHorizontal: WIDTH(4),
     marginTop: 14,
-    borderBottomWidth: 0.5,
-    borderColor: '#DDD',
     paddingBottom: 8,
     marginBottom: 8,
   },
@@ -243,5 +247,12 @@ const styles = StyleSheet.create({
   interestedText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_MEDIUM,
+  },
+  dashedDivider: {
+    borderBottomWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#ccc',
+    marginHorizontal: 10,
+    marginTop: 2,
   },
 });

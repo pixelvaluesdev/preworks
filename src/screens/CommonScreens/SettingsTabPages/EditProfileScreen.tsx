@@ -73,7 +73,7 @@ const EditProfileScreen = ({ navigation }: any) => {
             label="Mobile Number"
             value={mobile}
             onChangeText={setMobile}
-            placeholder="Enter your mobile number"
+            placeholder="+91- Enter your mobile number"
           />
 
           <BorderTextInput

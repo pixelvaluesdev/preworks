@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Switch,
+  ScrollView,
 } from 'react-native';
 
 import { WIDTH, HEIGHT } from '../../utils/responsive';
@@ -65,160 +66,165 @@ const SettingsScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* HEADER */}
-      <LinearGradient
-        colors={['#53d78e', '#166850']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.header}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: HEIGHT(10) }} // 👈 IMPORTANT
       >
-        <TouchableOpacity style={styles.backBtn}>
-          <RightIcon />
-        </TouchableOpacity>
-
-        <Text style={styles.headerTitle}>Settings</Text>
-      </LinearGradient>
-
-      {/* PROFILE IMAGE */}
-      <View style={styles.profileContainer}>
-        <Image
-          source={require('../../assets/pngs/BannerImg.png')}
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>
-          {fName} {lName}
-        </Text>
-      </View>
-
-      {/* SETTINGS LIST */}
-      <View style={styles.listContainer}>
-        {/* Profile */}
-        <TouchableOpacity
-          style={styles.row}
-          onPress={() =>
-            navigation.navigate(
-              isCustomer ? 'ProfileScreen' : 'ProfessionalProfile',
-            )
-          }
+        {/* HEADER */}
+        <LinearGradient
+          colors={['#53d78e', '#166850']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.header}
         >
-          <View style={styles.rowLeft}>
-            <ProfileIcon />
-            <Text style={styles.rowText}>Profile</Text>
-          </View>
-          <ForwardIcon />
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.backBtn}>
+            <RightIcon />
+          </TouchableOpacity>
 
-        {/* Applied Projects (only for professionals) */}
-        {!isCustomer && (
+          <Text style={styles.headerTitle}>Settings</Text>
+        </LinearGradient>
+
+        {/* PROFILE IMAGE */}
+        <View style={styles.profileContainer}>
+          <Image
+            source={require('../../assets/pngs/BannerImg.png')}
+            style={styles.profileImage}
+          />
+          <Text style={styles.name}>
+            {fName} {lName}
+          </Text>
+        </View>
+
+        {/* SETTINGS LIST */}
+        <View style={styles.listContainer}>
+          {/* Profile */}
           <TouchableOpacity
             style={styles.row}
-            onPress={() => navigation.navigate('AppliedProjects')}
+            onPress={() =>
+              navigation.navigate(
+                isCustomer ? 'ProfileScreen' : 'ProfessionalProfile',
+              )
+            }
           >
             <View style={styles.rowLeft}>
-              <YesIcon />
-              <Text style={styles.rowText}>Applied Projects</Text>
+              <ProfileIcon />
+              <Text style={styles.rowText}>Profile</Text>
             </View>
             <ForwardIcon />
           </TouchableOpacity>
-        )}
 
-        {/* Notification */}
-        <View style={styles.row}>
-          <View style={styles.rowLeft}>
-            <NotifiIcon />
-            <Text style={styles.rowText}>Notification</Text>
+          {/* Applied Projects (only for professionals) */}
+          {!isCustomer && (
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => navigation.navigate('AppliedProjects')}
+            >
+              <View style={styles.rowLeft}>
+                <YesIcon />
+                <Text style={styles.rowText}>Applied Projects</Text>
+              </View>
+              <ForwardIcon />
+            </TouchableOpacity>
+          )}
+
+          {/* Notification */}
+          <View style={styles.row}>
+            <View style={styles.rowLeft}>
+              <NotifiIcon />
+              <Text style={styles.rowText}>Notification</Text>
+            </View>
+
+            <Switch
+              value={notificationEnabled}
+              onValueChange={setNotificationEnabled}
+              trackColor={{ false: '#ccc', true: '#3BA56A' }}
+            />
           </View>
 
-          <Switch
-            value={notificationEnabled}
-            onValueChange={setNotificationEnabled}
-            trackColor={{ false: '#ccc', true: '#3BA56A' }}
-          />
+          {/* Privacy */}
+          <TouchableOpacity style={styles.row}>
+            <View style={styles.rowLeft}>
+              <PrivacyIcon />
+              <Text style={styles.rowText}>Privacy Policy</Text>
+            </View>
+
+            <ForwardIcon />
+          </TouchableOpacity>
+
+          {/* Terms */}
+          <TouchableOpacity style={styles.row}>
+            <View style={styles.rowLeft}>
+              <PolicyIcon />
+              <Text style={styles.rowText}>Terms & Condition</Text>
+            </View>
+
+            <ForwardIcon />
+          </TouchableOpacity>
+
+          {/* Delete Account */}
+          <TouchableOpacity
+            style={styles.row}
+            onPress={() => setShowDeletePopup(true)}
+          >
+            <View style={styles.rowLeft}>
+              <DeleteIcon />
+              <Text style={styles.rowText}>Delete My Account</Text>
+            </View>
+
+            <ForwardIcon />
+          </TouchableOpacity>
+
+          {/* Logout */}
+          <TouchableOpacity
+            style={styles.logoutRow}
+            onPress={() => setShowLogout(true)}
+          >
+            <Logoutcon />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Privacy */}
-        <TouchableOpacity style={styles.row}>
-          <View style={styles.rowLeft}>
-            <PrivacyIcon />
-            <Text style={styles.rowText}>Privacy Policy</Text>
-          </View>
-
-          <ForwardIcon />
-        </TouchableOpacity>
-
-        {/* Terms */}
-        <TouchableOpacity style={styles.row}>
-          <View style={styles.rowLeft}>
-            <PolicyIcon />
-            <Text style={styles.rowText}>Terms & Condition</Text>
-          </View>
-
-          <ForwardIcon />
-        </TouchableOpacity>
-
-        {/* Delete Account */}
-        <TouchableOpacity
-          style={styles.row}
-          onPress={() => setShowDeletePopup(true)}
-        >
-          <View style={styles.rowLeft}>
-            <DeleteIcon />
-            <Text style={styles.rowText}>Delete My Account</Text>
-          </View>
-
-          <ForwardIcon />
-        </TouchableOpacity>
-
-        {/* Logout */}
-        <TouchableOpacity
-          style={styles.logoutRow}
-          onPress={() => setShowLogout(true)}
-        >
-          <Logoutcon />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-
-      <CustomPopup
-        visible={showLogout}
-        message="Are you sure you want to Logout?"
-        buttons={[
-          {
-            label: 'Logout',
-            type: 'primary',
-            onPress: () => {
-              handleLogout();
-              setShowLogout(false);
+        <CustomPopup
+          visible={showLogout}
+          message="Are you sure you want to Logout?"
+          buttons={[
+            {
+              label: 'Logout',
+              type: 'primary',
+              onPress: () => {
+                handleLogout();
+                setShowLogout(false);
+              },
             },
-          },
-          {
-            label: 'Cancel',
+            {
+              label: 'Cancel',
 
-            onPress: () => {
-              setShowLogout(false);
+              onPress: () => {
+                setShowLogout(false);
+              },
             },
-          },
-        ]}
-      />
+          ]}
+        />
 
-      <CustomPopup
-        visible={showDeletePopup}
-        message="Are you sure you want to delete your account?"
-        buttons={[
-          {
-            label: 'Delete',
-            type: 'primary',
-            onPress: () => {
-              console.log('Delete API call here');
-              setShowDeletePopup(false);
+        <CustomPopup
+          visible={showDeletePopup}
+          message="Are you sure you want to delete your account?"
+          buttons={[
+            {
+              label: 'Delete',
+              type: 'primary',
+              onPress: () => {
+                console.log('Delete API call here');
+                setShowDeletePopup(false);
+              },
             },
-          },
-          {
-            label: 'Cancel',
-            onPress: () => setShowDeletePopup(false),
-          },
-        ]}
-      />
+            {
+              label: 'Cancel',
+              onPress: () => setShowDeletePopup(false),
+            },
+          ]}
+        />
+      </ScrollView>
     </View>
   );
 };

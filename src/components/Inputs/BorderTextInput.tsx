@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
@@ -27,6 +27,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   containerStyle,
   rightComponent,
 }) => {
+  const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   return (
     <View style={[styles.inputWrapper, containerStyle]}>
       <Text style={styles.floatingLabel}>{label}</Text>
@@ -46,13 +47,21 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
             outlineColor="#757575"
             activeOutlineColor={Colors.primary}
             textColor="black"
+            onContentSizeChange={e => {
+              if (multiline) {
+                setInputHeight(e.nativeEvent.contentSize.height);
+              }
+            }}
             style={[
               styles.input,
               {
-                height: height || HEIGHT(6),
+                height: multiline
+                  ? Math.max(HEIGHT(6), inputHeight)
+                  : HEIGHT(6),
                 paddingRight: 50,
                 fontSize: 14,
                 fontFamily: FONT.POPPINS_REGULAR,
+                textAlignVertical: multiline ? 'top' : 'center',
               },
             ]}
             outlineStyle={styles.outline}

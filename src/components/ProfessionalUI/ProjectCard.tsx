@@ -39,7 +39,7 @@ const ProjectCard = ({ title, location, image, selectedTab, item }) => {
               style={styles.button}
               onPress={() => navigation.navigate('GeneralEnquiry')}
             >
-              <Text style={styles.buttonText}>View Enquiry</Text>
+              <Text style={styles.buttonText}>View Full Enquiry</Text>
             </TouchableOpacity>
           </>
         )}
