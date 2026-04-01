@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const BASE_URL = 'https://preworksdemo.reviewdevelopment.net/api/v1';
-// export const IMG_URL = 'https://disaster.pixelplanet.in/';
+export const IMG_URL = 'https://preworksdemo.reviewdevelopment.net/';
 
 const getHeader = (isFormData = false) => ({
   'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
@@ -59,6 +59,7 @@ const requestPath = {
   shortProfile: '/auth/short-Profile',
   banners: '/customer/banners',
   professionalList: '/customer/prof-list',
+  projectList: '/customer/project-list',
 };
 
 const ApiManager = {
@@ -75,6 +76,10 @@ const ApiManager = {
     return requests.put(`${requestPath.shortProfile}/${id}`, params, token);
   },
   resendOtp: params => requests.post(requestPath.resendOtp, params),
+
+  getProjects: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.projectList}/${userId}`, token);
+  },
 };
 
 export default ApiManager;

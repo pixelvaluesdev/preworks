@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -17,43 +18,64 @@ import DeleteIcon from '../../../assets/svgs/Delete.svg';
 import ScreenHeader from '../../../components/ScreenHeader';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { useSelector } from 'react-redux';
-
-const projects = [
-  {
-    id: '1',
-    name: 'ABC complex',
-    code: '#C82922787',
-    status: 'Active',
-    image: require('../../../assets/pngs/BannerImg.png'),
-  },
-  {
-    id: '2',
-    name: 'ABC complex',
-    code: '#C82922787',
-    status: 'Active',
-    image: require('../../../assets/pngs/BannerImg.png'),
-  },
-  {
-    id: '3',
-    name: 'My house',
-    code: '#C82956787',
-    status: 'Closed',
-    image: require('../../../assets/pngs/BannerImg.png'),
-  },
-];
+import ApiManager from '../../../apis/ApiManager';
+import { BASE_URL, IMG_URL } from '../../../apis/ApiManager';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
 
-  // coming from API
   const userType = useSelector((state: any) => state.auth.userType);
+  const token = useSelector((state: any) => state.auth.userToken);
+  const user = useSelector((state: any) => state.auth.user);
+  const userId = user?._id;
 
   const isCustomer = userType === 'customer';
 
   const [deletePopupVisible, setDeletePopupVisible] = React.useState(false);
   const [selectedProject, setSelectedProject] = React.useState(null);
+  const [projects, setProjects] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (userId) {
+      fetchProjects();
+    }
+  }, [userId]);
+
+  React.useEffect(() => {
+    if (!loading && userId) {
+      if (projects.length === 0) {
+        navigation.navigate('NoProjects');
+      }
+    }
+  }, [loading]);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getProjects(userId, token);
+
+      console.log('API RESPONSE 👉', res?.data);
+
+      if (res?.data?.status === 'success') {
+        setProjects(res?.data?.data || []);
+      }
+    } catch (error) {
+      console.log('API ERROR 👉', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderItem = ({ item }: any) => {
+    const imageUrl =
+      item?.image?.length > 0
+        ? { uri: `${IMG_URL}/${item.image[0]}` }
+        : require('../../../assets/pngs/DummyImg.png');
+
+    const statusText = item.status ? 'Active' : 'Closed';
+
     return (
       <TouchableOpacity
         activeOpacity={0.8}
@@ -63,11 +85,8 @@ const ProjectsScreen = ({ route }: any) => {
       >
         <View style={styles.card}>
           <Image
-            source={item.image}
-            style={[
-              styles.projectImage,
-              item.status === 'Closed' && styles.closedImage,
-            ]}
+            source={imageUrl}
+            style={[styles.projectImage, !item.status && styles.closedImage]}
           />
 
           {isCustomer && (
@@ -84,20 +103,19 @@ const ProjectsScreen = ({ route }: any) => {
 
           <View style={styles.rowBetween}>
             <View>
-              <Text style={styles.projectName}>{item.name}</Text>
-              <Text style={styles.projectCode}>{item.code}</Text>
+              <Text style={styles.projectName}>{item.projectName}</Text>
+
+              <Text style={styles.projectCode}>#{item._id}</Text>
             </View>
 
             {isCustomer && (
               <Text
                 style={[
                   styles.status,
-                  item.status === 'Closed'
-                    ? styles.closedStatus
-                    : styles.activeStatus,
+                  item.status ? styles.activeStatus : styles.closedStatus,
                 ]}
               >
-                {item.status}
+                {statusText}
               </Text>
             )}
           </View>
@@ -106,12 +124,20 @@ const ProjectsScreen = ({ route }: any) => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScreenHeader title="Projects" showBack />
       <FlatList
         data={projects}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
         renderItem={renderItem}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
@@ -235,5 +261,10 @@ const styles = StyleSheet.create({
   closedImage: {
     opacity: 0.5,
     // tintColor: 'gray',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

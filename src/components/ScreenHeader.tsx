@@ -6,13 +6,21 @@ import { FONT } from '../theme/fonts';
 import { FONTSIZE, WIDTH, HEIGHT } from '../utils/responsive';
 import BackIcon from '../assets/svgs/LeftArrow.svg';
 
-const ScreenHeader = ({ title, showBack = false }) => {
+const ScreenHeader = ({ title, showBack = false, onBackPress }) => {
   const navigation = useNavigation();
+
+  const handleBack = () => {
+    if (onBackPress) {
+      onBackPress();
+    } else {
+      navigation.goBack();
+    }
+  };
 
   return (
     <View style={styles.container}>
       {showBack && (
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={handleBack}>
           <BackIcon width={22} height={22} />
         </TouchableOpacity>
       )}

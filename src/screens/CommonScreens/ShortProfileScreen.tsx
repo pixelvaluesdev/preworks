@@ -16,6 +16,7 @@ const ShortProfileScreen = () => {
   const dispatch = useDispatch();
 
   const user = useSelector(state => state.auth.user);
+  console.log(user);
   const token = useSelector(state => state.auth.userToken);
   const userType = useSelector((state: any) => state.auth.userType);
   const isCustomer = userType === 'customer';

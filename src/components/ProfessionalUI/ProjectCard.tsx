@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: FONT.POPPINS_BOLD,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 16,
   },
 

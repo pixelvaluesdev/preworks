@@ -57,6 +57,7 @@ const CustomerHomeScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
+    console.log(token, 'Tokennnn here');
     if (token) {
       fetchBanners();
     }

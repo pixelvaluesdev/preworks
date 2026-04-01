@@ -46,6 +46,8 @@ const LoginScreen = () => {
 
       const response = await ApiManager.phoneSignin(body);
 
+      console.log(response);
+
       if (response.data.status === 'success') {
         showSnackbar(response.data.message, 'success');
         navigation.navigate('OtpVeri', { phone: trimmedMobile });
