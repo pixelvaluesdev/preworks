@@ -49,15 +49,15 @@ const VerificationScreen = () => {
         const token = response.data.token;
 
         dispatch(setUser(user));
+        console.log('User in verification', user);
+        console.log('Token in verification', token);
         dispatch(setUserToken(token));
 
-        // ✅ FIRST CHECK PROFILE COMPLETION
         if (!user.firstName || !user.lastName) {
           navigation.replace('ShortProfile');
-          return; // ❗ VERY IMPORTANT (stop here)
+          return;
         }
 
-        // ✅ THEN CHECK USER TYPE
         if (
           userType === 'contractor' ||
           userType === 'architect' ||

@@ -9,10 +9,23 @@ const SplashScreen = () => {
 
   const token = useSelector((state: any) => state.auth.userToken);
   const user = useSelector((state: any) => state.auth.user);
+  console.log('USer Object', user);
   const userType = useSelector((state: any) => state.auth.userType);
 
+  const isRehydrated = useSelector((state: any) => state._persist?.rehydrated);
+
+  const hasSeenOnboarding = useSelector(
+    (state: any) => state.auth.hasSeenOnboarding,
+  );
+
+  console.log('token:', token);
+  console.log('user:', user);
+  console.log('hasSeenOnboarding:', hasSeenOnboarding);
+
   useEffect(() => {
-    setTimeout(() => {
+    if (!isRehydrated) return;
+
+    const timer = setTimeout(() => {
       if (!token) {
         navigation.replace('Welcome');
         return;
@@ -27,11 +40,17 @@ const SplashScreen = () => {
         if (userType === 'professional') {
           navigation.replace('ProfTabNav');
         } else {
-          navigation.replace('CustmTabNav');
+          if (!hasSeenOnboarding) {
+            navigation.replace('Onboarding');
+          } else {
+            navigation.replace('CustmTabNav');
+          }
         }
       }
     }, 1500);
-  }, []);
+
+    return () => clearTimeout(timer);
+  }, [isRehydrated]);
 
   return (
     <View style={styles.container}>

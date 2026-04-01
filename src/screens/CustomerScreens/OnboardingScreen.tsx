@@ -13,6 +13,8 @@ import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
 import BackIcon from '../../assets/svgs/LeftArrow.svg';
 import NextIcon from '../../assets/svgs/NextIcon.svg';
+import { useDispatch } from 'react-redux';
+import { setHasSeenOnboarding } from '../../redux/slices/authSlice';
 
 const { width } = Dimensions.get('window');
 
@@ -42,11 +44,14 @@ const OnboardingScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   const handleNext = () => {
     if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
     } else {
+      dispatch(setHasSeenOnboarding(true));
+      console.log('SETTING ONBOARDING TRUE');
       navigation.replace('Login');
     }
   };
@@ -88,7 +93,10 @@ const OnboardingScreen = () => {
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.skipBtn}
-              onPress={() => navigation.replace('Login')}
+              onPress={() => {
+                dispatch(setHasSeenOnboarding(true));
+                navigation.replace('Login');
+              }}
             >
               <Text style={styles.skipText}>Skip</Text>
             </TouchableOpacity>

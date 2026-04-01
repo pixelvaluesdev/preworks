@@ -9,10 +9,15 @@ import { WIDTH } from '../../utils/responsive';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { setUserType } from '../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
+  const hasSeenOnboarding = useSelector(
+    (state: any) => state.auth.hasSeenOnboarding,
+  );
 
   return (
     <ImageBackground
@@ -31,7 +36,12 @@ const WelcomeScreen = () => {
           Icon={Customer}
           onPress={() => {
             dispatch(setUserType('customer'));
-            navigation.navigate('Onboarding');
+
+            if (!hasSeenOnboarding) {
+              navigation.navigate('Onboarding');
+            } else {
+              navigation.navigate('Login');
+            }
           }}
         />
 

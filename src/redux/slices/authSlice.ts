@@ -12,12 +12,14 @@ interface AuthState {
   user: User | null;
   userType: string | null;
   userToken: string;
+  hasSeenOnboarding: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   userType: null,
   userToken: '',
+  hasSeenOnboarding: false,
 };
 
 const authSlice = createSlice({
@@ -36,6 +38,10 @@ const authSlice = createSlice({
       state.userToken = action.payload;
     },
 
+    setHasSeenOnboarding: (state, action: PayloadAction<boolean>) => {
+      state.hasSeenOnboarding = action.payload;
+    },
+
     clearUser: state => {
       state.user = null;
       state.userType = null;
@@ -44,7 +50,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, setUserType, setUserToken, clearUser } =
-  authSlice.actions;
+export const {
+  setUser,
+  setUserType,
+  setUserToken,
+  clearUser,
+  setHasSeenOnboarding,
+} = authSlice.actions;
 
 export default authSlice.reducer;
