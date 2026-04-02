@@ -97,7 +97,7 @@ const ProjectsScreen = ({ route }: any) => {
                 setDeletePopupVisible(true);
               }}
             >
-              <DeleteIcon width={25} height={25} />
+              <DeleteIcon width={20} height={20} />
             </TouchableOpacity>
           )}
 

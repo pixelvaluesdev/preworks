@@ -82,10 +82,27 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
           'Ground + 1 Floor',
           'Ground + 2 Floor',
           'Ground + 3 Floor',
-          'Custom _______',
+          'Custom',
         ]}
-        onSelect={val => handleChange('floors', val)}
+        onSelect={val => {
+          handleChange('floors', val);
+
+          if (val !== 'Custom') {
+            handleChange('customFloors', '');
+          }
+        }}
       />
+      {data.floors === 'Custom' && (
+        <BorderTextInput
+          label="Enter Custom Floors"
+          placeholder="e.g. 5"
+          value={data.customFloors}
+          onChangeText={text =>
+            handleChange('customFloors', text.replace(/[^0-9]/g, ''))
+          }
+          height={HEIGHT(7)}
+        />
+      )}
 
       <BorderDropdown
         label="Type Of Quote"
@@ -105,8 +122,9 @@ const styles = StyleSheet.create({
   },
 
   infoBox: {
-    backgroundColor: '#F1F1F1',
-    padding: 12,
+    backgroundColor: '#C8FFC8',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderRadius: 10,
   },
 

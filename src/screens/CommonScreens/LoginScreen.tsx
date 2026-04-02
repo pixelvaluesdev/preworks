@@ -77,8 +77,12 @@ const LoginScreen = () => {
           prefix="+91-"
           placeholder="Mobile number"
           keyboardType="number-pad"
+          maxLength={10}
           value={mobile}
-          onChangeText={setMobile}
+          onChangeText={text => {
+            const numericText = text.replace(/[^0-9]/g, '');
+            setMobile(numericText);
+          }}
         />
 
         <SecondaryButton title="Get OTP" onPress={handleGetOtp} />

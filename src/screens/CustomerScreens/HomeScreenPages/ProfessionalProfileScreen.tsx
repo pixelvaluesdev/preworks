@@ -17,6 +17,7 @@ import CallIcon from '../../../assets/svgs/Call.svg';
 import ChatIcon from '../../../assets/svgs/Chat.svg';
 import LinkIcon from '../../../assets/svgs/Links.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
+import { useSelector } from 'react-redux';
 
 const portfolioImages = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
@@ -32,6 +33,8 @@ const ProfessionalProfileScreen = () => {
   // const { id } = route.params as { id: any };
 
   const navigation = useNavigation();
+  const userType = useSelector((state: any) => state.auth.userType);
+  const isProffesional = userType !== 'customer';
 
   return (
     <View style={styles.container}>
@@ -52,12 +55,14 @@ const ProfessionalProfileScreen = () => {
             style={styles.profileImage}
           />
 
-          <TouchableOpacity
-            style={styles.editBtn}
-            onPress={() => navigation.navigate('EditProfileScreen')}
-          >
-            <Text style={styles.editText}>Edit</Text>
-          </TouchableOpacity>
+          {isProffesional && (
+            <TouchableOpacity
+              style={styles.editBtn}
+              onPress={() => navigation.navigate('EditProfileScreen')}
+            >
+              <Text style={styles.editText}>Edit</Text>
+            </TouchableOpacity>
+          )}
 
           <Text style={styles.name}>Rajendra singh</Text>
           <Text style={styles.role}>Contractor</Text>
@@ -189,8 +194,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 20,
     alignItems: 'center',
-    width: WIDTH(100),
-    justifyContent: 'space-between',
+
+    justifyContent: 'space-around',
   },
 
   actionItem: {

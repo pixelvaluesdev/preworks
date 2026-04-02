@@ -15,6 +15,7 @@ interface BorderTextInputProps {
   height?: number;
   containerStyle?: any;
   rightComponent?: React.ReactNode;
+  editable?: boolean;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -26,6 +27,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   height,
   containerStyle,
   rightComponent,
+  editable = true,
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   return (
@@ -47,6 +49,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
             outlineColor="#757575"
             activeOutlineColor={Colors.primary}
             textColor="black"
+            editable={editable}
             onContentSizeChange={e => {
               if (multiline) {
                 setInputHeight(e.nativeEvent.contentSize.height);
