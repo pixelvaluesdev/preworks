@@ -8,8 +8,11 @@ import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../../assets/svgs/PlusIcon.svg';
 import ScreenHeader from '../../../components/ScreenHeader';
+import { useSelector } from 'react-redux';
 const NoProjectScreen = () => {
   const navigation = useNavigation();
+  const userType = useSelector((state: any) => state.auth.userType);
+  const isCustomer = userType === 'customer';
 
   return (
     <View style={styles.container}>
@@ -32,16 +35,20 @@ const NoProjectScreen = () => {
 
         {/* Main Message */}
         <Text style={styles.message}>
-          You don’t have any projects yet. Hit 'Add Project' to get started.
+          {isCustomer
+            ? "You don’t have any projects yet. Hit 'Add Project' to get started."
+            : 'No projects uploaded yet from customers.'}
         </Text>
 
         {/* Button */}
-        <SecondaryButton
-          title="Add Project Details"
-          style={styles.button}
-          onPress={() => navigation.navigate('AddProjectInformation')}
-          icon={<PlusIcon height={20} width={30} />}
-        />
+        {isCustomer && (
+          <SecondaryButton
+            title="Add Project Details"
+            style={styles.button}
+            onPress={() => navigation.navigate('AddProjectInformation')}
+            icon={<PlusIcon height={20} width={30} />}
+          />
+        )}
       </View>
     </View>
   );

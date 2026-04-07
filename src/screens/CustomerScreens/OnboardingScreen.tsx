@@ -83,12 +83,19 @@ const OnboardingScreen = () => {
 
           {/* DOTS */}
           <View style={styles.dots}>
-            {slides.map((_, index) => (
-              <View
-                key={index}
-                style={[styles.dot, currentIndex === index && styles.activeDot]}
-              />
-            ))}
+            {slides.map((_, index) => {
+              const isActive = currentIndex === index;
+
+              return (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    isActive ? styles.activeDot : styles.inactiveDot,
+                  ]}
+                />
+              );
+            })}
           </View>
 
           {/* BUTTONS */}
@@ -196,15 +203,24 @@ const styles = StyleSheet.create({
   },
 
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#ddd',
-    marginHorizontal: 4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 5,
   },
 
   activeDot: {
     backgroundColor: '#fff',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  inactiveDot: {
+    borderWidth: 1,
+    borderColor: '#fff',
+    backgroundColor: 'transparent',
+    opacity: 0.5,
+    borderRadius: 4,
   },
 
   buttonRow: {

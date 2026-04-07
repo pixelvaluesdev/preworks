@@ -105,7 +105,7 @@ const PortfolioScreen = () => {
 
               <BorderTextInput
                 label="Caption"
-                placeholder="Enter caption"
+                placeholder="Type here"
                 value={form.caption}
                 onChangeText={text => handleChange('caption', text)}
               />

@@ -1,3 +1,6 @@
+import { Animated } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import CustomerHomeScreen from '../screens/CustomerScreens/CustomerHomeScreen';
 import NotificationScreen from '../screens/CommonScreens/NotificationScreen';
@@ -16,6 +19,27 @@ import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
+
+const AnimatedIcon = ({ focused, ActiveIcon, InactiveIcon }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.4 : 1,
+      friction: 3,
+      tension: 40,
+      useNativeDriver: true,
+    }).start();
+  }, [focused]);
+
+  const IconComponent = focused ? ActiveIcon : InactiveIcon;
+
+  return (
+    <Animated.View style={{ transform: [{ scale }] }}>
+      <IconComponent height={22} />
+    </Animated.View>
+  );
+};
 
 const CustomerTabNavigator = () => {
   const insets = useSafeAreaInsets();
@@ -38,8 +62,13 @@ const CustomerTabNavigator = () => {
         name="Home"
         component={CustomerHomeScreen}
         options={{
-          tabBarIcon: ({ focused }) =>
-            focused ? <ActHome height={22} /> : <HomeIcon height={22} />,
+          tabBarIcon: ({ focused }) => (
+            <AnimatedIcon
+              focused={focused}
+              ActiveIcon={ActHome}
+              InactiveIcon={HomeIcon}
+            />
+          ),
         }}
       />
       <Tab.Screen

@@ -4,11 +4,21 @@ import { FONT } from '../../theme/fonts';
 import { WIDTH } from '../../utils/responsive';
 import Colors from '../../constants/colors';
 
-const PrimaryButton = ({ title, Icon, onPress, disabled = false }: any) => {
+const PrimaryButton = ({
+  title,
+  Icon,
+  onPress,
+  disabled = false,
+  width,
+}: any) => {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      style={[styles.container, disabled && styles.disabled]}
+      style={[
+        styles.container,
+        width && { width },
+        disabled && styles.disabled,
+      ]}
       onPress={onPress}
       disabled={disabled}
     >
@@ -31,7 +41,7 @@ export default PrimaryButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: WIDTH(60),
+    width: WIDTH(70), // 🔥 increase width (60 → 75)
     borderRadius: 15,
     borderWidth: 0.5,
     borderColor: 'white',
@@ -47,19 +57,19 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 2,
+    paddingVertical: 2, // 🔥 better height
     paddingHorizontal: 14,
   },
 
   iconContainer: {
-    marginRight: 10,
+    marginRight: 12,
   },
 
   text: {
-    flex: 1,
     fontSize: 16,
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_BOLD,
-    textAlign: 'left',
+    // ❌ remove flex: 1
+    flexShrink: 1, // 🔥 allows proper text shrink instead of pushing space
   },
 });

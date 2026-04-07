@@ -8,6 +8,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -24,6 +25,7 @@ import { useSelector } from 'react-redux';
 
 const VerificationScreen = () => {
   const [otp, setOtp] = useState('');
+  const [loading, setLoading] = useState(false);
   const route = useRoute();
   const { phone } = route.params;
 
@@ -34,6 +36,7 @@ const VerificationScreen = () => {
 
   const handleVerifyOtp = async () => {
     try {
+      setLoading(true);
       if (otp.length !== 5) {
         Alert.alert('Please enter valid OTP');
         return;
@@ -82,6 +85,8 @@ const VerificationScreen = () => {
       } else {
         Alert.alert('Something went wrong. Please try again.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,7 +110,11 @@ const VerificationScreen = () => {
             <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
           </View>
 
-          <SecondaryButton title="Verify" onPress={handleVerifyOtp} />
+          <SecondaryButton
+            title={loading ? <ActivityIndicator color="#fff" /> : 'Verify'}
+            onPress={handleVerifyOtp}
+            disabled={loading}
+          />
           <View
             style={{
               marginTop: 20,

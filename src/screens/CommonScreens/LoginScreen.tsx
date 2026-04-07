@@ -100,6 +100,7 @@ const LoginScreen = () => {
             title={loading ? <ActivityIndicator color="#fff" /> : 'Get OTP'}
             onPress={handleGetOtp}
             disabled={loading}
+            style={{ marginTop: 10 }}
           />
 
           {/* <SecondaryButton

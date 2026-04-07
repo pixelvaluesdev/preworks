@@ -33,6 +33,7 @@ const WelcomeScreen = () => {
 
         <PrimaryButton
           title="Customer"
+          width={WIDTH(55)}
           Icon={Customer}
           onPress={() => {
             dispatch(setUserType('customer'));
@@ -48,6 +49,7 @@ const WelcomeScreen = () => {
         <PrimaryButton
           title="Professional"
           Icon={Professional}
+          width={WIDTH(55)}
           onPress={() => {
             // dispatch(setUserType('professional'));
             navigation.navigate('ProfWelc');
