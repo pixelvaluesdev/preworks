@@ -14,7 +14,7 @@ const NoProjectScreen = () => {
   return (
     <View style={styles.container}>
       <ScreenHeader
-        title="Quote List"
+        title="Projects List" // No projects (empty array of project from api)
         showBack
         onBackPress={() =>
           navigation.navigate('CustmTabNav', {
@@ -32,7 +32,7 @@ const NoProjectScreen = () => {
 
         {/* Main Message */}
         <Text style={styles.message}>
-          You don’t have any projects yet.Hit 'Add Project' to get started.
+          You don’t have any projects yet. Hit 'Add Project' to get started.
         </Text>
 
         {/* Button */}

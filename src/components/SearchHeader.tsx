@@ -90,10 +90,12 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 20,
     paddingHorizontal: 15,
+    justifyContent: 'center',
   },
 
   input: {
     marginLeft: 8,
+    color: '#000',
     flex: 1,
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,

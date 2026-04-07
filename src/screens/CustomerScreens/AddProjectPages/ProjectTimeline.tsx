@@ -137,7 +137,9 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
       {/* PRICE RANGE */}
       <View style={styles.sliderContainer}>
-        <Text style={styles.sliderLabel}>Select Price Range</Text>
+        <Text style={styles.sliderLabel}>
+          Select Price Range <Text style={styles.asterisk}> *</Text>
+        </Text>
 
         <View style={{ position: 'relative', width: '100%' }}>
           <Slider
@@ -214,6 +216,10 @@ const styles = StyleSheet.create({
   selectedValue: {
     fontSize: 14,
     color: Colors.primary,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  asterisk: {
+    color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

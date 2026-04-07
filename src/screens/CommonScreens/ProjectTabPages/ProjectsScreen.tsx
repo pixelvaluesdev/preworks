@@ -20,6 +20,7 @@ import CustomPopup from '../../../components/Popups/CustomPopup';
 import { useSelector } from 'react-redux';
 import ApiManager from '../../../apis/ApiManager';
 import { BASE_URL, IMG_URL } from '../../../apis/ApiManager';
+import OptionsIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -35,6 +36,13 @@ const ProjectsScreen = ({ route }: any) => {
   const [selectedProject, setSelectedProject] = React.useState(null);
   const [projects, setProjects] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [apiFinished, setApiFinished] = React.useState(false);
+
+  React.useEffect(() => {
+    if (apiFinished && projects.length === 0) {
+      navigation.navigate('NoProjects');
+    }
+  }, [apiFinished, projects]);
 
   React.useEffect(() => {
     if (userId) {
@@ -42,13 +50,7 @@ const ProjectsScreen = ({ route }: any) => {
     }
   }, [userId]);
 
-  React.useEffect(() => {
-    if (!loading && userId) {
-      if (projects.length === 0) {
-        navigation.navigate('NoProjects');
-      }
-    }
-  }, [loading]);
+  React.useEffect(() => {}, [projects]);
 
   const fetchProjects = async () => {
     try {
@@ -56,15 +58,13 @@ const ProjectsScreen = ({ route }: any) => {
 
       const res = await ApiManager.getProjects(userId, token);
 
-      console.log('API RESPONSE 👉', res?.data);
-
       if (res?.data?.status === 'success') {
         setProjects(res?.data?.data || []);
       }
     } catch (error) {
-      console.log('API ERROR 👉', error);
     } finally {
       setLoading(false);
+      setApiFinished(true);
     }
   };
 
@@ -97,7 +97,7 @@ const ProjectsScreen = ({ route }: any) => {
                 setDeletePopupVisible(true);
               }}
             >
-              <DeleteIcon width={20} height={20} />
+              <OptionsIcon width={20} height={20} />
             </TouchableOpacity>
           )}
 

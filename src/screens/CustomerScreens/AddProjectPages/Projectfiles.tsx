@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { FONT } from '../../../theme/fonts';
 import UploadIcon from '../../../assets/svgs/UploadIcon.svg';
 import { Switch } from 'react-native';
 import Colors from '../../../constants/colors';
+import CheckBox from '@react-native-community/checkbox';
+import { launchImageLibrary } from 'react-native-image-picker';
+import CloseIcon from '../../../assets/svgs/Delete.svg';
 
 const Projectfile = ({ data, handleChange }: any) => {
   const hasDrawing = data?.hasDrawing ?? false;
@@ -21,18 +24,40 @@ const Projectfile = ({ data, handleChange }: any) => {
     handleChange('services', updated);
   };
 
+  const pickImage = key => {
+    const options = {
+      mediaType: 'photo',
+      quality: 0.7,
+    };
+
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled');
+      } else if (response.errorCode) {
+        console.log('Error: ', response.errorMessage);
+      } else {
+        const uri = response.assets?.[0]?.uri;
+
+        if (uri) {
+          handleChange(key, uri); // store image
+        }
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       <UploadBox
         label="Upload Site image (Required)"
         value={data.siteImage}
-        onPress={() => {}}
+        onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
       />
 
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>
           Do you already have architectural drawings?
+          <Text style={styles.asterisk}> *</Text>
         </Text>
 
         <View style={styles.radioRow}>
@@ -62,16 +87,19 @@ const Projectfile = ({ data, handleChange }: any) => {
         <UploadBox
           label="Upload architectural drawing (Preferred PDF)"
           value={data.archDrawing}
-          onPress={() => {}}
+          onPress={() => pickImage('archDrawing')}
           textStyle={{ fontSize: 10 }}
           rightComponent={<UploadIcon />}
+          onRemove={() => handleChange('siteImage', '')}
         />
       )}
       {!hasDrawing && (
         <>
           {/* SERVICES */}
           <View>
-            <Text style={styles.questionText}>What services do you need?</Text>
+            <Text style={styles.questionText}>
+              What services do you need? <Text style={styles.asterisk}> *</Text>
+            </Text>
 
             {[
               'Architectural Design',
@@ -84,16 +112,14 @@ const Projectfile = ({ data, handleChange }: any) => {
               const isSelected = services.includes(item);
 
               return (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.checkboxRow}
-                  onPress={() => toggleService(item)}
-                >
-                  <View style={styles.checkbox}>
-                    {isSelected && <View style={styles.checkboxInner} />}
-                  </View>
+                <View key={item} style={styles.checkboxRow}>
+                  <CheckBox
+                    value={isSelected}
+                    onValueChange={() => toggleService(item)}
+                    tintColors={{ true: Colors.primary, false: '#999' }}
+                  />
                   <Text style={styles.checkboxLabel}>{item}</Text>
-                </TouchableOpacity>
+                </View>
               );
             })}
           </View>
@@ -101,7 +127,8 @@ const Projectfile = ({ data, handleChange }: any) => {
           {/* HIDE NUMBER */}
           <View style={styles.toggleContainer}>
             <Text style={styles.questionText}>
-              Do you want to hide your number?
+              Do you want to hide your number?{' '}
+              <Text style={styles.asterisk}> *</Text>
             </Text>
             <Switch
               value={data?.hideNumber || false}
@@ -112,7 +139,8 @@ const Projectfile = ({ data, handleChange }: any) => {
           </View>
 
           <Text style={styles.note}>
-            Note : IF you choose to hide you will not receive any calls from
+            <Text style={styles.noteLabel}>Note: </Text>
+            IF you choose to hide you will not receive any calls from
             professional.
           </Text>
         </>
@@ -130,20 +158,26 @@ const UploadBox = ({
   onPress,
   rightComponent,
   textStyle,
+  onRemove,
 }: any) => {
   return (
     <View style={styles.inputWrapper}>
-      <Text style={[styles.label, textStyle]}>{label}</Text>
+      <Text style={[styles.label, textStyle]}>
+        {label} <Text style={styles.asterisk}> *</Text>
+      </Text>
 
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
-        <Text
-          style={{
-            color: value ? '#000' : '#a6a6a6',
-            fontFamily: FONT.POPPINS_REGULAR,
-          }}
-        >
-          {value || 'Browse image'}
-        </Text>
+        {value ? (
+          <View style={styles.previewContainer}>
+            <Image source={{ uri: value }} style={styles.previewImage} />
+
+            <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
+              <CloseIcon width={16} height={16} />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text style={styles.placeholder}>Browse image</Text>
+        )}
         {rightComponent && <View>{rightComponent}</View>}
       </TouchableOpacity>
     </View>
@@ -229,8 +263,8 @@ const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
+    gap: 5,
+    marginBottom: 5,
   },
 
   checkbox: {
@@ -274,6 +308,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#757575',
     marginTop: 10,
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  noteLabel: {
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  asterisk: {
+    color: 'red',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  previewContainer: {
+    position: 'relative',
+  },
+
+  previewImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+
+  removeBtn: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 2,
+    elevation: 3,
+  },
+
+  placeholder: {
+    color: '#a6a6a6',
     fontFamily: FONT.POPPINS_REGULAR,
   },
 });

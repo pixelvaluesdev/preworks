@@ -65,7 +65,9 @@ const OnboardingScreen = () => {
       >
         <BackIcon width={20} height={20} />
       </TouchableOpacity>
-      <Image source={item.image} style={styles.image} resizeMode="contain" />
+      <View style={{ alignItems: 'center', marginBottom: HEIGHT(2) }}>
+        <Image source={item.image} style={styles.image} resizeMode="contain" />
+      </View>
 
       <View style={styles.bottomSection}>
         <Image
@@ -107,13 +109,7 @@ const OnboardingScreen = () => {
                   {currentIndex === 2 ? 'Start' : 'Next'}
                 </Text>
 
-                <View style={{ justifyContent: 'center' }}>
-                  <NextIcon
-                    width={20}
-                    height={20}
-                    style={{ marginBottom: 3 }}
-                  />
-                </View>
+                <NextIcon width={20} height={20} />
               </View>
             </TouchableOpacity>
           </View>
@@ -145,17 +141,17 @@ const styles = StyleSheet.create({
     width: width,
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'space-between',
   },
 
   image: {
     width: '100%',
-    height: HEIGHT(50),
+    height: HEIGHT(47),
     alignSelf: 'center',
     marginTop: HEIGHT(10),
   },
 
   bottomSection: {
-    position: 'absolute',
     bottom: 0,
     height: HEIGHT(35),
     width: '100%',
@@ -164,14 +160,16 @@ const styles = StyleSheet.create({
   bottomBg: {
     position: 'absolute',
     width: '100%',
-    height: '100%',
+    height: HEIGHT(40),
+    bottom: 0,
   },
 
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 30,
+    paddingTop: HEIGHT(2),
+    paddingBottom: HEIGHT(3),
   },
 
   title: {
@@ -188,6 +186,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: '400',
     fontFamily: FONT.POPPINS_REGULAR,
+    width: '90%',
+    alignSelf: 'center',
   },
 
   dots: {
@@ -218,8 +218,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fff',
     paddingHorizontal: 30,
-    paddingVertical: 6,
+    height: 45,
     borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   skipText: {
@@ -230,15 +232,17 @@ const styles = StyleSheet.create({
 
   nextBtn: {
     backgroundColor: '#fff',
-    paddingHorizontal: 25,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    height: 45,
     borderRadius: 20,
+    justifyContent: 'center',
   },
 
   nextText: {
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 18,
     color: '#3AA171',
+    marginRight: 5,
   },
   backBtn: {
     position: 'absolute',
@@ -255,7 +259,6 @@ const styles = StyleSheet.create({
   nextContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     justifyContent: 'center',
   },
 });

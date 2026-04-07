@@ -15,10 +15,12 @@ import ActProject from '../assets/svgs/ActProjectIcon.svg';
 import ActHome from '../assets/svgs/ActHomeIcon.svg';
 import ActNotifi from '../assets/svgs/ActNotifiIcon.svg';
 import ActSetting from '../assets/svgs/ActSettingIcon.svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Tab = createBottomTabNavigator();
 
 const ProfessionalTabNavigator = () => {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -29,8 +31,8 @@ const ProfessionalTabNavigator = () => {
           fontSize: 10,
         },
         tabBarStyle: {
-          height: 60,
-          paddingBottom: 6,
+          height: 60 + insets.bottom,
+          paddingBottom: Math.max(insets.bottom, 8),
         },
       }}
     >

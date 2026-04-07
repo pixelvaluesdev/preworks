@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { SnackbarProvider } from './src/hooks/SnackbarProvider';
 import { PersistGate } from 'redux-persist/integration/react';
+import { InternetProvider } from './src/context/InternetContext';
 
 function App() {
   return (
@@ -12,9 +13,11 @@ function App() {
       <PersistGate loading={null} persistor={Persistor}>
         <SafeAreaProvider>
           <SnackbarProvider>
-            <PaperProvider>
-              <AppNavigator />
-            </PaperProvider>
+            <InternetProvider>
+              <PaperProvider>
+                <AppNavigator />
+              </PaperProvider>
+            </InternetProvider>
           </SnackbarProvider>
         </SafeAreaProvider>
       </PersistGate>

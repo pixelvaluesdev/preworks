@@ -6,6 +6,8 @@ import {
   ImageBackground,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -89,38 +91,43 @@ const VerificationScreen = () => {
       style={styles.container}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Verification OTP</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.overlay}>
+          <Text style={styles.title}>Verification OTP</Text>
 
-        <Text style={styles.subtitle}>
-          Enter the OTP sent to your mobile number
-        </Text>
-        <View style={{ marginTop: 5 }}>
-          <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
-        </View>
+          <Text style={styles.subtitle}>
+            Enter the OTP sent to your mobile number
+          </Text>
+          <View style={{ marginTop: 5 }}>
+            <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
+          </View>
 
-        <SecondaryButton title="Verify" onPress={handleVerifyOtp} />
-        <View
-          style={{
-            marginTop: 20,
-            alignItems: 'center',
-          }}
-        >
-          <Text
+          <SecondaryButton title="Verify" onPress={handleVerifyOtp} />
+          <View
             style={{
-              color: 'white',
-              fontFamily: FONT.POPPINS_REGULAR,
-              fontSize: 16,
+              marginTop: 20,
+              alignItems: 'center',
             }}
           >
-            Didn't receive the OTP?
-          </Text>
-        </View>
+            <Text
+              style={{
+                color: 'white',
+                fontFamily: FONT.POPPINS_REGULAR,
+                fontSize: 16,
+              }}
+            >
+              Didn't receive the OTP?
+            </Text>
+          </View>
 
-        <TouchableOpacity style={styles.resendContainer}>
-          <Text style={styles.resendText}>Resend OTP</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.resendContainer}>
+            <Text style={styles.resendText}>Resend OTP</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };

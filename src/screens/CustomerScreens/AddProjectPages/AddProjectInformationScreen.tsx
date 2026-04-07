@@ -5,6 +5,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 import CustomStepIndicator from '../../../components/CustomStepIndicator';
@@ -23,6 +26,8 @@ const TOTAL_STEPS = 4;
 
 const AddProjectInformationScreen = ({ navigation }: any) => {
   const [step, setStep] = useState<number>(0);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const [form, setForm] = useState({
     projectName: '',
@@ -48,7 +53,47 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
     }));
   };
 
+  const validateStep = () => {
+    // STEP 0 validation (ProjectInfo)
+    if (step === 0) {
+      if (!form.projectName.trim()) return false;
+      if (!form.address.trim()) return false;
+      if (!form.city.trim()) return false;
+      if (!form.pinCode.trim()) return false;
+    }
+
+    // STEP 1 validation (PlotWorkDetails)
+    if (step === 1) {
+      if (!form.selectedType) return false;
+      if (!form.area) return false;
+      if (!form.floors) return false;
+      if (!form.quoteType) return false;
+    }
+
+    // STEP 2 validation (Timeline)
+    if (step === 2) {
+      if (!form.startDate) return false;
+      if (!form.lastDate) return false;
+      if (!form.description) return false;
+      if (!form.budget) return false;
+    }
+
+    // STEP 3 validation (Files)
+    if (step === 3) {
+      if (!form.siteImage) return false;
+      if (!form.archDrawing) return false;
+    }
+
+    return true;
+  };
+
   const handleNext = () => {
+    if (!validateStep()) {
+      setPopupMessage('Please fill all required fields');
+      setPopupVisible(true);
+      return;
+    }
+
     if (step < TOTAL_STEPS - 1) {
       setStep(prev => prev + 1);
     } else {
@@ -83,7 +128,11 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
         <CustomStepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
       </View>
 
-      <View style={styles.content}>
+      <KeyboardAvoidingView
+        style={styles.content}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={20} // tweak if needed
+      >
         <ScrollView
           style={{ flex: 1 }}
           showsVerticalScrollIndicator={false}
@@ -108,10 +157,12 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
         <View style={styles.buttonContainer}>
           {step == 0 && (
             <SecondaryButton
-              title={step === TOTAL_STEPS - 1 ? 'Submit' : 'Continue'}
+              title="Continue"
+              disabled={!validateStep()}
               style={{
                 marginHorizontal: WIDTH(4),
                 marginVertical: HEIGHT(2),
+                opacity: validateStep() ? 1 : 0.5,
               }}
               onPress={handleNext}
             />
@@ -129,12 +180,16 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
               <AppButton
                 title={step === TOTAL_STEPS - 1 ? 'Submit Project' : 'Continue'}
                 onPress={handleNext}
-                style={{ flex: 1 }}
+                disabled={!validateStep()}
+                style={{
+                  flex: 1,
+                  opacity: validateStep() ? 1 : 0.5,
+                }}
               />
             </View>
           )}
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -172,7 +227,7 @@ const styles = StyleSheet.create({
 
   content: {
     flex: 1,
-    justifyContent: 'space-between', // ✅ key fix
+    justifyContent: 'space-between',
   },
 
   formContainer: {

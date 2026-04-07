@@ -19,6 +19,7 @@ import PhoneIcon from '../../assets/svgs/Phone.svg';
 import StairsIcon from '../../assets/svgs/Stairs.svg';
 import Phone2Icon from '../../assets/svgs/Phone2.svg';
 import Popup from '../../components/Popup';
+import Location from '../../assets/svgs/LocationIcon.svg';
 
 const GeneralEnquiryScreen = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -46,8 +47,17 @@ const GeneralEnquiryScreen = () => {
 
       {/* Title */}
       <Text style={styles.title}>ABC complex</Text>
-
-      <Text style={styles.location}>202, C.G. Road Nagpur</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginLeft: WIDTH(4),
+          gap: 4,
+        }}
+      >
+        <Location width={20} height={17} />
+        <Text style={styles.location}>202, C.G. Road Nagpur</Text>
+      </View>
 
       {/* Services */}
       <Text style={styles.sectionTitle}>services you need</Text>
@@ -119,7 +129,7 @@ const GeneralEnquiryScreen = () => {
         style={styles.interestedBtn}
         onPress={() => setShowPopup(true)}
       >
-        <Text style={styles.interestedText}>I'm Intrested</Text>
+        <Text style={styles.interestedText}>I'm Interested</Text>
       </TouchableOpacity>
 
       <Popup
@@ -156,7 +166,6 @@ const styles = StyleSheet.create({
   },
 
   location: {
-    marginLeft: WIDTH(4),
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 16,
     fontWeight: '400',

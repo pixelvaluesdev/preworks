@@ -1,5 +1,12 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
@@ -12,38 +19,41 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.popupContainer}>
-          <Text style={styles.message}>{message}</Text>
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.overlay}>
+          <View style={styles.popupContainer}>
+            <Text style={styles.message}>{message}</Text>
 
-          <View
-            style={[
-              styles.buttonRow,
-              buttons.length === 1 && styles.singleButtonRow,
-            ]}
-          >
-            {buttons.map((btn, index) => (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.button,
-                  btn.type === 'primary' && styles.primaryBtn,
-                ]}
-                onPress={btn.onPress}
-              >
-                <Text
+            <View
+              style={[
+                styles.buttonRow,
+                buttons.length === 1 && styles.singleButtonRow,
+              ]}
+            >
+              {buttons.map((btn, index) => (
+                <TouchableOpacity
+                  key={index}
                   style={[
-                    styles.buttonText,
-                    btn.type === 'primary' && styles.primaryBtnText,
+                    styles.button,
+                    buttons.length === 1 && styles.singleButton,
+                    btn.type === 'primary' && styles.primaryBtn,
                   ]}
+                  onPress={btn.onPress}
                 >
-                  {btn.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      btn.type === 'primary' && styles.primaryBtnText,
+                    ]}
+                  >
+                    {btn.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -106,5 +116,10 @@ const styles = StyleSheet.create({
 
   primaryBtnText: {
     color: '#FFFFFF',
+  },
+  singleButton: {
+    flex: 0,
+    minWidth: 120,
+    paddingHorizontal: 20,
   },
 });

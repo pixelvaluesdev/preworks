@@ -7,6 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -18,6 +20,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
 import { useSnackbar } from '../../hooks/SnackbarProvider';
+import { ActivityIndicator } from 'react-native-paper';
 
 const LoginScreen = () => {
   const [mobile, setMobile] = useState('');
@@ -25,6 +28,7 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
   const showSnackbar = useSnackbar();
+  const [loading, setLoading] = useState(false);
 
   const userType = useSelector((state: any) => state.auth.userType);
 
@@ -37,6 +41,7 @@ const LoginScreen = () => {
     }
 
     try {
+      setLoading(true);
       const body = {
         phone: trimmedMobile,
         userType: userType,
@@ -57,6 +62,8 @@ const LoginScreen = () => {
         error?.response?.data?.message || 'Something went wrong';
 
       showSnackbar(serverMessage, 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,32 +73,41 @@ const LoginScreen = () => {
       style={styles.container}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Log In</Text>
-        <Text style={styles.subtitle}>
-          Please enter your details to sign in
-        </Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.overlay}>
+          <Text style={styles.title}>Log In</Text>
+          <Text style={styles.subtitle}>
+            Please enter your details to sign in
+          </Text>
 
-        <CustomTextInput
-          label="Mobile number"
-          prefix="+91-"
-          placeholder="Mobile number"
-          keyboardType="number-pad"
-          maxLength={10}
-          value={mobile}
-          onChangeText={text => {
-            const numericText = text.replace(/[^0-9]/g, '');
-            setMobile(numericText);
-          }}
-        />
+          <CustomTextInput
+            label="Mobile number"
+            prefix="+91-"
+            placeholder="Mobile number"
+            keyboardType="number-pad"
+            maxLength={10}
+            value={mobile}
+            onChangeText={text => {
+              const numericText = text.replace(/[^0-9]/g, '');
+              setMobile(numericText);
+            }}
+          />
 
-        <SecondaryButton title="Get OTP" onPress={handleGetOtp} />
+          <SecondaryButton
+            title={loading ? <ActivityIndicator color="#fff" /> : 'Get OTP'}
+            onPress={handleGetOtp}
+            disabled={loading}
+          />
 
-        {/* <SecondaryButton
+          {/* <SecondaryButton
           title="Dummy Home"
           onPress={() => navigation.navigate('CustmTabNav')}
         /> */}
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };

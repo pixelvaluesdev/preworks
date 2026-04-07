@@ -29,6 +29,7 @@ import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import Popup from '../../../components/Popup';
 import CallIcon from '../../../assets/svgs/Call.svg';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
+import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
 
 const images = [
   require('../../../assets/pngs/BannerImg.png'),
@@ -260,6 +261,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       {/* Floating Edit Button for customers if there customers project */}
       {isCustomer && (
         <TouchableOpacity style={styles.floatingEditBtn}>
+          <EditIcon width={30} style={{ marginRight: 4 }} />
           <Text style={styles.editText}>Edit Your Project</Text>
         </TouchableOpacity>
       )}
@@ -450,13 +452,17 @@ const styles = StyleSheet.create({
 
   floatingEditBtn: {
     position: 'absolute',
+    flexDirection: 'row',
     right: 20,
     bottom: 30,
     backgroundColor: Colors.primary,
     paddingVertical: 14,
-    paddingHorizontal: 25,
+    paddingHorizontal: 15,
     borderRadius: 12,
     elevation: 5,
+
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   editText: {

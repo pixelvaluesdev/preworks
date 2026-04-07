@@ -61,14 +61,19 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_REGULAR,
     justifyContent: 'center',
     fontSize: 16,
+    height: '100%',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
   },
 
   input: {
     flex: 1,
     fontSize: 16,
     color: '#000',
-    paddingVertical: 0,
-    textAlignVertical: 'center',
     fontFamily: FONT.POPPINS_REGULAR,
+    height: '100%',
+    textAlignVertical: 'center',
+    paddingVertical: 0,
+    includeFontPadding: false,
   },
 });

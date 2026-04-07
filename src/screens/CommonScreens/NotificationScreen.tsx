@@ -51,7 +51,14 @@ const NotificationScreen = () => {
 
   const renderItem = ({ item }: any) => {
     return (
-      <>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => {
+          console.log('Clicked:', item);
+
+          // navigation.navigate('NotificationDetails', { item });
+        }}
+      >
         <View
           style={[
             styles.notificationCard,
@@ -69,8 +76,9 @@ const NotificationScreen = () => {
 
           <Text style={styles.message}>{item.message}</Text>
         </View>
+
         <View style={styles.divider} />
-      </>
+      </TouchableOpacity>
     );
   };
 

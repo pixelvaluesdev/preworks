@@ -6,6 +6,10 @@ import {
   Image,
   TouchableOpacity,
   Text,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
@@ -15,8 +19,12 @@ import Colors from '../../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import Camera from '../../../assets/svgs/CameraSvg.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
+import { useSelector } from 'react-redux';
+import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 
 const EditProfileScreen = ({ navigation }: any) => {
+  const userType = useSelector((state: any) => state.auth.userType);
+  const isProfessional = userType !== 'customer';
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
@@ -24,108 +32,157 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [pin, setPin] = useState('');
   const [state, setState] = useState('');
   const [address, setAddress] = useState('');
+  const [experience, setExperience] = useState('');
+  const [links, setLinks] = useState('');
+  const [bio, setBio] = useState('');
 
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* HEADER */}
-        <LinearGradient
-          colors={['#53d78e', '#166850']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.header}
-        >
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={() => navigation.goBack()}
-          >
-            <Back />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cameraCvrBtn}>
-            <Camera width={35} />
-          </TouchableOpacity>
-        </LinearGradient>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      {/* Hide keyboard on outside tap */}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            {/* HEADER */}
+            <LinearGradient
+              colors={['#53d78e', '#166850']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.header}
+            >
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => navigation.goBack()}
+              >
+                <Back />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cameraCvrBtn}>
+                <Camera width={35} />
+              </TouchableOpacity>
+            </LinearGradient>
 
-        {/* PROFILE IMAGE */}
-        <View style={styles.profileWrapper}>
-          <View style={styles.profileSection}>
-            <Image
-              style={styles.profileImage}
-              source={require('../../../assets/pngs/BannerImg.png')}
-            />
+            {/* PROFILE IMAGE */}
+            <View style={styles.profileWrapper}>
+              <View style={styles.profileSection}>
+                <Image
+                  style={styles.profileImage}
+                  source={require('../../../assets/pngs/BannerImg.png')}
+                />
 
-            <TouchableOpacity style={styles.cameraBtn}>
-              <Camera width={35} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* FORM CARD */}
-        <View style={styles.card}>
-          <BorderTextInput
-            label="Name"
-            value={name}
-            onChangeText={setName}
-            placeholder="Enter your name"
-          />
-
-          <BorderTextInput
-            label="Mobile Number"
-            value={mobile}
-            onChangeText={setMobile}
-            placeholder="+91- Enter your mobile number"
-          />
-
-          <BorderTextInput
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-          />
-
-          {/* ROW */}
-          <View style={styles.row}>
-            <View style={styles.col}>
-              <BorderTextInput
-                label="City"
-                value={city}
-                onChangeText={setCity}
-                placeholder="City"
-              />
+                <TouchableOpacity style={styles.cameraBtn}>
+                  <Camera width={35} />
+                </TouchableOpacity>
+              </View>
             </View>
 
-            <View style={styles.col}>
+            {/* FORM CARD */}
+            <View style={styles.card}>
               <BorderTextInput
-                label="Pin code"
-                value={pin}
-                onChangeText={setPin}
-                placeholder="Pincode"
+                label="Name"
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your name"
               />
+
+              <BorderTextInput
+                label="Mobile Number"
+                value={mobile}
+                onChangeText={setMobile}
+                placeholder="+91- Enter your mobile number"
+              />
+
+              {!isProfessional && (
+                <BorderTextInput
+                  label="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Enter your email"
+                />
+              )}
+
+              {/* ROW */}
+              <View style={styles.row}>
+                <View style={styles.col}>
+                  <BorderTextInput
+                    label="City"
+                    value={city}
+                    onChangeText={setCity}
+                    placeholder="City"
+                  />
+                </View>
+
+                <View style={styles.col}>
+                  <BorderTextInput
+                    label="Pin code"
+                    value={pin}
+                    onChangeText={setPin}
+                    placeholder="Pincode"
+                  />
+                </View>
+              </View>
+
+              <BorderTextInput
+                label="State"
+                value={state}
+                onChangeText={setState}
+                placeholder="Enter your State"
+              />
+
+              <BorderTextInput
+                label="Address"
+                value={address}
+                onChangeText={setAddress}
+                //multiline
+                placeholder="Enter your Address"
+              />
+
+              {isProfessional && (
+                <BorderTextInput
+                  label="Experience"
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="Enter your experience"
+                />
+              )}
+              <View style={{}}>
+                {isProfessional && (
+                  <BorderTextInput
+                    label="Links"
+                    value={links}
+                    onChangeText={setLinks}
+                    placeholder="Prework.com/follow/."
+                  />
+                )}
+
+                {isProfessional && (
+                  <TouchableOpacity style={styles.addMoreBtn}>
+                    <AddIcon />
+                    <Text style={styles.addMoreText}>Add more links</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {isProfessional && (
+                <BorderTextInput
+                  label="Bio"
+                  value={bio}
+                  onChangeText={setBio}
+                  placeholder="Write Here.."
+                  multiline={true}
+                />
+              )}
+              {/* SAVE BUTTON */}
+              <TouchableOpacity style={styles.saveBtn}>
+                <Text style={styles.saveText}>Save</Text>
+              </TouchableOpacity>
             </View>
-          </View>
-
-          <BorderTextInput
-            label="State"
-            value={state}
-            onChangeText={setState}
-            placeholder="Enter your State"
-          />
-
-          <BorderTextInput
-            label="Address"
-            value={address}
-            onChangeText={setAddress}
-            //multiline
-            placeholder="Enter your Address"
-          />
-
-          {/* SAVE BUTTON */}
-          <TouchableOpacity style={styles.saveBtn}>
-            <Text style={styles.saveText}>Save</Text>
-          </TouchableOpacity>
+          </ScrollView>
         </View>
-      </ScrollView>
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -181,6 +238,7 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.05,
     // shadowRadius: 10,
     // elevation: 4,
+    gap: 10,
   },
 
   row: {
@@ -212,5 +270,19 @@ const styles = StyleSheet.create({
 
     padding: 8,
     borderRadius: 20,
+  },
+  addMoreBtn: {
+    marginTop: HEIGHT(-2),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+
+  addMoreText: {
+    color: Colors.primary,
+    fontFamily: FONT.POPPINS_MEDIUM,
+    fontSize: 14,
+    textAlignVertical: 'center',
   },
 });

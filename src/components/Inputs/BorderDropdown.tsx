@@ -21,7 +21,10 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
   return (
     <View style={styles.wrapper}>
       {/* FLOATING LABEL */}
-      <Text style={styles.label}>{label}</Text>
+      <Text style={styles.label}>
+        {label}
+        <Text style={styles.asterisk}> *</Text>
+      </Text>
 
       {/* DROPDOWN BOX */}
       <TouchableOpacity style={styles.dropdown} onPress={() => setOpen(!open)}>
@@ -100,5 +103,9 @@ const styles = StyleSheet.create({
     padding: 14,
     borderBottomWidth: 0.5,
     borderColor: '#eee',
+  },
+  asterisk: {
+    color: 'red',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

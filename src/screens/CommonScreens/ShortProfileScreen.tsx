@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, ImageBackground, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  ImageBackground,
+  StyleSheet,
+  Alert,
+  Platform,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
@@ -10,6 +17,7 @@ import ApiManager from '../../apis/ApiManager';
 import { FONT } from '../../theme/fonts';
 import { WIDTH } from '../../utils/responsive';
 import { setUser } from '../../redux/slices/authSlice';
+import CustomPopup from '../../components/Popups/CustomPopup';
 
 const ShortProfileScreen = () => {
   const navigation = useNavigation();
@@ -26,6 +34,8 @@ const ShortProfileScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
 
   const handleNext = async () => {
     const fName = firstName.trim();
@@ -47,17 +57,9 @@ const ShortProfileScreen = () => {
       const response = await ApiManager.shortProfile(userId, body, token);
 
       if (response.data?.status === 'success') {
-        Alert.alert(
-          'Success',
-          response.data.message || 'Profile updated successfully',
-          [
-            {
-              text: 'OK',
-              onPress: () =>
-                navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav'),
-            },
-          ],
-        );
+        setPopupMessage(response.data.message || 'Profile added successfully');
+        setPopupVisible(true);
+
         const updatedUser = {
           ...user,
           firstName: fName,
@@ -83,26 +85,47 @@ const ShortProfileScreen = () => {
       style={styles.container}
       resizeMode="cover"
     >
-      <View style={styles.overlay}>
-        <CustomTextInput
-          label="First Name"
-          placeholder="First Name"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <View style={styles.overlay}>
+          <CustomTextInput
+            label="First Name"
+            placeholder="First Name"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
 
-        <CustomTextInput
-          label="Last Name"
-          placeholder="Last Name"
-          value={lastName}
-          onChangeText={setLastName}
-        />
+          <CustomTextInput
+            label="Last Name"
+            placeholder="Last Name"
+            value={lastName}
+            onChangeText={setLastName}
+          />
 
-        <SecondaryButton
-          title={loading ? 'Saving...' : 'Next'}
-          onPress={handleNext}
+          <SecondaryButton
+            title={loading ? 'Saving...' : 'Next'}
+            onPress={handleNext}
+          />
+        </View>
+
+        <CustomPopup
+          visible={popupVisible}
+          message={popupMessage}
+          onClose={() => setPopupVisible(false)}
+          buttons={[
+            {
+              label: 'OK',
+              type: 'primary',
+              onPress: () => {
+                setPopupVisible(false);
+                navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+              },
+            },
+          ]}
         />
-      </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };

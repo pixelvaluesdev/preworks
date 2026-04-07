@@ -68,7 +68,7 @@ const SettingsScreen = () => {
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: HEIGHT(10) }} // 👈 IMPORTANT
+        contentContainerStyle={{ paddingBottom: HEIGHT(10) }}
       >
         {/* HEADER */}
         <LinearGradient
@@ -77,7 +77,7 @@ const SettingsScreen = () => {
           end={{ x: 0, y: 1 }}
           style={styles.header}
         >
-          <TouchableOpacity style={styles.backBtn}>
+          <TouchableOpacity style={styles.backBtn} onPress={navigation.goBack}>
             <RightIcon />
           </TouchableOpacity>
 
@@ -127,7 +127,7 @@ const SettingsScreen = () => {
             </TouchableOpacity>
           )}
 
-          {/* Notification */}
+          {/* Notification
           <View style={styles.row}>
             <View style={styles.rowLeft}>
               <NotifiIcon />
@@ -139,7 +139,7 @@ const SettingsScreen = () => {
               onValueChange={setNotificationEnabled}
               trackColor={{ false: '#ccc', true: '#3BA56A' }}
             />
-          </View>
+          </View> */}
 
           {/* Privacy */}
           <TouchableOpacity style={styles.row}>

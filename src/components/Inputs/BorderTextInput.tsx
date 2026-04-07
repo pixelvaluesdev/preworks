@@ -32,49 +32,45 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   return (
     <View style={[styles.inputWrapper, containerStyle]}>
-      <Text style={styles.floatingLabel}>{label}</Text>
+      <Text style={styles.floatingLabel}>
+        {label}
+        <Text style={styles.asterisk}> *</Text>
+      </Text>
 
-      <View style={[styles.inputWrapper, containerStyle]}>
-        <Text style={styles.floatingLabel}>{label}</Text>
+      <View style={styles.inputContainer}>
+        <TextInput
+          mode="outlined"
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#a6a6a6"
+          multiline={multiline}
+          numberOfLines={multiline ? 3 : 1}
+          outlineColor="#757575"
+          activeOutlineColor={Colors.primary}
+          textColor="black"
+          editable={editable}
+          onContentSizeChange={e => {
+            if (multiline) {
+              setInputHeight(e.nativeEvent.contentSize.height);
+            }
+          }}
+          style={[
+            styles.input,
+            {
+              height: multiline ? Math.max(HEIGHT(6), inputHeight) : HEIGHT(6),
+              paddingRight: 50,
+              fontSize: 14,
+              fontFamily: FONT.POPPINS_REGULAR,
+              textAlignVertical: multiline ? 'top' : 'center',
+            },
+          ]}
+          outlineStyle={styles.outline}
+        />
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            mode="outlined"
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            placeholderTextColor="#a6a6a6"
-            multiline={multiline}
-            numberOfLines={multiline ? 3 : 1}
-            outlineColor="#757575"
-            activeOutlineColor={Colors.primary}
-            textColor="black"
-            editable={editable}
-            onContentSizeChange={e => {
-              if (multiline) {
-                setInputHeight(e.nativeEvent.contentSize.height);
-              }
-            }}
-            style={[
-              styles.input,
-              {
-                height: multiline
-                  ? Math.max(HEIGHT(6), inputHeight)
-                  : HEIGHT(6),
-                paddingRight: 50,
-                fontSize: 14,
-                fontFamily: FONT.POPPINS_REGULAR,
-                textAlignVertical: multiline ? 'top' : 'center',
-              },
-            ]}
-            outlineStyle={styles.outline}
-          />
-
-          {/* RIGHT COMPONENT */}
-          {rightComponent && (
-            <View style={styles.rightComponent}>{rightComponent}</View>
-          )}
-        </View>
+        {rightComponent && (
+          <View style={styles.rightComponent}>{rightComponent}</View>
+        )}
       </View>
     </View>
   );
@@ -120,5 +116,9 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  asterisk: {
+    color: 'red',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

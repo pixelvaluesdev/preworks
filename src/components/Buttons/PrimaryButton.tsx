@@ -15,7 +15,7 @@ const PrimaryButton = ({ title, Icon, onPress, disabled = false }: any) => {
       <View style={styles.innerContainer}>
         {Icon && (
           <View style={styles.iconContainer}>
-            <Icon width={44} height={44} />
+            <Icon width={40} height={40} />
           </View>
         )}
 

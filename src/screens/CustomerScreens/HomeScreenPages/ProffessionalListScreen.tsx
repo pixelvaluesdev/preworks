@@ -17,6 +17,7 @@ import Colors from '../../../constants/colors';
 import ScreenHeader from '../../../components/ScreenHeader';
 import SearchHeader from '../../../components/SearchHeader';
 import Location from '../../../assets/svgs/LocationIcon.svg';
+import SuitCaseIcon from '../../../assets/svgs/suitcaseIcon.svg';
 
 const professionals = [
   {
@@ -122,13 +123,17 @@ const ProfessionalListScreen = () => {
                   backgroundColor: '#F0F0F0',
                   borderBottomRightRadius: 5,
                   borderBottomLeftRadius: 5,
-                  paddingHorizontal: 14,
+                  paddingHorizontal: 10,
                   paddingVertical: 0,
                 }}
               >
                 <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.exp}>{item.exp}</Text>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', gap: 4 }}>
+                  <SuitCaseIcon width={16} height={16} />
+                  <Text style={styles.exp}>{item.exp}</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', gap: 4 }}>
                   <Location width={16} height={16} />
                   <Text style={styles.location}>{item.location}</Text>
                 </View>

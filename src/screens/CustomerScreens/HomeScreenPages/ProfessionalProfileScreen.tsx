@@ -18,6 +18,7 @@ import ChatIcon from '../../../assets/svgs/Chat.svg';
 import LinkIcon from '../../../assets/svgs/Links.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
+import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 
 const portfolioImages = [
   'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
@@ -46,6 +47,13 @@ const ProfessionalProfileScreen = () => {
           }}
           style={styles.banner}
         />
+
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
+          <BackArrow width={25} height={25} />
+        </TouchableOpacity>
 
         {/* Profile Card */}
         <View style={styles.card}>
@@ -269,5 +277,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 14,
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: 'rgba(222, 221, 221, 0.88)',
+    padding: 8,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    zIndex: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

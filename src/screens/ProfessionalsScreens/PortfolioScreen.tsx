@@ -1,5 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,104 +38,139 @@ const PortfolioScreen = () => {
 
   const toggleStep = () => setIsStepTwo(prev => !prev);
 
+  const validateStep = () => {
+    // STEP 1 (Image + Caption)
+    if (!isStepTwo) {
+      if (!form.image.trim()) return false;
+      if (!form.caption.trim()) return false;
+    }
+
+    // STEP 2 (Project details)
+    if (isStepTwo) {
+      if (!form.projectName.trim()) return false;
+      if (!form.siteName.trim()) return false;
+      if (!form.budget.trim()) return false;
+    }
+
+    return true;
+  };
+
   return (
-    <View style={styles.container}>
-      <ScreenHeader title="Add Work" showBack />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+    >
+      <View style={styles.container}>
+        <ScreenHeader title="Add Work" showBack />
 
-      {/* Step Indicator */}
-      <View style={styles.stepContainer}>
-        <View
-          style={[
-            styles.step,
-            { borderColor: !isStepTwo ? Colors.primary : Colors.border },
-          ]}
-        />
-        <View
-          style={[
-            styles.step,
-            { borderColor: isStepTwo ? Colors.primary : Colors.border },
-          ]}
-        />
-      </View>
+        {/* Step Indicator */}
+        <View style={styles.stepContainer}>
+          <View
+            style={[
+              styles.step,
+              { borderColor: !isStepTwo ? Colors.primary : Colors.border },
+            ]}
+          />
+          <View
+            style={[
+              styles.step,
+              { borderColor: isStepTwo ? Colors.primary : Colors.border },
+            ]}
+          />
+        </View>
 
-      <View style={styles.content}>
+        <View style={styles.content}>
+          {!isStepTwo ? (
+            <>
+              <BorderTextInput
+                label="Add Photo"
+                placeholder="Browse image"
+                value={form.image}
+                editable={false}
+                onChangeText={text => handleChange('image', text)}
+                rightComponent={
+                  <TouchableOpacity>
+                    <UploadIcon />
+                  </TouchableOpacity>
+                }
+              />
+
+              <Image
+                source={{
+                  uri: 'https://pe-images.s3.amazonaws.com/basics/cc/image-size-resolution/resize-images-for-print/image-cropped-8x10.jpg',
+                }}
+                style={styles.image}
+              />
+
+              <BorderTextInput
+                label="Caption"
+                placeholder="Enter caption"
+                value={form.caption}
+                onChangeText={text => handleChange('caption', text)}
+              />
+            </>
+          ) : (
+            <>
+              <BorderTextInput
+                label="Project Name / Client Name"
+                placeholder="Enter your Project Name"
+                value={form.projectName}
+                onChangeText={text => handleChange('projectName', text)}
+              />
+
+              <BorderTextInput
+                label="Site Address"
+                placeholder="Enter address of site"
+                value={form.siteName}
+                onChangeText={text => handleChange('siteName', text)}
+              />
+
+              <BorderTextInput
+                label="Budget"
+                placeholder="Enter your Budget"
+                value={form.budget}
+                onChangeText={text => handleChange('budget', text)}
+              />
+            </>
+          )}
+        </View>
+
+        {/* Footer Buttons */}
         {!isStepTwo ? (
-          <>
-            <BorderTextInput
-              label="Project Name / Client Name"
-              placeholder="Enter your Project Name"
-              value={form.projectName}
-              onChangeText={text => handleChange('projectName', text)}
-            />
-
-            <BorderTextInput
-              label="Site Address"
-              placeholder="Enter address of site"
-              value={form.siteName}
-              onChangeText={text => handleChange('siteName', text)}
-            />
-
-            <BorderTextInput
-              label="Budget"
-              placeholder="Enter your Budget"
-              value={form.budget}
-              onChangeText={text => handleChange('budget', text)}
-            />
-          </>
-        ) : (
-          <>
-            <BorderTextInput
-              label="Add Photo"
-              placeholder="Browse image"
-              value={form.image}
-              onChangeText={text => handleChange('image', text)}
-              rightComponent={
-                <TouchableOpacity>
-                  <UploadIcon />
-                </TouchableOpacity>
-              }
-            />
-
-            <Image
-              source={{
-                uri: 'https://pe-images.s3.amazonaws.com/basics/cc/image-size-resolution/resize-images-for-print/image-cropped-8x10.jpg',
+          <View style={styles.footer}>
+            <SecondaryButton
+              title="Continue"
+              onPress={toggleStep}
+              disabled={!validateStep()}
+              style={{
+                opacity: validateStep() ? 1 : 0.5,
               }}
-              style={styles.image}
             />
-
-            <BorderTextInput
-              label="Caption"
-              placeholder="Enter caption"
-              value={form.caption}
-              onChangeText={text => handleChange('caption', text)}
+          </View>
+        ) : (
+          <View style={styles.row}>
+            <AppButton
+              title="Back"
+              type="outline"
+              onPress={toggleStep}
+              style={{ flex: 1 }}
             />
-          </>
+            <AppButton
+              title="Submit"
+              onPress={() => {
+                console.log('Form Data:', form);
+              }}
+              disabled={!validateStep()}
+              style={{
+                flex: 1,
+                opacity: validateStep() ? 1 : 0.5,
+              }}
+            />
+          </View>
         )}
       </View>
-
-      {/* Footer Buttons */}
-      {!isStepTwo ? (
-        <View style={styles.footer}>
-          <SecondaryButton title="Continue" onPress={toggleStep} />
-        </View>
-      ) : (
-        <View style={styles.row}>
-          <AppButton
-            title="Back"
-            type="outline"
-            onPress={toggleStep}
-            style={{ flex: 1 }}
-          />
-          <AppButton
-            title="Submit"
-            onPress={() => {
-              console.log('Form Data:', form);
-            }}
-            style={{ flex: 1 }}
-          />
-        </View>
-      )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
