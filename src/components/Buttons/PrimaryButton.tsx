@@ -25,7 +25,7 @@ const PrimaryButton = ({
       <View style={styles.innerContainer}>
         {Icon && (
           <View style={styles.iconContainer}>
-            <Icon width={40} height={40} />
+            <Icon width={35} height={35} />
           </View>
         )}
 

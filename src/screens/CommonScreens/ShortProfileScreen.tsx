@@ -3,7 +3,6 @@ import {
   View,
   ImageBackground,
   StyleSheet,
-  Alert,
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -36,13 +35,16 @@ const ShortProfileScreen = () => {
   const [loading, setLoading] = useState(false);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const handleNext = async () => {
     const fName = firstName.trim();
     const lName = lastName.trim();
 
     if (!fName || !lName) {
-      Alert.alert('Error', 'Please enter both first and last name');
+      setPopupMessage('Please enter both first and last name');
+      setPopupVisible(true);
+      setShouldNavigate(false);
       return;
     }
 
@@ -59,6 +61,7 @@ const ShortProfileScreen = () => {
       if (response.data?.status === 'success') {
         setPopupMessage(response.data.message || 'Profile added successfully');
         setPopupVisible(true);
+        setShouldNavigate(true);
 
         const updatedUser = {
           ...user,
@@ -68,12 +71,16 @@ const ShortProfileScreen = () => {
 
         dispatch(setUser(updatedUser));
       } else {
-        Alert.alert('Error', response.data?.message || 'Something went wrong');
+        setPopupMessage(response.data?.message || 'Something went wrong');
+        setPopupVisible(true);
+        setShouldNavigate(false);
       }
     } catch (error) {
       const serverMessage = error?.response?.data?.message;
+      setShouldNavigate(false);
 
-      Alert.alert('Error', serverMessage || 'Network error');
+      setPopupMessage(serverMessage || 'Network error');
+      setPopupVisible(true);
     } finally {
       setLoading(false);
     }
@@ -120,7 +127,9 @@ const ShortProfileScreen = () => {
               type: 'primary',
               onPress: () => {
                 setPopupVisible(false);
-                navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+                if (shouldNavigate) {
+                  navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+                }
               },
             },
           ]}

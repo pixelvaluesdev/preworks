@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,10 +15,11 @@ import ScreenHeader from '../../components/ScreenHeader';
 import BorderTextInput from '../../components/Inputs/BorderTextInput';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import AppButton from '../../components/Buttons/AppButton';
-
+import { launchImageLibrary } from 'react-native-image-picker';
 import Colors from '../../constants/colors';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
 import UploadIcon from '../../assets/svgs/UploadIcon.svg';
+import UploadBox from '../../components/Inputs/UploadBox';
 
 const PortfolioScreen = () => {
   const navigation = useNavigation();
@@ -33,7 +35,21 @@ const PortfolioScreen = () => {
   });
 
   const handleChange = useCallback((key: string, value: string) => {
-    setForm(prev => ({ ...prev, [key]: value }));
+    let cleaned = value;
+    if (key === 'budget') {
+      // allow only numbers
+      cleaned = value.replace(/[^0-9]/g, '');
+
+      // prevent starting with 0
+      if (cleaned.length === 1 && cleaned === '0') return;
+
+      // limit length (optional, e.g. 10 digits)
+      if (cleaned.length > 10) return;
+
+      // format with commas (optional but nice UX)
+      cleaned = Number(cleaned).toLocaleString('en-IN');
+    }
+    setForm(prev => ({ ...prev, [key]: cleaned }));
   }, []);
 
   const toggleStep = () => setIsStepTwo(prev => !prev);
@@ -49,10 +65,31 @@ const PortfolioScreen = () => {
     if (isStepTwo) {
       if (!form.projectName.trim()) return false;
       if (!form.siteName.trim()) return false;
-      if (!form.budget.trim()) return false;
+      if (!form.budget.replace(/,/g, '')) return false;
     }
 
     return true;
+  };
+
+  const pickImage = () => {
+    const options = {
+      mediaType: 'photo',
+      quality: 0.7,
+    };
+
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled');
+      } else if (response.errorCode) {
+        console.log('Error: ', response.errorMessage);
+      } else {
+        const uri = response.assets?.[0]?.uri;
+
+        if (uri) {
+          handleChange('image', uri);
+        }
+      }
+    });
   };
 
   return (
@@ -80,20 +117,17 @@ const PortfolioScreen = () => {
           />
         </View>
 
-        <View style={styles.content}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
           {!isStepTwo ? (
             <>
-              <BorderTextInput
+              <UploadBox
                 label="Add Photo"
-                placeholder="Browse image"
                 value={form.image}
-                editable={false}
-                onChangeText={text => handleChange('image', text)}
-                rightComponent={
-                  <TouchableOpacity>
-                    <UploadIcon />
-                  </TouchableOpacity>
-                }
+                onPress={pickImage}
+                onRemove={() => handleChange('image', '')}
               />
 
               <Image
@@ -134,8 +168,7 @@ const PortfolioScreen = () => {
               />
             </>
           )}
-        </View>
-
+        </ScrollView>
         {/* Footer Buttons */}
         {!isStepTwo ? (
           <View style={styles.footer}>
@@ -196,7 +229,7 @@ const styles = StyleSheet.create({
   },
 
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: WIDTH(4),
     paddingTop: 30,
     gap: 10,

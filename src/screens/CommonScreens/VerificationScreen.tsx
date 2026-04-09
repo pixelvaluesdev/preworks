@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ImageBackground,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
@@ -22,10 +21,19 @@ import { useRoute } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import { setUser, setUserToken } from '../../redux/slices/authSlice';
 import { useSelector } from 'react-redux';
+import CustomPopup from '../../components/Popups/CustomPopup';
+import { useSnackbar } from '../../hooks/SnackbarProvider';
 
 const VerificationScreen = () => {
   const [otp, setOtp] = useState('');
+  const showSnackbar = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupConfig, setPopupConfig] = useState({
+    message: '',
+    buttons: [],
+  });
   const route = useRoute();
   const { phone } = route.params;
 
@@ -38,7 +46,13 @@ const VerificationScreen = () => {
     try {
       setLoading(true);
       if (otp.length !== 5) {
-        Alert.alert('Please enter valid OTP');
+        showPopup('Please enter valid OTP', [
+          {
+            label: 'OK',
+            type: 'primary',
+            onPress: () => setPopupVisible(false),
+          },
+        ]);
         return;
       }
 
@@ -81,13 +95,65 @@ const VerificationScreen = () => {
       }
 
       if (serverMessage) {
-        Alert.alert(serverMessage);
+        showPopup(serverMessage, [
+          {
+            label: 'OK',
+            type: 'primary',
+            onPress: () => setPopupVisible(false),
+          },
+        ]);
       } else {
-        Alert.alert('Something went wrong. Please try again.');
+        showPopup('Something went wrong. Please try again.', [
+          {
+            label: 'OK',
+            type: 'primary',
+            onPress: () => setPopupVisible(false),
+          },
+        ]);
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGetOtp = async () => {
+    const trimmedMobile = phone.trim();
+
+    if (trimmedMobile.length !== 10) {
+      showSnackbar('Phone number must be exactly 10 digits', 'error');
+      return;
+    }
+
+    try {
+      setLoading2(true);
+      const body = {
+        phone: trimmedMobile,
+        userType: userType,
+      };
+
+      console.log(body, 'In proffessional ligu');
+
+      const response = await ApiManager.phoneSignin(body);
+
+      console.log(response);
+
+      if (response.data.status === 'success') {
+        showSnackbar(response.data.message, 'success');
+        // navigation.navigate('OtpVeri', { phone: trimmedMobile });
+      }
+    } catch (error: any) {
+      const serverMessage =
+        error?.response?.data?.message || 'Something went wrong';
+
+      showSnackbar(serverMessage, 'error');
+    } finally {
+      setLoading2(false);
+    }
+  };
+
+  const showPopup = (message, buttons = []) => {
+    setPopupConfig({ message, buttons });
+    setPopupVisible(true);
   };
 
   return (
@@ -132,10 +198,25 @@ const VerificationScreen = () => {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.resendContainer}>
-            <Text style={styles.resendText}>Resend OTP</Text>
+          <TouchableOpacity
+            style={styles.resendContainer}
+            onPress={handleGetOtp}
+          >
+            <Text style={styles.resendText}>
+              {loading2 ? (
+                <ActivityIndicator color={Colors.primary} />
+              ) : (
+                'Resend OTP'
+              )}
+            </Text>
           </TouchableOpacity>
         </View>
+        <CustomPopup
+          visible={popupVisible}
+          message={popupConfig.message}
+          buttons={popupConfig.buttons}
+          onClose={() => setPopupVisible(false)}
+        />
       </KeyboardAvoidingView>
     </ImageBackground>
   );

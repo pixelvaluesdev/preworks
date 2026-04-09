@@ -8,12 +8,14 @@ const AppButton = ({
   onPress,
   type = 'primary', // 'primary' | 'outline'
   style,
+  disabled = false,
 }: any) => {
   const isOutline = type === 'outline';
 
   return (
     <TouchableOpacity
       onPress={onPress}
+      disabled={disabled}
       style={[
         styles.button,
         isOutline ? styles.outlineBtn : styles.primaryBtn,

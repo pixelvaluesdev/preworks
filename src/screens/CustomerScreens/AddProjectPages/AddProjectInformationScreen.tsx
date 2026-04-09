@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -47,6 +46,43 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
   });
 
   const handleChange = (key: string, value: string) => {
+    if (key === 'pinCode') {
+      // Allow only numbers
+      let cleaned = value.replace(/[^0-9]/g, '');
+
+      // Prevent first digit as 0
+      if (cleaned.length === 1 && cleaned === '0') {
+        return;
+      }
+
+      // Limit to 6 digits
+      if (cleaned.length > 6) {
+        return;
+      }
+
+      setForm(prev => ({
+        ...prev,
+        pinCode: cleaned,
+      }));
+      return;
+    }
+
+    //  For area field (numbers only)
+    if (key === 'area') {
+      let cleaned = value.replace(/[^0-9.]/g, ''); // only integers
+
+      setForm(prev => ({ ...prev, area: cleaned }));
+      return;
+    }
+
+    //  City: only alphabets + spaces
+    if (key === 'city') {
+      let cleaned = value.replace(/[^a-zA-Z ]/g, '');
+
+      setForm(prev => ({ ...prev, city: cleaned }));
+      return;
+    }
+
     setForm(prev => ({
       ...prev,
       [key]: value,
@@ -80,8 +116,14 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
 
     // STEP 3 validation (Files)
     if (step === 3) {
-      if (!form.siteImage) return false;
-      if (!form.archDrawing) return false;
+      if (!form.siteImage?.length) return false;
+
+      if (form.hasDrawing) {
+        if (!form.archDrawing?.length) return false;
+      } else {
+        if (!form.services || form.services.length === 0) return false;
+        // hideNumber is NOT mandatory → no need to validate
+      }
     }
 
     return true;

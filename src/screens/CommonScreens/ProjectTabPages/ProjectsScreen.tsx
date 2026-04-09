@@ -156,7 +156,7 @@ const ProjectsScreen = ({ route }: any) => {
         </TouchableOpacity>
       )}
 
-      <CustomPopup
+      {/* <CustomPopup
         visible={deletePopupVisible}
         message="Are you sure you want to delete the project?"
         onClose={() => setDeletePopupVisible(false)}
@@ -173,7 +173,7 @@ const ProjectsScreen = ({ route }: any) => {
             },
           },
         ]}
-      />
+      /> */}
     </View>
   );
 };
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     top: 20,
-    backgroundColor: 'rgba(239, 239, 239, 0.25)',
+    backgroundColor: 'rgba(119, 119, 119, 0.51)',
     padding: 6,
     borderRadius: 20,
   },

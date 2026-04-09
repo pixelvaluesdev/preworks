@@ -24,6 +24,7 @@ import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
+  console.log('userType:', userType);
   const isProfessional = userType !== 'customer';
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
@@ -35,6 +36,64 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [experience, setExperience] = useState('');
   const [links, setLinks] = useState('');
   const [bio, setBio] = useState('');
+  const [errors, setErrors] = useState({
+    email: '',
+  });
+
+  const handleInputChange = (key, value, setter) => {
+    let cleaned = value;
+
+    if (key === 'mobile') {
+      cleaned = value.replace(/[^0-9]/g, '');
+
+      if (cleaned.length === 1 && !['6', '7', '8', '9'].includes(cleaned))
+        return;
+      if (cleaned.length > 10) return;
+    }
+
+    if (key === 'pin') {
+      cleaned = value.replace(/[^0-9]/g, '');
+
+      if (cleaned.length === 1 && cleaned === '0') return;
+      if (cleaned.length > 6) return;
+    }
+
+    if (key === 'city' || key === 'state') {
+      cleaned = value.replace(/[^a-zA-Z ]/g, '');
+    }
+
+    if (key === 'area' || key === 'experience') {
+      cleaned = value.replace(/[^0-9]/g, '');
+    }
+
+    setter(cleaned);
+  };
+
+  const validateEmail = email => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email) return 'Email is required';
+    if (!regex.test(email)) return 'Enter valid email';
+
+    return '';
+  };
+
+  const handleSave = () => {
+    let emailError = '';
+
+    if (!isProfessional) {
+      emailError = validateEmail(email);
+    }
+
+    if (emailError) {
+      setErrors({ email: emailError });
+      return;
+    }
+
+    setErrors({ email: '' });
+
+    console.log('Form is valid');
+  };
 
   return (
     <KeyboardAvoidingView
@@ -90,17 +149,30 @@ const EditProfileScreen = ({ navigation }: any) => {
               <BorderTextInput
                 label="Mobile Number"
                 value={mobile}
-                onChangeText={setMobile}
+                onChangeText={text =>
+                  handleInputChange('mobile', text, setMobile)
+                }
                 placeholder="+91- Enter your mobile number"
               />
 
               {!isProfessional && (
-                <BorderTextInput
-                  label="Email"
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Enter your email"
-                />
+                <>
+                  <BorderTextInput
+                    label="Email"
+                    value={email}
+                    onChangeText={text => {
+                      setEmail(text);
+                      setErrors(prev => ({ ...prev, email: '' })); // clear error while typing
+                    }}
+                    placeholder="Enter your email"
+                  />
+
+                  {errors.email ? (
+                    <Text style={{ color: 'red', marginTop: -20 }}>
+                      {errors.email}
+                    </Text>
+                  ) : null}
+                </>
               )}
 
               {/* ROW */}
@@ -109,7 +181,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                   <BorderTextInput
                     label="City"
                     value={city}
-                    onChangeText={setCity}
+                    onChangeText={text =>
+                      handleInputChange('city', text, setCity)
+                    }
                     placeholder="City"
                   />
                 </View>
@@ -118,7 +192,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                   <BorderTextInput
                     label="Pin code"
                     value={pin}
-                    onChangeText={setPin}
+                    onChangeText={text =>
+                      handleInputChange('pin', text, setPin)
+                    }
                     placeholder="Pincode"
                   />
                 </View>
@@ -127,7 +203,9 @@ const EditProfileScreen = ({ navigation }: any) => {
               <BorderTextInput
                 label="State"
                 value={state}
-                onChangeText={setState}
+                onChangeText={text =>
+                  handleInputChange('state', text, setState)
+                }
                 placeholder="Enter your State"
               />
 
@@ -175,7 +253,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                 />
               )}
               {/* SAVE BUTTON */}
-              <TouchableOpacity style={styles.saveBtn}>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
                 <Text style={styles.saveText}>Save</Text>
               </TouchableOpacity>
             </View>

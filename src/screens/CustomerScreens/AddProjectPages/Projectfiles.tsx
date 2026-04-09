@@ -52,6 +52,7 @@ const Projectfile = ({ data, handleChange }: any) => {
         value={data.siteImage}
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
+        onRemove={() => handleChange('siteImage', '')}
       />
 
       <View style={styles.questionContainer}>
@@ -88,11 +89,11 @@ const Projectfile = ({ data, handleChange }: any) => {
           label="Upload architectural drawing (Preferred PDF)"
           value={data.archDrawing}
           onPress={() => pickImage('archDrawing')}
-          textStyle={{ fontSize: 10 }}
           rightComponent={<UploadIcon />}
-          onRemove={() => handleChange('siteImage', '')}
+          onRemove={() => handleChange('archDrawing', '')} // also fix this
         />
       )}
+
       {!hasDrawing && (
         <>
           {/* SERVICES */}
@@ -108,7 +109,7 @@ const Projectfile = ({ data, handleChange }: any) => {
               'Construction',
               'Interior Design',
               'Renovation',
-            ].map((item, index) => {
+            ].map(item => {
               const isSelected = services.includes(item);
 
               return (
@@ -123,28 +124,27 @@ const Projectfile = ({ data, handleChange }: any) => {
               );
             })}
           </View>
-
-          {/* HIDE NUMBER */}
-          <View style={styles.toggleContainer}>
-            <Text style={styles.questionText}>
-              Do you want to hide your number?{' '}
-              <Text style={styles.asterisk}> *</Text>
-            </Text>
-            <Switch
-              value={data?.hideNumber || false}
-              onValueChange={val => handleChange('hideNumber', val)}
-              trackColor={{ false: '#ccc', true: Colors.primary }}
-              thumbColor="#fff"
-            />
-          </View>
-
-          <Text style={styles.note}>
-            <Text style={styles.noteLabel}>Note: </Text>
-            IF you choose to hide you will not receive any calls from
-            professional.
-          </Text>
         </>
       )}
+
+      {/* ✅ ALWAYS VISIBLE */}
+      <View style={styles.toggleContainer}>
+        <Text style={styles.questionText}>
+          Do you want to hide your number?{' '}
+          <Text style={styles.asterisk}> *</Text>
+        </Text>
+        <Switch
+          value={data?.hideNumber || false}
+          onValueChange={val => handleChange('hideNumber', val)}
+          trackColor={{ false: '#ccc', true: Colors.primary }}
+          thumbColor="#fff"
+        />
+      </View>
+
+      <Text style={styles.note}>
+        <Text style={styles.noteLabel}>Note: </Text>
+        IF you choose to hide you will not receive any calls from professional.
+      </Text>
     </View>
   );
 };

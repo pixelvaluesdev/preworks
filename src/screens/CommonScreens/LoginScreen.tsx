@@ -6,7 +6,6 @@ import {
   ImageBackground,
   TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
@@ -21,6 +20,7 @@ import { useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
 import { useSnackbar } from '../../hooks/SnackbarProvider';
 import { ActivityIndicator } from 'react-native-paper';
+import { useRoute } from '@react-navigation/native';
 
 const LoginScreen = () => {
   const [mobile, setMobile] = useState('');
