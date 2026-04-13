@@ -120,6 +120,8 @@ const PortfolioScreen = () => {
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
           {!isStepTwo ? (
             <>
@@ -232,6 +234,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: WIDTH(4),
     paddingTop: 30,
+    paddingBottom: 20,
     gap: 10,
   },
 

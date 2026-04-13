@@ -20,17 +20,20 @@ const Popup = ({ title, visible, onClose, showQuotation = true }) => {
 
           {/* Quotation Input */}
           {showQuotation && (
-            <BorderTextInput
-              label="Quotation"
-              value={quotation}
-              onChangeText={setQuotation}
-              placeholder="Select"
-              rightComponent={
-                <TouchableOpacity>
-                  <UploadIcon />
-                </TouchableOpacity>
-              }
-            />
+            <TouchableOpacity>
+              <BorderTextInput
+                label="Quotation"
+                value={quotation}
+                onChangeText={setQuotation}
+                placeholder="Select"
+                editable={false}
+                rightComponent={
+                  <TouchableOpacity>
+                    <UploadIcon />
+                  </TouchableOpacity>
+                }
+              />
+            </TouchableOpacity>
           )}
 
           {/* Message Input */}

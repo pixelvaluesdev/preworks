@@ -90,30 +90,34 @@ const ProfileScreen = ({ navigation }: any) => {
           <View style={styles.divider} />
 
           <View style={styles.rowBetween}>
-            <View style={styles.row}>
+            {/* City */}
+            <View style={styles.col}>
               <View style={styles.rowLeft}>
-                <EmailIcon />
-
+                <City />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.label}>City</Text>
                   <Text style={styles.value}>Mumbai</Text>
                 </View>
               </View>
+
+              {/* Divider for City only */}
+              <View style={styles.halfDivider} />
             </View>
 
-            <View style={styles.row}>
+            {/* Pincode */}
+            <View style={styles.col}>
               <View style={styles.rowLeft}>
                 <Pincode />
-
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.label}>Pincode</Text>
                   <Text style={styles.value}>440024</Text>
                 </View>
               </View>
+
+              {/* Divider for Pincode only */}
+              <View style={styles.halfDivider} />
             </View>
           </View>
-
-          <View style={styles.divider} />
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
@@ -233,7 +237,8 @@ const styles = StyleSheet.create({
 
   rowBetween: {
     flexDirection: 'row',
-    gap: WIDTH(20),
+    justifyContent: 'space-between',
+    gap: 20,
   },
 
   label: {
@@ -250,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   col: {
-    width: '48%',
+    flex: 1,
   },
 
   divider: {
@@ -261,5 +266,11 @@ const styles = StyleSheet.create({
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+
+  halfDivider: {
+    borderBottomWidth: 1,
+    borderColor: '#c3c3c3',
+    marginTop: 12,
   },
 });

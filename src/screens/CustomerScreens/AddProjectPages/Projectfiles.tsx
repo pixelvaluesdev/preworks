@@ -28,6 +28,7 @@ const Projectfile = ({ data, handleChange }: any) => {
     const options = {
       mediaType: 'photo',
       quality: 0.7,
+      selectionLimit: 0,
     };
 
     launchImageLibrary(options, response => {
@@ -36,10 +37,10 @@ const Projectfile = ({ data, handleChange }: any) => {
       } else if (response.errorCode) {
         console.log('Error: ', response.errorMessage);
       } else {
-        const uri = response.assets?.[0]?.uri;
+        const uris = response.assets?.map(item => item.uri) || [];
 
-        if (uri) {
-          handleChange(key, uri); // store image
+        if (uris.length) {
+          handleChange(key, [...(data[key] || []), ...uris]);
         }
       }
     });
@@ -48,11 +49,11 @@ const Projectfile = ({ data, handleChange }: any) => {
   return (
     <View style={styles.container}>
       <UploadBox
-        label="Upload Site image (Required)"
+        label="Upload Site images (Required)"
         value={data.siteImage}
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
-        onRemove={() => handleChange('siteImage', '')}
+        onRemove={updatedArray => handleChange('siteImage', updatedArray)}
       />
 
       <View style={styles.questionContainer}>
@@ -86,11 +87,12 @@ const Projectfile = ({ data, handleChange }: any) => {
 
       {hasDrawing && (
         <UploadBox
-          label="Upload architectural drawing (Preferred PDF)"
+          label="Upload architectural drawings (Preferred PDF)"
           value={data.archDrawing}
           onPress={() => pickImage('archDrawing')}
           rightComponent={<UploadIcon />}
-          onRemove={() => handleChange('archDrawing', '')} // also fix this
+          onRemove={updatedArray => handleChange('archDrawing', updatedArray)}
+          textStyle={{ fontSize: 12 }}
         />
       )}
 
@@ -167,13 +169,23 @@ const UploadBox = ({
       </Text>
 
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
-        {value ? (
-          <View style={styles.previewContainer}>
-            <Image source={{ uri: value }} style={styles.previewImage} />
+        {Array.isArray(value) && value.length > 0 ? (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+            {value.map((img, index) => (
+              <View key={index} style={styles.previewContainer}>
+                <Image source={{ uri: img }} style={styles.previewImage} />
 
-            <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
-              <CloseIcon width={16} height={16} />
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.removeBtn}
+                  onPress={() => {
+                    const updated = value.filter((_, i) => i !== index);
+                    onRemove(updated); // send updated array
+                  }}
+                >
+                  <CloseIcon width={16} height={16} />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
         ) : (
           <Text style={styles.placeholder}>Browse image</Text>

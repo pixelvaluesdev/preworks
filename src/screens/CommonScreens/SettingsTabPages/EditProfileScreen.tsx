@@ -21,6 +21,7 @@ import Camera from '../../../assets/svgs/CameraSvg.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
+import CustomPopup from '../../../components/Popups/CustomPopup';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
@@ -36,6 +37,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [experience, setExperience] = useState('');
   const [links, setLinks] = useState('');
   const [bio, setBio] = useState('');
+  const [showPopup, setShowPopup] = useState(false);
   const [errors, setErrors] = useState({
     email: '',
   });
@@ -92,7 +94,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     setErrors({ email: '' });
 
-    console.log('Form is valid');
+    setShowPopup(true);
   };
 
   return (
@@ -258,6 +260,22 @@ const EditProfileScreen = ({ navigation }: any) => {
               </TouchableOpacity>
             </View>
           </ScrollView>
+
+          <CustomPopup
+            visible={showPopup}
+            message="Your profile has been saved successfully!"
+            onClose={() => setShowPopup(false)}
+            buttons={[
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setShowPopup(false);
+                  navigation.goBack(); // optional
+                },
+              },
+            ]}
+          />
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

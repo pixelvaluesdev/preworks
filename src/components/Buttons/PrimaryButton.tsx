@@ -41,13 +41,14 @@ export default PrimaryButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: WIDTH(70), // 🔥 increase width (60 → 75)
-    borderRadius: 15,
+    width: WIDTH(65), 
+    borderRadius: 10,
     borderWidth: 0.5,
     borderColor: 'white',
     marginBottom: 20,
     backgroundColor: 'rgba(255,255,255,0.3)',
     overflow: 'hidden',
+    paddingVertical: 6,
   },
 
   disabled: {
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 2, // 🔥 better height
+    paddingVertical: 2, 
     paddingHorizontal: 14,
   },
 
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_BOLD,
-    // ❌ remove flex: 1
-    flexShrink: 1, // 🔥 allows proper text shrink instead of pushing space
+   
+    flexShrink: 1, 
   },
 });

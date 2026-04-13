@@ -11,7 +11,7 @@ import {
 import ScreenHeader from '../../components/ScreenHeader';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
-import { FONTSIZE, WIDTH } from '../../utils/responsive';
+import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
 import AreaIcon from '../../assets/svgs/Area.svg';
 import CalenderIcon from '../../assets/svgs/Calender.svg';
 import ConstructionIcon from '../../assets/svgs/Construction.svg';
@@ -194,6 +194,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 8,
     marginBottom: 8,
+    height: HEIGHT(4),
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlignVertical: 'center',
   },
 
   detailRow: {

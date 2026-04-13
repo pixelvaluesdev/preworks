@@ -5,10 +5,18 @@ import CloseIcon from '../../assets/svgs/Delete.svg';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 
-const UploadBox = ({ label, value, onPress, onRemove, required = true }) => {
+const UploadBox = ({
+  label,
+  value,
+  onPress,
+  onRemove,
+  required = true,
+  labelSize = 14,
+  TextSize = 14,
+}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>
+      <Text style={[styles.label, { fontSize: labelSize }]}>
         {label} {required && <Text style={styles.asterisk}>*</Text>}
       </Text>
 

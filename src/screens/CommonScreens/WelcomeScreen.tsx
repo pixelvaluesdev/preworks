@@ -26,14 +26,14 @@ const WelcomeScreen = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Logo />
+        <Logo width={200} />
 
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Please Select Your User Type</Text>
 
         <PrimaryButton
           title="Customer"
-          width={WIDTH(55)}
+          width={WIDTH(50)}
           Icon={Customer}
           onPress={() => {
             dispatch(setUserType('customer'));
@@ -49,7 +49,7 @@ const WelcomeScreen = () => {
         <PrimaryButton
           title="Professional"
           Icon={Professional}
-          width={WIDTH(55)}
+          width={WIDTH(50)}
           onPress={() => {
             // dispatch(setUserType('professional'));
             navigation.navigate('ProfWelc');

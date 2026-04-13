@@ -233,20 +233,23 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           {!isCustomer && (
             <>
               <View style={{ marginTop: 15 }}>
-                <BorderTextInput
-                  label="Architectural Drawing"
-                  placeholder="Architectural Drawing.PDF"
-                  // value={data.lastDate}
-                  // onChangeText={text => handleChange('lastDate', text)}
-                  height={HEIGHT(7)}
-                  rightComponent={
-                    <>
-                      <TouchableOpacity>
-                        <DownloadIcon />
-                      </TouchableOpacity>
-                    </>
-                  }
-                />
+                <TouchableOpacity>
+                  <BorderTextInput
+                    label="Architectural Drawing"
+                    placeholder="Architectural Drawing.PDF"
+                    editable={false}
+                    // value={data.lastDate}
+                    // onChangeText={text => handleChange('lastDate', text)}
+                    height={HEIGHT(7)}
+                    rightComponent={
+                      <>
+                        <TouchableOpacity>
+                          <DownloadIcon />
+                        </TouchableOpacity>
+                      </>
+                    }
+                  />
+                </TouchableOpacity>
 
                 <SecondaryButton
                   title="Send Your Quotation"

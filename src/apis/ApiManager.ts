@@ -60,6 +60,7 @@ const requestPath = {
   banners: '/customer/banners',
   professionalList: '/customer/prof-list',
   projectList: '/customer/project-list',
+  createProject: '/customer/create-project',
 };
 
 const ApiManager = {
@@ -79,6 +80,9 @@ const ApiManager = {
 
   getProjects: (userId: string, token?: string) => {
     return requests.get(`${requestPath.projectList}/${userId}`, token);
+  },
+  createProject: (data: any, token?: string) => {
+    return requests.post(requestPath.createProject, data, token);
   },
 };
 

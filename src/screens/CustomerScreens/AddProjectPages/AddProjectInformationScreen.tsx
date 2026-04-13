@@ -20,6 +20,9 @@ import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import Projectfiles from './Projectfiles';
 import AppButton from '../../../components/Buttons/AppButton';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
+import ApiManager from '../../../apis/ApiManager';
+import { useSelector } from 'react-redux';
+import CustomPopup from '../../../components/Popups/CustomPopup';
 
 const TOTAL_STEPS = 4;
 
@@ -27,6 +30,11 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
   const [step, setStep] = useState<number>(0);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const token = useSelector(state => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
 
   const [form, setForm] = useState({
     projectName: '',
@@ -41,8 +49,8 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
     lastDate: '',
     description: '',
     budget: '',
-    siteImage: '',
-    archDrawing: '',
+    siteImage: [],
+    archDrawing: [],
   });
 
   const handleChange = (key: string, value: string) => {
@@ -139,7 +147,7 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
     if (step < TOTAL_STEPS - 1) {
       setStep(prev => prev + 1);
     } else {
-      navigation.goBack();
+      createProjectApi();
     }
   };
 
@@ -148,6 +156,81 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
       navigation.goBack();
     } else {
       setStep(prev => prev - 1);
+    }
+  };
+
+  const mapFloors = val => {
+    if (val === 'Only Ground Floor') return 'g';
+    if (val === 'Ground + 1 Floor') return 'g1';
+    if (val === 'Ground + 2 Floor') return 'g2';
+    return val;
+  };
+
+  const createProjectApi = async () => {
+    try {
+      setLoading(true);
+      setIsSuccess(false);
+      const formData = new FormData();
+
+      formData.append('projectName', form.projectName);
+      formData.append('plotAddress', form.address);
+      formData.append('city', form.city);
+      formData.append('pinCode', form.pinCode);
+      formData.append('floorArea', form.area);
+      formData.append('noOfFloors', mapFloors(form.floors));
+      formData.append(
+        'typeOfQuote',
+        form.quoteType === 'Labour Only' ? 'labour' : 'labour+material',
+      );
+      formData.append('constStartDate', form.startDate);
+      formData.append('quoteLastDate', form.lastDate);
+      formData.append('requirementDesc', form.description);
+      formData.append('priceRange', form.budget);
+
+      formData.append('drawingStatus', form.hasDrawing ? 'true' : 'false');
+      formData.append('hideNumber', form.hideNumber ? 'true' : 'false');
+
+      // services (array → string)
+      if (!form.hasDrawing) {
+        formData.append('services', JSON.stringify(form.services));
+      }
+
+      // IMAGE (site image)
+      if (form.siteImage) {
+        formData.append('image', {
+          uri: form.siteImage,
+          type: 'image/jpeg',
+          name: 'site.jpg',
+        });
+      }
+
+      // DRAWING FILE
+      if (form.archDrawing) {
+        formData.append('drawing', {
+          uri: form.archDrawing,
+          type: 'application/pdf', // or image if needed
+          name: 'drawing.pdf',
+        });
+      }
+
+      //  userId (important)
+      formData.append('userId', userId);
+
+      const response = await ApiManager.createProject(formData, token);
+      setLoading(false);
+      setIsSuccess(true);
+
+      console.log('SUCCESS:', response.data);
+      setPopupMessage(
+        response?.data?.message || 'Project created successfully',
+      );
+      setPopupVisible(true);
+    } catch (error) {
+      console.log('ERROR:', error?.response?.data || error.message);
+      setLoading(false);
+      setIsSuccess(false);
+      setPopupMessage(error?.response?.data?.message || 'Something went wrong');
+      setPopupVisible(true);
     }
   };
 
@@ -220,17 +303,43 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
               />
 
               <AppButton
-                title={step === TOTAL_STEPS - 1 ? 'Submit Project' : 'Continue'}
+                title={
+                  loading
+                    ? 'Submitting...'
+                    : step === TOTAL_STEPS - 1
+                    ? 'Submit Project'
+                    : 'Continue'
+                }
                 onPress={handleNext}
-                disabled={!validateStep()}
+                disabled={!validateStep() || loading}
                 style={{
                   flex: 1,
-                  opacity: validateStep() ? 1 : 0.5,
+                  opacity: validateStep() && !loading ? 1 : 0.5,
                 }}
               />
             </View>
           )}
         </View>
+
+        <CustomPopup
+          visible={popupVisible}
+          title={isSuccess ? 'Success' : 'Error'}
+          message={popupMessage}
+          onClose={() => setPopupVisible(false)}
+          buttons={[
+            {
+              label: 'OK',
+              type: 'primary',
+              onPress: () => {
+                setPopupVisible(false);
+
+                if (isSuccess) {
+                  navigation.goBack();
+                }
+              },
+            },
+          ]}
+        />
       </KeyboardAvoidingView>
     </View>
   );

@@ -21,6 +21,9 @@ import { useSelector } from 'react-redux';
 import ApiManager from '../../../apis/ApiManager';
 import { BASE_URL, IMG_URL } from '../../../apis/ApiManager';
 import OptionsIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
+import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
+import DeleteICon from '../../../assets/svgs/BlackDeleteIcon.svg';
+import EditIcon from '../../../assets/svgs/BlackEditIcon.svg';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -36,13 +39,15 @@ const ProjectsScreen = ({ route }: any) => {
   const [selectedProject, setSelectedProject] = React.useState(null);
   const [projects, setProjects] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [menuVisible, setMenuVisible] = React.useState(false);
+  const [menuPosition, setMenuPosition] = React.useState({ x: 0, y: 0 });
   const [apiFinished, setApiFinished] = React.useState(false);
 
-  React.useEffect(() => {
-    if (apiFinished && projects.length === 0) {
-      navigation.navigate('NoProjects');
-    }
-  }, [apiFinished, projects]);
+  // React.useEffect(() => {
+  //   if (apiFinished && projects.length === 0) {
+  //     navigation.navigate('NoProjects');
+  //   }
+  // }, [apiFinished, projects]);
 
   React.useEffect(() => {
     if (userId) {
@@ -92,9 +97,12 @@ const ProjectsScreen = ({ route }: any) => {
           {isCustomer && (
             <TouchableOpacity
               style={styles.deleteIcon}
-              onPress={() => {
+              onPress={event => {
+                const { pageX, pageY } = event.nativeEvent;
+
                 setSelectedProject(item);
-                setDeletePopupVisible(true);
+                setMenuPosition({ x: pageX, y: pageY });
+                setMenuVisible(true);
               }}
             >
               <OptionsIcon width={20} height={20} />
@@ -132,6 +140,46 @@ const ProjectsScreen = ({ route }: any) => {
     );
   }
 
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
+  // EMPTY STATE SECOND
+  if (apiFinished && projects.length === 0) {
+    return (
+      <View style={styles.container}>
+        <ScreenHeader title="Projects" showBack />
+
+        <View style={styles.content}>
+          <Image
+            source={require('../../../assets/pngs/NoProjectsImg.png')}
+            style={styles.image}
+            resizeMode="contain"
+          />
+
+          <Text style={styles.message}>
+            {isCustomer
+              ? "You don’t have any projects yet. Hit 'Add Project' to get started."
+              : 'No projects uploaded yet from customers.'}
+          </Text>
+
+          {isCustomer && (
+            <SecondaryButton
+              title="Add Project Details"
+              style={styles.button}
+              onPress={() => navigation.navigate('AddProjectInformation')}
+              icon={<PlusIcon height={20} width={30} />}
+            />
+          )}
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScreenHeader title="Projects" showBack />
@@ -146,6 +194,46 @@ const ProjectsScreen = ({ route }: any) => {
         }}
       />
 
+      {menuVisible && (
+        <TouchableOpacity
+          style={styles.overlay}
+          activeOpacity={1}
+          onPress={() => setMenuVisible(false)}
+        >
+          <View
+            style={[
+              styles.menuContainer,
+              { top: menuPosition.y, left: menuPosition.x - 120 },
+            ]}
+          >
+            {/* Edit */}
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setMenuVisible(false);
+                navigation.navigate('AddProjectInformation', {
+                  project: selectedProject,
+                });
+              }}
+            >
+              <EditIcon width={20} height={20} />
+              <Text style={styles.menuText}>Edit</Text>
+            </TouchableOpacity>
+
+            {/* Delete */}
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setDeletePopupVisible(true);
+              }}
+            >
+              <DeleteICon width={20} height={20} />
+              <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      )}
+
       {/* Add Button only for customer */}
       {isCustomer && (
         <TouchableOpacity
@@ -156,7 +244,7 @@ const ProjectsScreen = ({ route }: any) => {
         </TouchableOpacity>
       )}
 
-      {/* <CustomPopup
+      <CustomPopup
         visible={deletePopupVisible}
         message="Are you sure you want to delete the project?"
         onClose={() => setDeletePopupVisible(false)}
@@ -173,7 +261,7 @@ const ProjectsScreen = ({ route }: any) => {
             },
           },
         ]}
-      /> */}
+      />
     </View>
   );
 };
@@ -266,5 +354,56 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: WIDTH(6),
+  },
+
+  image: {
+    width: WIDTH(70),
+    height: HEIGHT(35),
+  },
+
+  message: {
+    fontSize: 16,
+    fontFamily: FONT.POPPINS_MEDIUM,
+    marginTop: HEIGHT(2),
+    textAlign: 'center',
+  },
+
+  button: {
+    marginTop: HEIGHT(3),
+    width: '100%',
+  },
+  overlay: {
+    position: 'absolute',
+    top: -30,
+    left: 20,
+    right: 0,
+    bottom: 0,
+  },
+
+  menuContainer: {
+    position: 'absolute',
+    width: 100,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 2,
+    elevation: 5,
+  },
+
+  menuItem: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    flexDirection: 'row',
+    gap: 6,
+  },
+
+  menuText: {
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 });

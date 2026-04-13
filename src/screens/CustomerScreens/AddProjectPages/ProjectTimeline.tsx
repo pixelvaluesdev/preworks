@@ -59,7 +59,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   };
 
   const formatBudgetRange = val => {
-    const step = 1000000;
+    const step = 500000;
     const max = 20000000;
 
     if (val >= max) {
@@ -71,11 +71,12 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
     const toLakh = v => Math.round(v / 100000);
 
-    // Convert to Cr if >= 1Cr
+    // If >= 1 Cr → show in Cr
     if (start >= 10000000) {
-      return `${(start / 10000000).toFixed(1)} - ${(end / 10000000).toFixed(
-        1,
-      )} Cr`;
+      const startCr = start / 10000000;
+      const endCr = end / 10000000;
+
+      return `${startCr.toFixed(2)} - ${endCr.toFixed(2)} Cr`;
     }
 
     return `${toLakh(start)} - ${toLakh(end)} Lakh`;
@@ -146,7 +147,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
             style={{ width: '100%', height: 40 }}
             minimumValue={500000} // 5 Lakh
             maximumValue={20000000} // 2 Crore
-            step={1000000} // 10 Lakh step
+            step={500000} // 5 Lakh step
             value={data.budget}
             minimumTrackTintColor={Colors.primary}
             maximumTrackTintColor="#ccc"
@@ -179,6 +180,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        minimumDate={new Date()}
       />
     </View>
   );

@@ -54,7 +54,7 @@ const AppliedProjectsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title="Applied Projects" showBack />
+      <ScreenHeader title="Projects Applied" showBack />
 
       <FlatList
         data={projects}

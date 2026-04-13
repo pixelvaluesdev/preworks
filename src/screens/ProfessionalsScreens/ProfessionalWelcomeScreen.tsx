@@ -26,7 +26,7 @@ const ProfessionalWelcomeScreen = () => {
 
         <PrimaryButton
           title="Contractor"
-          width={WIDTH(70)}
+          width={WIDTH(65)}
           Icon={Architect}
           onPress={() => {
             dispatch(setUserType('contractor'));
@@ -37,7 +37,7 @@ const ProfessionalWelcomeScreen = () => {
         <PrimaryButton
           title="Architect"
           Icon={Architect2}
-          width={WIDTH(70)}
+          width={WIDTH(65)}
           onPress={() => {
             dispatch(setUserType('architect'));
             navigation.navigate('Login');
@@ -47,7 +47,7 @@ const ProfessionalWelcomeScreen = () => {
         <PrimaryButton
           title="Interior Designer"
           Icon={Interior}
-          width={WIDTH(70)}
+          width={WIDTH(65)}
           onPress={() => {
             dispatch(setUserType('designer'));
             navigation.navigate('Login');
