@@ -42,6 +42,15 @@ const ProjectsScreen = ({ route }: any) => {
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [menuPosition, setMenuPosition] = React.useState({ x: 0, y: 0 });
   const [apiFinished, setApiFinished] = React.useState(false);
+  const [selectedTab, setSelectedTab] = React.useState('quoted');
+  const [quotedProjects, setQuotedProjects] = React.useState([]);
+
+  const [interestedProjects, setInterestedProjects] = React.useState([
+    { id: '1', name: 'House Construction' },
+    { id: '2', name: 'House Construction' },
+    { id: '3', name: 'House Construction' },
+    { id: '4', name: 'House Construction' },
+  ]);
 
   // React.useEffect(() => {
   //   if (apiFinished && projects.length === 0) {
@@ -94,12 +103,12 @@ const ProjectsScreen = ({ route }: any) => {
             style={[styles.projectImage, !item.status && styles.closedImage]}
           />
 
+          {/* ❌ Only show menu for customer */}
           {isCustomer && (
             <TouchableOpacity
               style={styles.deleteIcon}
               onPress={event => {
                 const { pageX, pageY } = event.nativeEvent;
-
                 setSelectedProject(item);
                 setMenuPosition({ x: pageX, y: pageY });
                 setMenuVisible(true);
@@ -111,11 +120,15 @@ const ProjectsScreen = ({ route }: any) => {
 
           <View style={styles.rowBetween}>
             <View>
-              <Text style={styles.projectName}>{item.projectName}</Text>
+              <Text style={styles.projectName}>
+                {item.projectName || item.name}
+              </Text>
 
-              <Text style={styles.projectCode}>#{item._id}</Text>
+              {/* ❗ fallback for dummy data */}
+              <Text style={styles.projectCode}>#{item._id || item.id}</Text>
             </View>
 
+            {/* ❌ Status only for customer */}
             {isCustomer && (
               <Text
                 style={[
@@ -149,7 +162,7 @@ const ProjectsScreen = ({ route }: any) => {
   }
 
   // EMPTY STATE SECOND
-  if (apiFinished && projects.length === 0) {
+  if (isCustomer && apiFinished && projects.length === 0) {
     return (
       <View style={styles.container}>
         <ScreenHeader title="Projects" showBack />
@@ -183,16 +196,101 @@ const ProjectsScreen = ({ route }: any) => {
   return (
     <View style={styles.container}>
       <ScreenHeader title="Projects" showBack />
-      <FlatList
-        data={projects}
-        keyExtractor={item => item._id}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: WIDTH(4),
-          paddingBottom: HEIGHT(10),
-        }}
-      />
+
+      {!isCustomer && (
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, selectedTab === 'quoted' && styles.activeTab]}
+            onPress={() => setSelectedTab('quoted')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === 'quoted' && styles.activeTabText,
+              ]}
+            >
+              Quoted Projects
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              selectedTab === 'interested' && styles.activeTab,
+            ]}
+            onPress={() => setSelectedTab('interested')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === 'interested' && styles.activeTabText,
+              ]}
+            >
+              Interested Projects
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {isCustomer && (
+        <FlatList
+          data={projects}
+          keyExtractor={item => item._id}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: WIDTH(4),
+            paddingBottom: HEIGHT(10),
+          }}
+        />
+      )}
+
+      {!isCustomer && (
+        <>
+          {selectedTab === 'quoted' ? (
+            quotedProjects.length > 0 ? (
+              <FlatList
+                data={quotedProjects}
+                keyExtractor={item => item.id}
+                renderItem={renderItem}
+                contentContainerStyle={{
+                  paddingHorizontal: WIDTH(4),
+                  paddingBottom: HEIGHT(10),
+                }}
+              />
+            ) : (
+              <View style={styles.content}>
+                <Image
+                  source={require('../../../assets/pngs/NoProjectsImg.png')}
+                  style={styles.image}
+                />
+                <Text style={styles.message}>
+                  You haven’t quoted any projects yet.
+                </Text>
+              </View>
+            )
+          ) : interestedProjects.length > 0 ? (
+            <FlatList
+              data={interestedProjects}
+              keyExtractor={item => item.id}
+              renderItem={renderItem}
+              contentContainerStyle={{
+                paddingHorizontal: WIDTH(4),
+                paddingBottom: HEIGHT(10),
+              }}
+            />
+          ) : (
+            <View style={styles.content}>
+              <Image
+                source={require('../../../assets/pngs/NoProjectsImg.png')}
+                style={styles.image}
+              />
+              <Text style={styles.message}>
+                You haven’t shown interest in any project.
+              </Text>
+            </View>
+          )}
+        </>
+      )}
 
       {menuVisible && (
         <TouchableOpacity
@@ -405,5 +503,33 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 14,
     fontFamily: FONT.POPPINS_MEDIUM,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginHorizontal: WIDTH(4),
+    marginTop: HEIGHT(2),
+    backgroundColor: '#eee',
+    borderRadius: 10,
+    marginBottom: HEIGHT(2),
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+
+  activeTab: {
+    backgroundColor: '#3AA171',
+    borderRadius: 10,
+  },
+
+  tabText: {
+    fontFamily: FONT.POPPINS_MEDIUM,
+    color: '#555',
+  },
+
+  activeTabText: {
+    color: '#fff',
   },
 });

@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 
   image: {
     width: '100%',
-    height: 150,
+    height: 130,
   },
 
   content: {
@@ -77,18 +77,18 @@ const styles = StyleSheet.create({
 
   title: {
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 16,
+    fontSize: 14,
   },
 
   new: {
     color: '#0E77EF',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   location: {
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400',
   },
 

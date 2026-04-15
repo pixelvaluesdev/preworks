@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -19,14 +20,28 @@ import LinkIcon from '../../../assets/svgs/Links.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
+import MultiImg from '../../../assets/svgs/MultiImgIcon.svg';
 
-const portfolioImages = [
-  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
-  'https://images.unsplash.com/photo-1600607687644-c94bf45c6d3e',
-  'https://images.unsplash.com/photo-1600566752355-35792bedcfea',
-  'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d',
-  'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
-  'https://images.unsplash.com/photo-1600607688969-a5bfcd646154',
+const portfolioData = [
+  {
+    id: 1,
+    images: [
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
+      'https://images.unsplash.com/photo-1600607687644-c94bf45c6d3e',
+    ],
+  },
+  {
+    id: 2,
+    images: ['https://images.unsplash.com/photo-1600566752355-35792bedcfea'],
+  },
+  {
+    id: 3,
+    images: [
+      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
+      'https://images.unsplash.com/photo-1600607688969-a5bfcd646154',
+    ],
+  },
 ];
 
 const ProfessionalProfileScreen = () => {
@@ -36,6 +51,33 @@ const ProfessionalProfileScreen = () => {
   const navigation = useNavigation();
   const userType = useSelector((state: any) => state.auth.userType);
   const isProffesional = userType !== 'customer';
+
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const blinkAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (showComingSoon) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(blinkAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blinkAnim, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+
+      // Hide after 3 sec
+      setTimeout(() => {
+        setShowComingSoon(false);
+      }, 3000);
+    }
+  }, [showComingSoon]);
 
   return (
     <View style={styles.container}>
@@ -92,11 +134,22 @@ const ProfessionalProfileScreen = () => {
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.actionItem}>
+            <TouchableOpacity
+              style={styles.actionItem}
+              onPress={() => setShowComingSoon(true)}
+            >
               <View style={styles.iconCircle}>
                 <ChatIcon width={40} height={40} />
               </View>
               <Text style={styles.actionText}>Chat now</Text>
+
+              {showComingSoon && (
+                <Animated.Text
+                  style={[styles.comingSoonText, { opacity: blinkAnim }]}
+                >
+                  Coming Soon
+                </Animated.Text>
+              )}
             </TouchableOpacity>
 
             <View style={styles.divider} />
@@ -115,17 +168,32 @@ const ProfessionalProfileScreen = () => {
           <Text style={styles.portfolioTitle}>My Portfolio</Text>
 
           <View style={styles.grid}>
-            {portfolioImages.map((img, index) => (
+            {portfolioData.map((item, index) => (
               <TouchableOpacity
-                key={index}
+                key={item.id}
                 style={styles.gridItem}
                 onPress={() =>
                   navigation.navigate('ProfessionalsProject', {
-                    projectId: index + 1,
+                    projectId: item.id,
+                    images: item.images,
                   })
                 }
               >
-                <Image source={{ uri: img }} style={styles.gridImage} />
+                <View style={{ position: 'relative' }}>
+                  {/* Show first image */}
+                  <Image
+                    source={{ uri: item.images[0] }}
+                    style={styles.gridImage}
+                  />
+
+                  {/* Show icon if multiple images */}
+                  {item.images.length > 1 && (
+                    <View style={styles.multiIcon}>
+                      {/* Option 1: Icon */}
+                      <MultiImg width={16} height={16} />
+                    </View>
+                  )}
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -290,5 +358,27 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  comingSoonText: {
+    marginTop: 5,
+    fontSize: 8,
+    color: Colors.primary,
+    fontFamily: FONT.POPPINS_MEDIUM,
+    alignSelf: 'center',
+  },
+  multiIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(36, 36, 36, 0.6)',
+    borderRadius: 10,
+    paddingHorizontal: 2,
+    paddingVertical: 2,
+  },
+
+  multiText: {
+    color: '#fff',
+    fontSize: 10,
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 });

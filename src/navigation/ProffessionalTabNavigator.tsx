@@ -157,7 +157,7 @@ const ProfessionalTabNavigator = () => {
       />
 
       <Tab.Screen
-        name="Add Work"
+        name="AddWork"
         component={PortfolioScreen}
         options={({ navigation, route }) => ({
           tabBarButton: props =>

@@ -18,33 +18,7 @@ import ScreenHeader from '../../../components/ScreenHeader';
 import SearchHeader from '../../../components/SearchHeader';
 import Location from '../../../assets/svgs/LocationIcon.svg';
 import SuitCaseIcon from '../../../assets/svgs/suitcaseIcon.svg';
-
-const professionals = [
-  {
-    id: '1',
-    name: 'Rajendra Singh',
-    exp: '5 yrs exp',
-    location: 'Mumbai, India',
-    type: 'contractor',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
-  },
-  {
-    id: '2',
-    name: 'Rajendra Singh',
-    exp: '5 yrs exp',
-    location: 'Mumbai, India',
-    type: 'architect',
-    image: 'https://randomuser.me/api/portraits/men/45.jpg',
-  },
-  {
-    id: '3',
-    name: 'Rajendra Singh',
-    exp: '5 yrs exp',
-    location: 'Mumbai, India',
-    type: 'interior',
-    image: 'https://randomuser.me/api/portraits/men/64.jpg',
-  },
-];
+import { IMG_URL } from '../../../apis/ApiManager';
 
 const suggestions = [
   'Residential',
@@ -59,6 +33,7 @@ const ProfessionalListScreen = () => {
   const route = useRoute();
 
   const type = route?.params?.type;
+  const professionals = route?.params?.professionals || [];
 
   const [search, setSearch] = useState('');
 
@@ -109,37 +84,55 @@ const ProfessionalListScreen = () => {
           numColumns={2}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() =>
-                navigation.navigate('ProfessionalProfile', { id: item.id })
-              }
-            >
-              <Image source={{ uri: item.image }} style={styles.image} />
+          renderItem={({ item }) => {
+            const hasValidImage =
+              item.image &&
+              Array.isArray(item.image) &&
+              item.image.length > 0 &&
+              typeof item.image[0] === 'string' &&
+              item.image[0].trim() !== '';
 
-              <View
-                style={{
-                  backgroundColor: '#F0F0F0',
-                  borderBottomRightRadius: 5,
-                  borderBottomLeftRadius: 5,
-                  paddingHorizontal: 10,
-                  paddingVertical: 0,
-                }}
+            return (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('ProfessionalProfile', { id: item.id })
+                }
               >
-                <Text style={styles.name}>{item.name}</Text>
-                <View style={{ flexDirection: 'row', gap: 4 }}>
-                  <SuitCaseIcon width={16} height={16} />
-                  <Text style={styles.exp}>{item.exp}</Text>
-                </View>
+                <Image
+                  source={
+                    hasValidImage
+                      ? { uri: `${IMG_URL}${item.image[0]}` }
+                      : require('../../../assets/pngs/Placeholder.png')
+                  }
+                  style={styles.image}
+                />
 
-                <View style={{ flexDirection: 'row', gap: 4 }}>
-                  <Location width={16} height={16} />
-                  <Text style={styles.location}>{item.location}</Text>
+                <View
+                  style={{
+                    backgroundColor: '#F0F0F0',
+                    borderBottomRightRadius: 5,
+                    borderBottomLeftRadius: 5,
+                    paddingHorizontal: 10,
+                  }}
+                >
+                  <Text style={styles.name}>
+                    {item.firstName} {item.lastName}
+                  </Text>
+
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <SuitCaseIcon width={16} height={16} />
+                    <Text style={styles.exp}>{item.exp}</Text>
+                  </View>
+
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <Location width={16} height={16} />
+                    <Text style={styles.location}>{item.location}</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          )}
+              </TouchableOpacity>
+            );
+          }}
         />
       )}
     </View>

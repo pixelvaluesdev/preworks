@@ -150,6 +150,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: WIDTH(6),
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    // backgroundColor: 'rgba(0,0,0,0.45)',
   },
 });

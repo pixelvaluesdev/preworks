@@ -33,6 +33,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         value={data.pinCode}
         onChangeText={text => handleChange('pinCode', text)}
         height={HEIGHT(7)}
+        keyboardType="number-pad"
       />
     </View>
   );

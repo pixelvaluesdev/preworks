@@ -50,7 +50,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
     const ratio = (data.budget - min) / (max - min);
     const position = ratio * sliderWidth;
 
-    const labelWidth = 80;
+    const labelWidth = 90;
 
     return Math.min(
       Math.max(position - labelWidth / 2, 0),
@@ -84,27 +84,6 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
   return (
     <View style={styles.container}>
-      {/* START DATE */}
-
-      <BorderTextInput
-        label="Plan to start your construction"
-        placeholder="Enter your start date"
-        value={data.startDate}
-        onChangeText={() => {}}
-        editable={false}
-        height={HEIGHT(7)}
-        rightComponent={
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedField('startDate');
-              showDatePicker();
-            }}
-          >
-            <CalenderIcon />
-          </TouchableOpacity>
-        }
-      />
-
       {/* LAST DATE */}
 
       <BorderTextInput
@@ -126,6 +105,27 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         }
       />
 
+      {/* START DATE */}
+
+      <BorderTextInput
+        label="Plan to start your construction"
+        placeholder="Enter your start date"
+        value={data.startDate}
+        onChangeText={() => {}}
+        editable={false}
+        height={HEIGHT(7)}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedField('startDate');
+              showDatePicker();
+            }}
+          >
+            <CalenderIcon />
+          </TouchableOpacity>
+        }
+      />
+
       {/* DESCRIPTION */}
       <BorderTextInput
         label="Scope of work description"
@@ -134,7 +134,9 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         onChangeText={text => handleChange('description', text)}
         multiline
         height={HEIGHT(10)}
+        maxLength={200}
       />
+      <Text style={styles.charCount}>{data.description?.length || 0}/200</Text>
 
       {/* PRICE RANGE */}
       <View style={styles.sliderContainer}>
@@ -160,17 +162,15 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
             }}
           />
 
-          <View
-            style={[
-              styles.floatingLabel,
-              {
-                left: getThumbPosition(), // adjust center
-              },
-            ]}
-          >
-            <Text style={styles.selectedValue}>
-              {formatBudgetRange(data.budget)}
-            </Text>
+          <View style={[styles.tooltipContainer, { left: getThumbPosition() }]}>
+            <View style={styles.tooltipBox}>
+              <Text style={styles.tooltipText}>
+                {formatBudgetRange(data.budget)}
+              </Text>
+            </View>
+
+            {/* Triangle pointer */}
+            <View style={styles.tooltipArrow} />
           </View>
         </View>
       </View>
@@ -180,7 +180,11 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
-        minimumDate={new Date()}
+        minimumDate={
+          selectedField === 'startDate' && data.lastDate
+            ? new Date(data.lastDate)
+            : new Date()
+        }
       />
     </View>
   );
@@ -193,7 +197,9 @@ const styles = StyleSheet.create({
     gap: 20,
   },
 
-  sliderContainer: {},
+  sliderContainer: {
+    gap: 30,
+  },
 
   sliderLabel: {
     fontSize: 16,
@@ -223,5 +229,44 @@ const styles = StyleSheet.create({
   asterisk: {
     color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  charCount: {
+    textAlign: 'right',
+    fontSize: 12,
+    color: '#777',
+    marginTop: -30,
+    marginRight: 10,
+  },
+  tooltipContainer: {
+    position: 'absolute',
+    top: -30,
+    alignItems: 'center',
+  },
+
+  tooltipBox: {
+    backgroundColor: '#B4F2BB',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+
+  tooltipText: {
+    color: '#333',
+    fontSize: 12,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+
+  tooltipArrow: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderTopWidth: 8,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#B4F2BB', // same as box
+    marginTop: -1,
   },
 });

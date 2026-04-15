@@ -18,35 +18,11 @@ import { useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import { useEffect } from 'react';
-import ApiManager from '../../apis/ApiManager';
+import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
 import { useBackExit } from '../../hooks/useBackExit';
 import LocationIcon from '../../assets/svgs/LocationIcon.svg';
-
-const professionals = [
-  {
-    id: '1',
-    name: 'Mayur Mishra',
-    exp: '5 yrs exp',
-    location: 'Indore, India',
-    //image: 'https://randomuser.me/api/portraits/men/32.jpg',
-  },
-  {
-    id: '2',
-    name: 'Mayur Mishra',
-    exp: '8 yrs exp',
-    location: 'Indore, India',
-    //image: 'https://randomuser.me/api/portraits/men/45.jpg',
-  },
-  {
-    id: '3',
-    name: 'Mayur Mishra',
-    exp: '1 yrs exp',
-    location: 'Indore, India',
-    // image: 'https://randomuser.me/api/portraits/men/64.jpg',
-  },
-];
 
 const CustomerHomeScreen = () => {
   const navigation = useNavigation();
@@ -55,6 +31,9 @@ const CustomerHomeScreen = () => {
   const [helpPopupVisible, setHelpPopupVisible] = useState(false);
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [professionals, setProfessionals] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     console.log(token, 'Tokennnn here');
@@ -76,6 +55,26 @@ const CustomerHomeScreen = () => {
   };
 
   useBackExit();
+
+  useEffect(() => {
+    fetchProfessionals();
+  }, []);
+
+  const fetchProfessionals = async () => {
+    try {
+      setLoading(true);
+
+      const response = await ApiManager.getProfessionals('all', token);
+
+      if (response?.data?.status === 'success') {
+        setProfessionals(response?.data?.data);
+      }
+    } catch (error) {
+      console.log('Error fetching professionals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -144,7 +143,10 @@ const CustomerHomeScreen = () => {
           <Text style={styles.sectionTitle}>Professionals List</Text>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate('ProfessionalList', { type: 'All' })
+              navigation.navigate('ProfessionalList', {
+                type: 'All',
+                professionals,
+              })
             }
           >
             <Text style={styles.seeAll}>See All</Text>
@@ -152,28 +154,48 @@ const CustomerHomeScreen = () => {
         </View>
 
         <FlatList
-          data={professionals}
+          data={professionals?.slice(0, 5) || []}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item.id}
-          renderItem={({ item }: any) => (
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('ProfessionalProfile', { id: item.id })
-              }
-              style={styles.proCard}
-            >
-              <Image source={{ uri: item.image }} style={styles.proImage} />
+          keyExtractor={item => item._id}
+          renderItem={({ item }) => {
+            const hasValidImage =
+              item.image &&
+              item.image.length > 0 &&
+              typeof item.image[0] === 'string' &&
+              item.image[0].trim() !== '';
 
-              <Text style={styles.proName}>{item.name}</Text>
-              <Text style={styles.proExp}>{item.exp}</Text>
+            const fullName =
+              item.name ||
+              `${item.firstName || ''} ${item.lastName || ''}`.trim() ||
+              'No Name';
 
-              <View style={styles.locationRow}>
-                <LocationIcon height={14} width={14} />
-                <Text style={styles.proLocation}>{item.location}</Text>
+            return (
+              <View style={styles.proCard}>
+                <Image
+                  source={
+                    hasValidImage
+                      ? { uri: `${IMG_URL}${item.image[0]}` }
+                      : require('../../assets/pngs/Placeholder.png')
+                  }
+                  style={styles.proImage}
+                />
+
+                <Text style={styles.proName}>{fullName}</Text>
+
+                <Text style={styles.proExp}>
+                  {item.userType?.toUpperCase()}
+                </Text>
+
+                <View style={styles.locationRow}>
+                  <LocationIcon width={12} height={12} />
+                  <Text style={styles.proLocation}>
+                    {item.city || 'No City'}
+                  </Text>
+                </View>
               </View>
-            </TouchableOpacity>
-          )}
+            );
+          }}
         />
       </View>
 
@@ -306,13 +328,13 @@ const styles = StyleSheet.create({
     padding: 10,
     marginRight: 15,
     marginTop: 8,
-    borderWidth: 0.5,
+    //borderWidth: 0.5,
     borderColor: '#c7c7c7',
   },
 
   proImage: {
     width: '100%',
-    height: 90,
+    height: 100,
     borderRadius: 10,
   },
 

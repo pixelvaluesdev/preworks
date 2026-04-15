@@ -17,6 +17,9 @@ const SplashScreen = () => {
   const hasSeenOnboarding = useSelector(
     (state: any) => state.auth.hasSeenOnboarding,
   );
+  const hasSeenProfessionalOnboarding = useSelector(
+    (state: any) => state.auth.hasSeenProfessionalOnboarding,
+  );
 
   console.log('token:', token);
   console.log('user:', user);
@@ -38,7 +41,11 @@ const SplashScreen = () => {
 
       if (token && user?.firstName) {
         if (userType === 'professional') {
-          navigation.replace('ProfTabNav');
+          if (!hasSeenProfessionalOnboarding) {
+            navigation.replace('ProfOnboarding');
+          } else {
+            navigation.replace('ProfTabNav');
+          }
         } else {
           if (!hasSeenOnboarding) {
             navigation.replace('Onboarding');

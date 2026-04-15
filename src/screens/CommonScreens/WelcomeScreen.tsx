@@ -19,6 +19,10 @@ const WelcomeScreen = () => {
     (state: any) => state.auth.hasSeenOnboarding,
   );
 
+  const hasSeenProfessionalOnboarding = useSelector(
+    (state: any) => state.auth.hasSeenProfessionalOnboarding,
+  );
+
   return (
     <ImageBackground
       source={require('../../assets/pngs/BGImg.png')}
@@ -51,8 +55,13 @@ const WelcomeScreen = () => {
           Icon={Professional}
           width={WIDTH(50)}
           onPress={() => {
-            // dispatch(setUserType('professional'));
-            navigation.navigate('ProfWelc');
+            dispatch(setUserType('professional'));
+
+            if (!hasSeenProfessionalOnboarding) {
+              navigation.navigate('ProfOnboarding');
+            } else {
+              navigation.navigate('ProfWelc');
+            }
           }}
         />
       </View>
@@ -72,7 +81,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: WIDTH(4),
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    //backgroundColor: 'rgba(0,0,0,0.45)',
     shadowColor: 'black',
   },
 

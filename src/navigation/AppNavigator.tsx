@@ -26,6 +26,7 @@ import EditProfileScreen from '../screens/CommonScreens/SettingsTabPages/EditPro
 import AddProjectInformationScreen from '../screens/CustomerScreens/AddProjectPages/AddProjectInformationScreen';
 import AppliedProjectsScreen from '../screens/ProfessionalsScreens/AppliedProjectsListScreen';
 import NoProjectScreen from '../screens/CustomerScreens/AddProjectPages/NoProjectsScreen';
+import ProfOnboardingScreen from '../screens/ProfessionalsScreens/ProfOnboardingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -45,6 +46,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="ProfWelc" component={ProfessionalWelcomeScreen} />
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+        <Stack.Screen name="ProfOnboarding" component={ProfOnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="OtpVeri" component={VerificationScreen} />
         <Stack.Screen name="CustmTabNav" component={CustomerTabNavigator} />

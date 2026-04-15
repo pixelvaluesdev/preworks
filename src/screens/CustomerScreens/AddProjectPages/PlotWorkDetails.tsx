@@ -56,6 +56,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
 
       <BorderTextInput
         label={data.selectedType === 'floor' ? 'Floor area' : 'Plot size'}
+        keyboardType="number-pad"
         placeholder={`Enter your ${
           data.selectedType === 'floor' ? 'Floor area' : 'Plot size'
         }`}
@@ -96,11 +97,14 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         <BorderTextInput
           label="Enter Custom Floors"
           placeholder="e.g. 5"
-          value={data.customFloors}
-          onChangeText={text =>
-            handleChange('customFloors', text.replace(/[^0-9]/g, ''))
-          }
+          value={data.customFloors ? `Ground + ${data.customFloors} Floor` : ''}
+          onChangeText={text => {
+            // Extract only number from user input
+            const number = text.replace(/[^0-9]/g, '');
+            handleChange('customFloors', number);
+          }}
           height={HEIGHT(7)}
+          keyboardType="number-pad"
         />
       )}
 

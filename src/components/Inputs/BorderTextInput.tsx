@@ -16,6 +16,8 @@ interface BorderTextInputProps {
   containerStyle?: any;
   rightComponent?: React.ReactNode;
   editable?: boolean;
+  keyboardType?: any;
+  maxLength?: number;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -28,6 +30,8 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   containerStyle,
   rightComponent,
   editable = true,
+  keyboardType = 'default',
+  maxLength,
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   return (
@@ -48,7 +52,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           numberOfLines={multiline ? 3 : 1}
           outlineColor="#757575"
           activeOutlineColor={Colors.primary}
-          textColor="black"
+          textColor={'#474747'}
           editable={editable}
           onContentSizeChange={e => {
             if (multiline) {
@@ -58,7 +62,9 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           style={[
             styles.input,
             {
-              height: multiline ? Math.max(HEIGHT(6), inputHeight) : HEIGHT(6),
+              height: multiline
+                ? Math.max(height || HEIGHT(6), inputHeight)
+                : height || HEIGHT(6),
               paddingRight: 50,
               fontSize: 14,
               fontFamily: FONT.POPPINS_REGULAR,
@@ -66,6 +72,17 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
             },
           ]}
           outlineStyle={styles.outline}
+          keyboardType={keyboardType}
+          theme={{
+            fonts: {
+              bodyLarge: {
+                fontFamily: FONT.POPPINS_REGULAR,
+                fontSize: 5,
+                color: 'red',
+              },
+            },
+          }}
+          maxLength={maxLength}
         />
 
         {rightComponent && (

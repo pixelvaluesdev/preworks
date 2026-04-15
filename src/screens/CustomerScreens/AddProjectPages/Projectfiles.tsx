@@ -1,5 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from 'react-native';
 import { FONT } from '../../../theme/fonts';
 import UploadIcon from '../../../assets/svgs/UploadIcon.svg';
 import { Switch } from 'react-native';
@@ -7,10 +14,15 @@ import Colors from '../../../constants/colors';
 import CheckBox from '@react-native-community/checkbox';
 import { launchImageLibrary } from 'react-native-image-picker';
 import CloseIcon from '../../../assets/svgs/Delete.svg';
+import { pick } from '@react-native-documents/picker';
+import CustomPopup from '../../../components/Popups/CustomPopup';
 
 const Projectfile = ({ data, handleChange }: any) => {
   const hasDrawing = data?.hasDrawing ?? false;
   const services = data?.services || [];
+
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [currentKey, setCurrentKey] = useState('');
 
   const toggleService = service => {
     let updated = [...services];
@@ -23,7 +35,6 @@ const Projectfile = ({ data, handleChange }: any) => {
 
     handleChange('services', updated);
   };
-
   const pickImage = key => {
     const options = {
       mediaType: 'photo',
@@ -32,18 +43,66 @@ const Projectfile = ({ data, handleChange }: any) => {
     };
 
     launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled');
-      } else if (response.errorCode) {
-        console.log('Error: ', response.errorMessage);
-      } else {
-        const uris = response.assets?.map(item => item.uri) || [];
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log(response.errorMessage);
+        return;
+      }
 
-        if (uris.length) {
-          handleChange(key, [...(data[key] || []), ...uris]);
-        }
+      const files =
+        response.assets?.map(item => ({
+          uri: item.uri,
+          type: item.type,
+          name: item.fileName,
+        })) || [];
+
+      if (files.length) {
+        handleChange(key, [...(data[key] || []), ...files]);
       }
     });
+  };
+
+  const pickDocument = async key => {
+    try {
+      const res = await pick({
+        type: ['application/pdf'],
+        allowMultiSelection: true,
+      });
+
+      const files = res.map(item => ({
+        uri: item.uri,
+        type: item.type,
+        name: item.name,
+      }));
+
+      if (files.length) {
+        handleChange(key, [...(data[key] || []), ...files]);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const pickMedia = key => {
+    Alert.alert('Upload File', 'Choose file type', [
+      {
+        text: 'Images',
+        onPress: () => pickImage(key),
+      },
+      {
+        text: 'PDF',
+        onPress: () => pickDocument(key),
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const openPickerPopup = key => {
+    setCurrentKey(key);
+    setPopupVisible(true);
   };
 
   return (
@@ -89,7 +148,7 @@ const Projectfile = ({ data, handleChange }: any) => {
         <UploadBox
           label="Upload architectural drawings (Preferred PDF)"
           value={data.archDrawing}
-          onPress={() => pickImage('archDrawing')}
+          onPress={() => openPickerPopup('archDrawing')}
           rightComponent={<UploadIcon />}
           onRemove={updatedArray => handleChange('archDrawing', updatedArray)}
           textStyle={{ fontSize: 12 }}
@@ -147,6 +206,33 @@ const Projectfile = ({ data, handleChange }: any) => {
         <Text style={styles.noteLabel}>Note: </Text>
         IF you choose to hide you will not receive any calls from professional.
       </Text>
+
+      <CustomPopup
+        visible={popupVisible}
+        message="Choose file type"
+        onClose={() => setPopupVisible(false)}
+        buttons={[
+          {
+            label: 'Images',
+            type: 'primary',
+            onPress: () => {
+              setPopupVisible(false);
+              pickImage(currentKey);
+            },
+          },
+          {
+            label: 'PDF',
+            onPress: () => {
+              setPopupVisible(false);
+              pickDocument(currentKey);
+            },
+          },
+          {
+            label: 'Cancel',
+            onPress: () => setPopupVisible(false),
+          },
+        ]}
+      />
     </View>
   );
 };
@@ -171,21 +257,43 @@ const UploadBox = ({
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
         {Array.isArray(value) && value.length > 0 ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-            {value.map((img, index) => (
-              <View key={index} style={styles.previewContainer}>
-                <Image source={{ uri: img }} style={styles.previewImage} />
+            {value.map((file, index) => {
+              const isImage = file?.type?.includes('image');
+              const isPDF = file?.type?.includes('pdf');
 
-                <TouchableOpacity
-                  style={styles.removeBtn}
-                  onPress={() => {
-                    const updated = value.filter((_, i) => i !== index);
-                    onRemove(updated); // send updated array
-                  }}
-                >
-                  <CloseIcon width={16} height={16} />
-                </TouchableOpacity>
-              </View>
-            ))}
+              return (
+                <View key={index} style={styles.previewContainer}>
+                  {/* IMAGE */}
+                  {isImage && (
+                    <Image
+                      source={{ uri: file.uri }}
+                      style={styles.previewImage}
+                    />
+                  )}
+
+                  {/* PDF */}
+                  {isPDF && (
+                    <View style={styles.pdfBox}>
+                      <Text style={{ fontSize: 22 }}>📄</Text>
+                      <Text numberOfLines={1} style={styles.pdfText}>
+                        {file.name}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* REMOVE BUTTON */}
+                  <TouchableOpacity
+                    style={styles.removeBtn}
+                    onPress={() => {
+                      const updated = value.filter((_, i) => i !== index);
+                      onRemove(updated);
+                    }}
+                  >
+                    <CloseIcon width={14} height={14} />
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
           </View>
         ) : (
           <Text style={styles.placeholder}>Browse image</Text>
@@ -353,5 +461,20 @@ const styles = StyleSheet.create({
   placeholder: {
     color: '#a6a6a6',
     fontFamily: FONT.POPPINS_REGULAR,
+  },
+  pdfBox: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#f2f2f2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 5,
+  },
+
+  pdfText: {
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 4,
   },
 });

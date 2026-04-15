@@ -13,6 +13,7 @@ interface AuthState {
   userType: string | null;
   userToken: string;
   hasSeenOnboarding: boolean;
+  hasSeenProfessionalOnboarding: boolean;
 }
 
 const initialState: AuthState = {
@@ -20,6 +21,7 @@ const initialState: AuthState = {
   userType: null,
   userToken: '',
   hasSeenOnboarding: false,
+  hasSeenProfessionalOnboarding: false,
 };
 
 const authSlice = createSlice({
@@ -42,6 +44,13 @@ const authSlice = createSlice({
       state.hasSeenOnboarding = action.payload;
     },
 
+    setHasSeenProfessionalOnboarding: (
+      state,
+      action: PayloadAction<boolean>,
+    ) => {
+      state.hasSeenProfessionalOnboarding = action.payload;
+    },
+
     clearUser: state => {
       state.user = null;
       state.userType = null;
@@ -56,6 +65,7 @@ export const {
   setUserToken,
   clearUser,
   setHasSeenOnboarding,
+  setHasSeenProfessionalOnboarding,
 } = authSlice.actions;
 
 export default authSlice.reducer;

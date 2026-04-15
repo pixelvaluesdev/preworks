@@ -167,6 +167,7 @@ const PortfolioScreen = () => {
                 placeholder="Enter your Budget"
                 value={form.budget}
                 onChangeText={text => handleChange('budget', text)}
+                keyboardType="number-pad"
               />
             </>
           )}

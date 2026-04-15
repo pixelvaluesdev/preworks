@@ -196,20 +196,24 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
       }
 
       // IMAGE (site image)
-      if (form.siteImage) {
-        formData.append('image', {
-          uri: form.siteImage,
-          type: 'image/jpeg',
-          name: 'site.jpg',
+      if (form.siteImage?.length) {
+        form.siteImage.forEach((file, index) => {
+          formData.append('image', {
+            uri: file.uri,
+            type: file.type || 'image/jpeg',
+            name: file.name || `image_${index}.jpg`,
+          });
         });
       }
 
       // DRAWING FILE
-      if (form.archDrawing) {
-        formData.append('drawing', {
-          uri: form.archDrawing,
-          type: 'application/pdf', // or image if needed
-          name: 'drawing.pdf',
+      if (form.archDrawing?.length) {
+        form.archDrawing.forEach((file, index) => {
+          formData.append('drawing', {
+            uri: file.uri,
+            type: file.type || 'application/pdf',
+            name: file.name || `drawing_${index}.pdf`,
+          });
         });
       }
 

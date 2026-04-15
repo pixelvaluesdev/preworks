@@ -155,6 +155,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                   handleInputChange('mobile', text, setMobile)
                 }
                 placeholder="+91- Enter your mobile number"
+                keyboardType="number-pad"
               />
 
               {!isProfessional && (
@@ -198,6 +199,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                       handleInputChange('pin', text, setPin)
                     }
                     placeholder="Pincode"
+                    keyboardType="number-pad"
                   />
                 </View>
               </View>

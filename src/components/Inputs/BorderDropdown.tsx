@@ -28,7 +28,12 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
 
       {/* DROPDOWN BOX */}
       <TouchableOpacity style={styles.dropdown} onPress={() => setOpen(!open)}>
-        <Text style={{ color: value ? '#000' : '#a6a6a6' }}>
+        <Text
+          style={{
+            color: value ? '#474747' : '#a6a6a6',
+            fontFamily: FONT.POPPINS_REGULAR,
+          }}
+        >
           {value || 'Select'}
         </Text>
         <DownArrow />
@@ -46,7 +51,7 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
                 setOpen(false);
               }}
             >
-              <Text>{item}</Text>
+              <Text style={styles.optionText}>{item}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -84,6 +89,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
+    alignItems: 'center',
+    textAlignVertical: 'center',
   },
 
   arrow: {
@@ -107,5 +114,10 @@ const styles = StyleSheet.create({
   asterisk: {
     color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  optionText: {
+    fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 14,
+    color: '#474747',
   },
 });

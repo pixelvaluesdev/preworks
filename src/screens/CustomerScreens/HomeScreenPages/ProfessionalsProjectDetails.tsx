@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ScrollView,
+  FlatList,
   TouchableOpacity,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -16,23 +17,87 @@ import { FONT } from '../../../theme/fonts';
 import Colors from '../../../constants/colors';
 import LocationIcon from '../../../assets/svgs/LocationIcon.svg';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
+import OptionIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
+import CustomPopup from '../../../components/Popups/CustomPopup';
+import { useSelector } from 'react-redux';
 
 const ProjectDetailsScreen = () => {
   const route = useRoute();
-  const { projectId } = route.params;
+  const { projectId, images = [] } = route.params;
   const navigation = useNavigation();
+  const userType = useSelector(state => state.auth.userType);
+  const isCustomer = userType === 'customer';
+
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
   // Later you will call API using projectId
+
+  const [showMenu, setShowMenu] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imageWrapper}>
-        <Image
-          source={{
-            uri: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
+        <FlatList
+          data={images}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(_, index) => index.toString()}
+          onMomentumScrollEnd={e => {
+            const index = Math.round(e.nativeEvent.contentOffset.x / WIDTH(92));
+            setActiveIndex(index);
           }}
-          style={styles.projectImage}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.projectImage} />
+          )}
         />
+        {!isCustomer && (
+          <TouchableOpacity
+            style={styles.optionBtn}
+            onPress={() => setShowMenu(!showMenu)}
+          >
+            <OptionIcon width={20} height={20} />
+          </TouchableOpacity>
+        )}
+
+        {showMenu && (
+          <View style={styles.menuBox}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                navigation.navigate('ProfTabNav', {
+                  screen: 'AddWork',
+                  params: { projectId },
+                });
+              }}
+            >
+              <Text style={styles.menuText}>Edit</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                setShowMenu(false);
+                setShowDeleteModal(true);
+              }}
+            >
+              <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {/* DOT INDICATOR (only if multiple images) */}
+        {images.length > 1 && (
+          <View style={styles.dotContainer}>
+            {images.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, activeIndex === index && styles.activeDot]}
+              />
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity
@@ -67,6 +132,28 @@ const ProjectDetailsScreen = () => {
         >
           <Text style={styles.showMore}>Show More</Text>
         </TouchableOpacity>
+
+        <CustomPopup
+          visible={showDeleteModal}
+          message="Are you sure you want to delete this project?"
+          onClose={() => setShowDeleteModal(false)}
+          buttons={[
+            {
+              label: 'Cancel',
+              onPress: () => setShowDeleteModal(false),
+            },
+            {
+              label: 'Delete',
+              type: 'primary',
+              onPress: () => {
+                setShowDeleteModal(false);
+
+                //  CALL DELETE API HERE
+                console.log('Delete project:', projectId);
+              },
+            },
+          ]}
+        />
       </View>
     </ScrollView>
   );
@@ -85,7 +172,7 @@ const styles = StyleSheet.create({
   },
 
   projectImage: {
-    width: '100%',
+    width: WIDTH(92),
     height: HEIGHT(50),
     borderRadius: 12,
   },
@@ -140,5 +227,53 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  dotContainer: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 10,
+    alignSelf: 'center',
+  },
+
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#ccc',
+    marginHorizontal: 4,
+  },
+
+  activeDot: {
+    backgroundColor: Colors.primary,
+  },
+  menuBox: {
+    position: 'absolute',
+    top: 70,
+    right: 30,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 10,
+    zIndex: 200,
+    paddingVertical: 5,
+  },
+
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+
+  menuText: {
+    fontFamily: FONT.POPPINS_MEDIUM,
+    fontSize: 14,
+  },
+  optionBtn: {
+    position: 'absolute',
+    top: 30,
+    right: 30, // adjust slightly (because of padding)
+    zIndex: 100,
+    elevation: 10,
+    backgroundColor: 'rgba(75, 75, 75, 0.4)',
+    padding: 6,
+    borderRadius: 20,
   },
 });
