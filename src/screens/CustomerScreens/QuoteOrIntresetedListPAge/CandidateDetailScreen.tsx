@@ -13,9 +13,11 @@ import { FONT } from '../../../theme/fonts';
 import ScreenHeader from '../../../components/ScreenHeader';
 import CallIcon from '../../../assets/svgs/WhitePhone.svg';
 import Download from '../../../assets/svgs/DownloadIcon.svg';
+import { IMG_URL } from '../../../apis/ApiManager';
 
 const CandidateDetailScreen = ({ route }: any) => {
   const { candidate } = route.params || {};
+  const user = candidate?.userId || {};
 
   return (
     <View style={styles.container}>
@@ -23,9 +25,16 @@ const CandidateDetailScreen = ({ route }: any) => {
 
       <ScrollView contentContainerStyle={{ padding: WIDTH(5) }}>
         <View style={styles.profileContainer}>
-          <Image source={candidate?.image} style={styles.profileImage} />
+          <Image
+            source={
+              user?.image?.[0]
+                ? { uri: `${IMG_URL}/${user.image[0]}` }
+                : require('../../../assets/pngs/Placeholder.png')
+            }
+            style={styles.profileImage}
+          />
 
-          <Text style={styles.name}>{candidate?.name}</Text>
+          <Text style={styles.name}>{user?.firstName || 'No Name'}</Text>
 
           <TouchableOpacity style={styles.callBtn}>
             <CallIcon width={25} height={25} />
@@ -35,21 +44,22 @@ const CandidateDetailScreen = ({ route }: any) => {
 
         <View style={styles.detailRow}>
           <Text style={styles.label}>Duration</Text>
-          <Text style={styles.value}>6 months</Text>
+          <Text style={styles.value}>6 months (dummy)</Text>
         </View>
 
         <View style={styles.dash} />
 
         <View style={styles.detailRow}>
           <Text style={styles.label}>Experience</Text>
-          <Text style={styles.value}>6 Years</Text>
+          <Text style={styles.value}>6 Years (dummy)</Text>
         </View>
 
         <View style={styles.dash} />
 
+        {/* CITY */}
         <View style={styles.detailRow}>
           <Text style={styles.label}>City</Text>
-          <Text style={styles.value}>Mumbai Maharashtra ,India</Text>
+          <Text style={styles.value}>{user?.city || 'N/A'}</Text>
         </View>
 
         <View style={styles.dash} />
@@ -57,16 +67,18 @@ const CandidateDetailScreen = ({ route }: any) => {
         <Text style={styles.messageTitle}>Message</Text>
 
         <Text style={styles.message}>
-          This is a placeholder description created purely for testing purposes.
-          It is used to demonstrate how text content will appear within a layout
-          or design without using actual data.
+          {candidate?.desc || 'No message provided'}
         </Text>
 
-        <TouchableOpacity style={styles.fileBtn}>
-          <Text style={styles.fileText}>Quotation.PDF</Text>
-          <Download />
-        </TouchableOpacity>
+        {/* FILE */}
+        {candidate?.files?.length > 0 && (
+          <TouchableOpacity style={styles.fileBtn}>
+            <Text style={styles.fileText}>Download File</Text>
+            <Download />
+          </TouchableOpacity>
+        )}
 
+        {/* PROFILE BUTTON */}
         <TouchableOpacity style={styles.profileBtn}>
           <Text style={styles.profileBtnText}>Contractor Profile</Text>
         </TouchableOpacity>

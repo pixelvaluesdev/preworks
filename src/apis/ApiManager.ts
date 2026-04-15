@@ -61,6 +61,8 @@ const requestPath = {
   professionalList: '/customer/prof-list',
   projectList: '/customer/project-list',
   createProject: '/customer/create-project',
+  projectDetails: '/customer/project-details',
+  projectEnquiryList: '/customer/enquiry-list',
 };
 
 const ApiManager = {
@@ -83,6 +85,15 @@ const ApiManager = {
   },
   createProject: (data: any, token?: string) => {
     return requests.post(requestPath.createProject, data, token);
+  },
+  getProjectDetails: (projectId: string, token?: string) => {
+    return requests.get(`${requestPath.projectDetails}/${projectId}`, token);
+  },
+  getProjectEnquiryList: (projectId: string, token?: string) => {
+    return requests.get(
+      `${requestPath.projectEnquiryList}/${projectId}`,
+      token,
+    );
   },
 };
 

@@ -11,7 +11,7 @@ import {
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 import PlusIcon from '../../../assets/svgs/PlusIcon.svg';
 import DeleteIcon from '../../../assets/svgs/Delete.svg';
@@ -44,6 +44,7 @@ const ProjectsScreen = ({ route }: any) => {
   const [apiFinished, setApiFinished] = React.useState(false);
   const [selectedTab, setSelectedTab] = React.useState('quoted');
   const [quotedProjects, setQuotedProjects] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const [interestedProjects, setInterestedProjects] = React.useState([
     { id: '1', name: 'House Construction' },
@@ -52,17 +53,13 @@ const ProjectsScreen = ({ route }: any) => {
     { id: '4', name: 'House Construction' },
   ]);
 
-  // React.useEffect(() => {
-  //   if (apiFinished && projects.length === 0) {
-  //     navigation.navigate('NoProjects');
-  //   }
-  // }, [apiFinished, projects]);
-
-  React.useEffect(() => {
-    if (userId) {
-      fetchProjects();
-    }
-  }, [userId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchProjects();
+      }
+    }, [userId]),
+  );
 
   React.useEffect(() => {}, [projects]);
 
@@ -82,6 +79,12 @@ const ProjectsScreen = ({ route }: any) => {
     }
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProjects();
+    setRefreshing(false);
+  };
+
   const renderItem = ({ item }: any) => {
     const imageUrl =
       item?.image?.length > 0
@@ -94,7 +97,7 @@ const ProjectsScreen = ({ route }: any) => {
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() =>
-          navigation.navigate('CommonProjectDetails', { project: item })
+          navigation.navigate('CommonProjectDetails', { projectId: item._id })
         }
       >
         <View style={styles.card}>
@@ -144,14 +147,6 @@ const ProjectsScreen = ({ route }: any) => {
       </TouchableOpacity>
     );
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
 
   if (loading) {
     return (
@@ -237,6 +232,8 @@ const ProjectsScreen = ({ route }: any) => {
           keyExtractor={item => item._id}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
           contentContainerStyle={{
             paddingHorizontal: WIDTH(4),
             paddingBottom: HEIGHT(10),
@@ -252,6 +249,8 @@ const ProjectsScreen = ({ route }: any) => {
                 data={quotedProjects}
                 keyExtractor={item => item.id}
                 renderItem={renderItem}
+                refreshing={refreshing}
+                onRefresh={onRefresh}
                 contentContainerStyle={{
                   paddingHorizontal: WIDTH(4),
                   paddingBottom: HEIGHT(10),
@@ -273,6 +272,8 @@ const ProjectsScreen = ({ route }: any) => {
               data={interestedProjects}
               keyExtractor={item => item.id}
               renderItem={renderItem}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
               contentContainerStyle={{
                 paddingHorizontal: WIDTH(4),
                 paddingBottom: HEIGHT(10),

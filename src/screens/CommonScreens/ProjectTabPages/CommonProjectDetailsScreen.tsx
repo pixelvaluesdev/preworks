@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   FlatList,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 
 import QuoteIcon from '../../../assets/svgs/Quote.svg';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import GreyMobile from '../../../assets/svgs/greyMobile.svg';
 import GreyAdress from '../../../assets/svgs/GreyAdress.svg';
@@ -30,6 +31,7 @@ import Popup from '../../../components/Popup';
 import CallIcon from '../../../assets/svgs/Call.svg';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
+import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
 const images = [
   require('../../../assets/pngs/BannerImg.png'),
@@ -43,15 +45,60 @@ const attachments = [
 ];
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
-  const { projectId, userType = 'customer' } = route.params || {};
+  const { projectId } = route.params || {};
 
   const userTypeRed = useSelector(state => state.auth.userType);
+  const token = useSelector(state => state.auth.userToken);
   const isCustomer = userTypeRed === 'customer';
   const isProfessional = userTypeRed === 'professional';
+
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [enquiryCount, setEnquiryCount] = useState(0);
+  const [quoteCount, setQuoteCount] = useState(0);
 
   const navigation = useNavigation();
 
   const [showPopup, setShowPopup] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (projectId) {
+        fetchProjectDetails();
+      }
+    }, [projectId]),
+  );
+
+  const fetchProjectDetails = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getProjectDetails(projectId, token);
+      console.log('Project Details Response:', res?.data);
+
+      if (res?.data?.status === 'success') {
+        const data = res?.data?.data;
+
+        setProject(data?.project);
+        setEnquiryCount(data?.enquiryCount || 0);
+
+        // future ready
+        setQuoteCount(data?.quoteCount || 0);
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !project) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -62,7 +109,11 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         {/* Banner Image */}
         <View>
           <ImageBackground
-            source={require('../../../assets/pngs/BannerImg.png')}
+            source={
+              project?.image?.length > 0
+                ? { uri: `${IMG_URL}/${project.image[0]}` }
+                : require('../../../assets/pngs/BannerImg.png')
+            }
             style={styles.banner}
           />
 
@@ -77,10 +128,24 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           {isCustomer && (
             <TouchableOpacity
               style={styles.quoteBadge}
-              onPress={() => navigation.navigate('Quote/IntrestedList')}
+              onPress={() =>
+                navigation.navigate('Quote/IntrestedList', {
+                  projectId,
+                  isQuote: project?.drawingStatus, // true = quote, false = interested
+                })
+              }
             >
               <QuoteIcon width={30} height={30} />
-              <Text style={styles.quoteLabel}>Quotes</Text>
+
+              {/* Dynamic Label */}
+              <Text style={styles.quoteLabel}>
+                {project?.drawingStatus ? 'Quotes' : 'Interested'}
+              </Text>
+
+              {/* Count Badge */}
+              <View style={styles.countBadge}>
+                <Text style={styles.countText}>{enquiryCount || 0}</Text>
+              </View>
             </TouchableOpacity>
           )}
         </View>
@@ -88,8 +153,12 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         {/* Image Thumbnails */}
         <View style={styles.thumbnailContainer}>
           <View style={styles.thumbnailContainer2}>
-            {images.map((img, index) => (
-              <Image key={index} source={img} style={styles.thumbnail} />
+            {project?.image?.map((img, index) => (
+              <Image
+                key={index}
+                source={{ uri: `${IMG_URL}/${img}` }}
+                style={styles.thumbnail}
+              />
             ))}
 
             <View style={styles.moreThumb}>
@@ -108,7 +177,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
                 <View style={{ marginLeft: 10, margin: 10 }}>
                   <Text style={styles.sectionTitle}>Mobile Number</Text>
-                  <Text style={styles.valueText}>3438545685</Text>
+                  <Text style={styles.valueText}>
+                    {project?.hideNumber ? 'Hidden' : project?.userId?.phone}
+                  </Text>
                 </View>
               </View>
 
@@ -130,7 +201,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
               <View style={{ marginLeft: 10, margin: 10 }}>
                 <Text style={styles.sectionTitle}>Full Plot Address</Text>
-                <Text style={styles.valueText}>Mumbai Maharashtra, India</Text>
+                <Text style={styles.valueText}>
+                  {project?.plotAddress}, {project?.city}, {project?.pinCode}
+                </Text>
               </View>
             </View>
           </View>
@@ -150,7 +223,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               </View>
 
               {/* RIGHT SIDE */}
-              <Text style={styles.value}>2782.0 sq.ft</Text>
+              <Text style={styles.value}>{project?.floorArea} sq.ft</Text>
             </View>
 
             <View style={styles.dashedDivider} />
@@ -164,7 +237,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                 </Text>
               </View>
 
-              <Text style={styles.value}>1 Floor</Text>
+              <Text style={styles.value}>{project?.noOfFloors}</Text>
             </View>
 
             <View style={styles.dashedDivider} />
@@ -178,7 +251,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                 </Text>
               </View>
 
-              <Text style={styles.value}>12 Aug 2026</Text>
+              <Text style={styles.value}>
+                {new Date(project?.quoteLastDate).toDateString()}
+              </Text>
             </View>
 
             <View style={styles.dashedDivider} />
@@ -192,7 +267,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                 </Text>
               </View>
 
-              <Text style={styles.value}>Labour Only</Text>
+              <Text style={styles.value}>{project?.typeOfQuote}</Text>
             </View>
             <View style={styles.dashedDivider} />
             {/* Price Range */}
@@ -204,7 +279,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                 </Text>
               </View>
 
-              <Text style={styles.value}>5-10 Lakh</Text>
+              <Text style={styles.value}>₹{project?.priceRange}</Text>
             </View>
           </View>
 
@@ -212,11 +287,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
           {/* Scope */}
           <Text style={styles.scopeTitle}>Scope Of Work Description</Text>
-          <Text style={styles.scopeText}>
-            This is a placeholder description created purely for testing
-            purposes. It is used to demonstrate how text content will appear
-            within a layout or design without using actual data.
-          </Text>
+          <Text style={styles.scopeText}>{project?.requirementDesc}</Text>
 
           {/* Attachments */}
           <FlatList
@@ -305,6 +376,7 @@ const styles = StyleSheet.create({
   quoteLabel: {
     color: '#fff',
     fontSize: 10,
+    marginTop: 8,
   },
 
   thumbnailContainer: {
@@ -513,5 +585,23 @@ const styles = StyleSheet.create({
     zIndex: 10,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  countBadge: {
+    position: 'absolute',
+    bottom: 30,
+    left: 18,
+    backgroundColor: 'red',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+
+  countText: {
+    color: '#fff',
+    fontSize: 10,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });
