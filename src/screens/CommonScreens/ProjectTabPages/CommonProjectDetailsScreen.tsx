@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   FlatList,
   ImageBackground,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -32,12 +33,7 @@ import CallIcon from '../../../assets/svgs/Call.svg';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
-
-const images = [
-  require('../../../assets/pngs/BannerImg.png'),
-  require('../../../assets/pngs/BannerImg.png'),
-  require('../../../assets/pngs/BannerImg.png'),
-];
+import ImageViewing from 'react-native-image-viewing';
 
 const attachments = [
   { id: '1', name: 'Akruti mall.png' },
@@ -46,6 +42,7 @@ const attachments = [
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId } = route.params || {};
+  const flatListRef = React.useRef(null);
 
   const userTypeRed = useSelector(state => state.auth.userType);
   const token = useSelector(state => state.auth.userToken);
@@ -55,11 +52,45 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(false);
   const [enquiryCount, setEnquiryCount] = useState(0);
+
   const [quoteCount, setQuoteCount] = useState(0);
 
   const navigation = useNavigation();
 
   const [showPopup, setShowPopup] = useState(false);
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const screenWidth = Dimensions.get('window').width;
+
+  const images = project?.image || [];
+  console.log('project.image 👉', project?.image);
+  const imageCount = images.length;
+
+  const imageUrls = images.map(img => ({
+    uri: `${IMG_URL}/${img}`,
+  }));
+  console.log('Image URL:', `${IMG_URL}/${images[0]}`);
+
+  useEffect(() => {
+    if (imageCount <= 1) return;
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      index = (index + 1) % imageCount;
+
+      flatListRef.current?.scrollToIndex({
+        index,
+        animated: true,
+      });
+    }, 3000); // 3 sec
+
+    return () => clearInterval(interval);
+  }, [imageCount]);
+  const openViewer = index => {
+    setCurrentIndex(index);
+    setViewerVisible(true);
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -108,14 +139,50 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       >
         {/* Banner Image */}
         <View>
-          <ImageBackground
-            source={
-              project?.image?.length > 0
-                ? { uri: `${IMG_URL}/${project.image[0]}` }
-                : require('../../../assets/pngs/BannerImg.png')
-            }
-            style={styles.banner}
-          />
+          {imageCount === 1 ? (
+            <TouchableOpacity onPress={() => openViewer(0)}>
+              <Image
+                source={{
+                  uri: `${IMG_URL}${
+                    images[0].startsWith('/') ? images[0] : '/' + images[0]
+                  }`,
+                }}
+                style={styles.banner}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          ) : (
+            <FlatList
+              ref={flatListRef}
+              data={images}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              style={{
+                width: screenWidth,
+                height: HEIGHT(35),
+              }}
+              keyExtractor={(_, index) => index.toString()}
+              getItemLayout={(_, index) => ({
+                length: screenWidth,
+                offset: screenWidth * index,
+                index,
+              })}
+              renderItem={({ item, index }) => (
+                <TouchableOpacity onPress={() => openViewer(index)}>
+                  <Image
+                    source={{
+                      uri: `${IMG_URL}${
+                        item.startsWith('/') ? item : '/' + item
+                      }`,
+                    }}
+                    style={styles.banner}
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          )}
 
           <TouchableOpacity
             style={styles.backBtn}
@@ -123,7 +190,6 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           >
             <BackArrow width={25} height={25} />
           </TouchableOpacity>
-
           {/* Quote badge */}
           {isCustomer && (
             <TouchableOpacity
@@ -151,21 +217,26 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         </View>
 
         {/* Image Thumbnails */}
-        <View style={styles.thumbnailContainer}>
-          <View style={styles.thumbnailContainer2}>
-            {project?.image?.map((img, index) => (
-              <Image
-                key={index}
-                source={{ uri: `${IMG_URL}/${img}` }}
-                style={styles.thumbnail}
-              />
-            ))}
+        {imageCount > 1 && (
+          <View style={styles.thumbnailContainer}>
+            <View style={styles.thumbnailContainer2}>
+              {images.slice(0, 3).map((img, index) => (
+                <TouchableOpacity key={index} onPress={() => openViewer(index)}>
+                  <Image
+                    source={{ uri: `${IMG_URL}/${img}` }}
+                    style={styles.thumbnail}
+                  />
+                </TouchableOpacity>
+              ))}
 
-            <View style={styles.moreThumb}>
-              <Text style={styles.moreText}>4+</Text>
+              {imageCount > 3 && (
+                <View style={styles.moreThumb}>
+                  <Text style={styles.moreText}>{imageCount - 3}+</Text>
+                </View>
+              )}
             </View>
           </View>
-        </View>
+        )}
 
         {/* Details Card */}
         <View style={styles.detailsCard}>
@@ -334,7 +405,15 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
       {/* Floating Edit Button for customers if there customers project */}
       {isCustomer && (
-        <TouchableOpacity style={styles.floatingEditBtn}>
+        <TouchableOpacity
+          style={styles.floatingEditBtn}
+          onPress={() =>
+            navigation.navigate('AddProjectInformation', {
+              isEdit: true,
+              projectId: projectId,
+            })
+          }
+        >
           <EditIcon width={30} style={{ marginRight: 4 }} />
           <Text style={styles.editText}>Edit Your Project</Text>
         </TouchableOpacity>
@@ -344,6 +423,12 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         title="Send your Quotation"
         visible={showPopup}
         onClose={() => setShowPopup(false)}
+      />
+      <ImageViewing
+        images={imageUrls}
+        imageIndex={currentIndex}
+        visible={viewerVisible}
+        onRequestClose={() => setViewerVisible(false)}
       />
     </View>
   );
@@ -358,7 +443,7 @@ const styles = StyleSheet.create({
   },
 
   banner: {
-    width: '100%',
+    width: Dimensions.get('window').width,
     height: HEIGHT(35),
   },
 

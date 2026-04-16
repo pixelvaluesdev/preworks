@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 
 import CustomStepIndicator from '../../../components/CustomStepIndicator';
@@ -23,18 +24,27 @@ import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import ApiManager from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import CustomPopup from '../../../components/Popups/CustomPopup';
+import Colors from '../../../constants/colors';
 
 const TOTAL_STEPS = 4;
 
-const AddProjectInformationScreen = ({ navigation }: any) => {
+const AddProjectInformationScreen = ({ navigation, route }: any) => {
+  const { isEdit, projectId } = route.params || {};
   const [step, setStep] = useState<number>(0);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(false);
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
+
+  useEffect(() => {
+    if (isEdit && projectId) {
+      fetchProjectDetails();
+    }
+  }, [isEdit, projectId]);
 
   const [form, setForm] = useState({
     projectName: '',
@@ -147,7 +157,7 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
     if (step < TOTAL_STEPS - 1) {
       setStep(prev => prev + 1);
     } else {
-      createProjectApi();
+      submitProjectApi();
     }
   };
 
@@ -166,10 +176,61 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
     return val;
   };
 
-  const createProjectApi = async () => {
+  const prefillForm = project => {
+    setForm({
+      projectName: project?.projectName || '',
+      address: project?.plotAddress || '',
+      city: project?.city || '',
+      pinCode: project?.pinCode || '',
+
+      selectedType: 'floor', // default (or adjust later)
+
+      area: project?.floorArea?.toString() || '',
+      floors: project?.noOfFloors || '',
+
+      quoteType:
+        project?.typeOfQuote === 'labour' ? 'Labour Only' : 'Labour + Material',
+
+      startDate: project?.constStartDate?.split('T')[0] || '',
+      lastDate: project?.quoteLastDate?.split('T')[0] || '',
+
+      description: project?.requirementDesc || '',
+      budget: project?.priceRange || '',
+
+      siteImage: [], // new uploads only
+      archDrawing: [],
+
+      hasDrawing: project?.drawingStatus || false,
+      services: project?.services || [],
+      hideNumber: project?.hideNumber || false,
+    });
+  };
+
+  const fetchProjectDetails = async () => {
+    try {
+      setFetchLoading(true);
+      setLoading(true);
+
+      const res = await ApiManager.getProjectDetails(projectId, token);
+
+      if (res?.data?.status === 'success') {
+        const project = res?.data?.data?.project;
+
+        prefillForm(project);
+      }
+    } catch (error) {
+      console.log('Error:', error);
+    } finally {
+      setFetchLoading(false);
+      setLoading(false);
+    }
+  };
+
+  const submitProjectApi = async () => {
     try {
       setLoading(true);
       setIsSuccess(false);
+
       const formData = new FormData();
 
       formData.append('projectName', form.projectName);
@@ -177,11 +238,13 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
       formData.append('city', form.city);
       formData.append('pinCode', form.pinCode);
       formData.append('floorArea', form.area);
-      formData.append('noOfFloors', mapFloors(form.floors));
+      formData.append('noOfFloors', form.floors);
+
       formData.append(
         'typeOfQuote',
         form.quoteType === 'Labour Only' ? 'labour' : 'labour+material',
       );
+
       formData.append('constStartDate', form.startDate);
       formData.append('quoteLastDate', form.lastDate);
       formData.append('requirementDesc', form.description);
@@ -190,12 +253,11 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
       formData.append('drawingStatus', form.hasDrawing ? 'true' : 'false');
       formData.append('hideNumber', form.hideNumber ? 'true' : 'false');
 
-      // services (array → string)
       if (!form.hasDrawing) {
         formData.append('services', JSON.stringify(form.services));
       }
 
-      // IMAGE (site image)
+      // images
       if (form.siteImage?.length) {
         form.siteImage.forEach((file, index) => {
           formData.append('image', {
@@ -206,7 +268,7 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
         });
       }
 
-      // DRAWING FILE
+      // drawings
       if (form.archDrawing?.length) {
         form.archDrawing.forEach((file, index) => {
           formData.append('drawing', {
@@ -217,26 +279,35 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
         });
       }
 
-      //  userId (important)
       formData.append('userId', userId);
 
-      const response = await ApiManager.createProject(formData, token);
-      setLoading(false);
-      setIsSuccess(true);
+      const response = isEdit
+        ? await ApiManager.updateProject(projectId, formData, token)
+        : await ApiManager.createProject(formData, token);
 
-      console.log('SUCCESS:', response.data);
+      setIsSuccess(true);
       setPopupMessage(
-        response?.data?.message || 'Project created successfully',
+        response?.data?.message ||
+          (isEdit
+            ? 'Project updated successfully'
+            : 'Project created successfully'),
       );
-      setPopupVisible(true);
     } catch (error) {
-      console.log('ERROR:', error?.response?.data || error.message);
-      setLoading(false);
       setIsSuccess(false);
       setPopupMessage(error?.response?.data?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
       setPopupVisible(true);
     }
   };
+
+  if (isEdit && fetchLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -311,7 +382,9 @@ const AddProjectInformationScreen = ({ navigation }: any) => {
                   loading
                     ? 'Submitting...'
                     : step === TOTAL_STEPS - 1
-                    ? 'Submit Project'
+                    ? isEdit
+                      ? 'Update Project'
+                      : 'Submit Project'
                     : 'Continue'
                 }
                 onPress={handleNext}

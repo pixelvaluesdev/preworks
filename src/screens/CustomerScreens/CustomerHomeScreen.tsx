@@ -157,7 +157,7 @@ const CustomerHomeScreen = () => {
           data={professionals?.slice(0, 5) || []}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={item => item._id}
+          keyExtractor={(item, index) => item._id || index.toString()}
           renderItem={({ item }) => {
             const hasValidImage =
               item.image &&
@@ -171,7 +171,12 @@ const CustomerHomeScreen = () => {
               'No Name';
 
             return (
-              <View style={styles.proCard}>
+              <TouchableOpacity
+                style={styles.proCard}
+                onPress={() =>
+                  navigation.navigate('ProfessionalProfile', { id: item._id })
+                }
+              >
                 <Image
                   source={
                     hasValidImage
@@ -193,7 +198,7 @@ const CustomerHomeScreen = () => {
                     {item.city || 'No City'}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
         />

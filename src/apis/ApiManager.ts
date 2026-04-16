@@ -63,6 +63,8 @@ const requestPath = {
   createProject: '/customer/create-project',
   projectDetails: '/customer/project-details',
   projectEnquiryList: '/customer/enquiry-list',
+  updateProject: '/customer/update-project',
+  deleteProject: '/customer/delete-project',
 };
 
 const ApiManager = {
@@ -92,6 +94,20 @@ const ApiManager = {
   getProjectEnquiryList: (projectId: string, token?: string) => {
     return requests.get(
       `${requestPath.projectEnquiryList}/${projectId}`,
+      token,
+    );
+  },
+  updateProject: (projectId: string, data: any, token?: string) => {
+    return requests.put(
+      `${requestPath.updateProject}/${projectId}`,
+      data,
+      token,
+    );
+  },
+  deleteProject: (projectId: string, token?: string) => {
+    return requests.delete(
+      `${requestPath.deleteProject}/${projectId}`,
+      {},
       token,
     );
   },

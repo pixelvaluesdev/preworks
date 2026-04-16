@@ -85,6 +85,30 @@ const ProjectsScreen = ({ route }: any) => {
     setRefreshing(false);
   };
 
+  const handleDeleteProject = async () => {
+    if (!selectedProject?._id) return;
+
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.deleteProject(selectedProject._id, token);
+
+      if (res?.data?.status === 'success') {
+        // Option 1 (best UX): remove from list instantly
+        setProjects(prev =>
+          prev.filter(item => item._id !== selectedProject._id),
+        );
+
+        await fetchProjects();
+      }
+    } catch (error) {
+      console.log('Delete Error:', error);
+    } finally {
+      setLoading(false);
+      setSelectedProject(null);
+    }
+  };
+
   const renderItem = ({ item }: any) => {
     const imageUrl =
       item?.image?.length > 0
@@ -311,7 +335,8 @@ const ProjectsScreen = ({ route }: any) => {
               onPress={() => {
                 setMenuVisible(false);
                 navigation.navigate('AddProjectInformation', {
-                  project: selectedProject,
+                  isEdit: true,
+                  projectId: selectedProject._id,
                 });
               }}
             >
@@ -357,6 +382,7 @@ const ProjectsScreen = ({ route }: any) => {
             type: 'primary',
             onPress: () => {
               setDeletePopupVisible(false);
+              handleDeleteProject();
             },
           },
         ]}
