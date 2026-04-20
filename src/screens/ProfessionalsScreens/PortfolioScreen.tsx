@@ -20,17 +20,19 @@ import Colors from '../../constants/colors';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
 import UploadIcon from '../../assets/svgs/UploadIcon.svg';
 import UploadBox from '../../components/Inputs/UploadBox';
+import CloseIcon from '../../assets/svgs/Delete.svg';
 
 const PortfolioScreen = () => {
   const navigation = useNavigation();
 
   const [isStepTwo, setIsStepTwo] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const [form, setForm] = useState({
     projectName: '',
     siteName: '',
     budget: '',
-    image: '',
+    image: [],
     caption: '',
   });
 
@@ -57,7 +59,7 @@ const PortfolioScreen = () => {
   const validateStep = () => {
     // STEP 1 (Image + Caption)
     if (!isStepTwo) {
-      if (!form.image.trim()) return false;
+      if (!form.image || form.image.length === 0) return false;
       if (!form.caption.trim()) return false;
     }
 
@@ -75,19 +77,28 @@ const PortfolioScreen = () => {
     const options = {
       mediaType: 'photo',
       quality: 0.7,
+      selectionLimit: 0,
     };
 
     launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled');
-      } else if (response.errorCode) {
-        console.log('Error: ', response.errorMessage);
-      } else {
-        const uri = response.assets?.[0]?.uri;
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log(response.errorMessage);
+        return;
+      }
 
-        if (uri) {
-          handleChange('image', uri);
-        }
+      const files =
+        response.assets?.map(item => ({
+          uri: item.uri,
+          type: item.type,
+          name: item.fileName,
+        })) || [];
+
+      if (files.length) {
+        setForm(prev => ({
+          ...prev,
+          image: [...(prev.image || []), ...files],
+        }));
       }
     });
   };
@@ -118,26 +129,77 @@ const PortfolioScreen = () => {
         </View>
 
         <ScrollView
+          style={{ flex: 1 }}
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
+          keyboardDismissMode="none"
         >
           {!isStepTwo ? (
             <>
               <UploadBox
-                label="Add Photo"
+                label="Add Photos"
                 value={form.image}
                 onPress={pickImage}
-                onRemove={() => handleChange('image', '')}
+                onRemove={updated =>
+                  setForm(prev => ({ ...prev, image: updated }))
+                }
+                showPreview={false}
               />
 
-              <Image
-                source={{
-                  uri: 'https://pe-images.s3.amazonaws.com/basics/cc/image-size-resolution/resize-images-for-print/image-cropped-8x10.jpg',
-                }}
-                style={styles.image}
-              />
+              {form.image.length > 0 && (
+                <View>
+                  <ScrollView
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    onScroll={e => {
+                      const index = Math.round(
+                        e.nativeEvent.contentOffset.x / WIDTH(94),
+                      );
+                      setCurrentIndex(index);
+                    }}
+                  >
+                    {form.image.map((item, index) => (
+                      <View key={index}>
+                        <Image
+                          source={{ uri: item.uri }}
+                          style={styles.image}
+                        />
+
+                        {/* Delete Button */}
+                        <TouchableOpacity
+                          style={styles.imageDelete}
+                          onPress={() => {
+                            const updated = form.image.filter(
+                              (_, i) => i !== index,
+                            );
+                            setForm(prev => ({ ...prev, image: updated }));
+                            setCurrentIndex(0);
+                          }}
+                        >
+                          <CloseIcon width={16} height={16} />
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </ScrollView>
+
+                  {/* Dots Indicator */}
+                  {form.image.length > 1 && (
+                    <View style={styles.dotsContainer}>
+                      {form.image.map((_, i) => (
+                        <View
+                          key={i}
+                          style={[
+                            styles.dot,
+                            currentIndex === i && styles.activeDot,
+                          ]}
+                        />
+                      ))}
+                    </View>
+                  )}
+                </View>
+              )}
 
               <BorderTextInput
                 label="Caption"
@@ -235,7 +297,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: WIDTH(4),
     paddingTop: 30,
-    paddingBottom: 20,
+    paddingBottom: HEIGHT(10),
     gap: 10,
   },
 
@@ -257,5 +319,32 @@ const styles = StyleSheet.create({
     marginHorizontal: WIDTH(4),
     marginTop: HEIGHT(2),
     paddingBottom: 10,
+  },
+  imageDelete: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 5,
+    elevation: 4,
+  },
+
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 6,
+  },
+
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#ccc',
+  },
+
+  activeDot: {
+    backgroundColor: Colors.primary,
   },
 });

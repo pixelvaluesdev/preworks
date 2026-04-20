@@ -23,25 +23,27 @@ const ProjectCard = ({ title, location, image, selectedTab, item }) => {
         </View>
 
         {selectedTab == 'project' ? (
-          <>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                navigation.navigate('CommonProjectDetails', { project: item })
-              }
-            >
-              <Text style={styles.buttonText}>View Full Details</Text>
-            </TouchableOpacity>
-          </>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('CommonProjectDetails', {
+                projectId: item._id,
+              })
+            }
+          >
+            <Text style={styles.buttonText}>View Full Details</Text>
+          </TouchableOpacity>
         ) : (
-          <>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => navigation.navigate('GeneralEnquiry')}
-            >
-              <Text style={styles.buttonText}>View Full Enquiry</Text>
-            </TouchableOpacity>
-          </>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('GeneralEnquiry', {
+                projectId: item._id,
+              })
+            }
+          >
+            <Text style={styles.buttonText}>View Full Enquiry</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>

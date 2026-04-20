@@ -65,6 +65,12 @@ const requestPath = {
   projectEnquiryList: '/customer/enquiry-list',
   updateProject: '/customer/update-project',
   deleteProject: '/customer/delete-project',
+  getNotifications: '/customer/get-notification',
+
+  // customer's projects in the professional acct
+  projectsForProfessional: '/professional/customer-Projects',
+
+  projectEnquiry: '/professional/proj-Enquiry',
 };
 
 const ApiManager = {
@@ -110,6 +116,15 @@ const ApiManager = {
       {},
       token,
     );
+  },
+  getNotifications: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.getNotifications}/${userId}`, token);
+  },
+  getProjectsForProfessional: (token?: string) => {
+    return requests.get(`${requestPath.projectsForProfessional}`, token);
+  },
+  projectEnquiry: (data: any, token?: string) => {
+    return requests.post(requestPath.projectEnquiry, data, token);
   },
 };
 

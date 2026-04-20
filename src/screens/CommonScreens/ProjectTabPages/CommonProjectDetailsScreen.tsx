@@ -45,6 +45,8 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const flatListRef = React.useRef(null);
 
   const userTypeRed = useSelector(state => state.auth.userType);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
   const token = useSelector(state => state.auth.userToken);
   const isCustomer = userTypeRed === 'customer';
   const isProfessional = userTypeRed === 'professional';
@@ -423,6 +425,10 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         title="Send your Quotation"
         visible={showPopup}
         onClose={() => setShowPopup(false)}
+        projectId={projectId}
+        token={token}
+        showQuotation={true}
+        userId={userId}
       />
       <ImageViewing
         images={imageUrls}

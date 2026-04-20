@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
@@ -13,7 +14,7 @@ import Colors from '../../constants/colors';
 import SearchHeader from '../../components/SearchHeader';
 import ToggleTabs from '../../components/ProfessionalUI/ToggleTabs';
 import ProjectCard from '../../components/ProfessionalUI/ProjectCard';
-import ApiManager from '../../apis/ApiManager';
+import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
 
@@ -66,6 +67,9 @@ const ProfessionalHomeScreen = () => {
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTab, setSelectedTab] = useState('project');
+  const [projects, setProjects] = useState([]);
+  const [enquiries, setEnquiries] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -85,17 +89,17 @@ const ProfessionalHomeScreen = () => {
     }
   };
 
-  const listData = useMemo(() => {
-    return selectedTab === 'project' ? projectList : enquiryList;
-  }, [selectedTab]);
+  const listData = selectedTab === 'project' ? projects : enquiries;
 
   const renderProject = useCallback(
     ({ item }) => {
       return (
         <ProjectCard
-          title={item.title}
-          location={item.location}
-          image={item.image}
+          title={item.projectName}
+          location={item.plotAddress}
+          image={{
+            uri: `${IMG_URL}${item.image?.[0]}`,
+          }}
           selectedTab={selectedTab}
           item={item}
         />
@@ -105,6 +109,30 @@ const ProfessionalHomeScreen = () => {
   );
 
   useBackExit();
+
+  useEffect(() => {
+    if (token) {
+      fetchProjects();
+    }
+  }, [token]);
+
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+
+      const response = await ApiManager.getProjectsForProfessional(token);
+
+      if (response?.data?.status === 'success') {
+        setProjects(response.data.data.projects);
+        setEnquiries(response.data.data.enquiries || []);
+        console.log('Projects for professional', response.data.data.projects);
+      }
+    } catch (error) {
+      console.log('Project error', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -157,12 +185,21 @@ const ProfessionalHomeScreen = () => {
       <ToggleTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
       {/* List */}
-      <FlatList
-        data={listData}
-        keyExtractor={item => item.id}
-        scrollEnabled={false}
-        renderItem={renderProject}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color={Colors.primary} />
+      ) : (
+        <FlatList
+          data={listData}
+          keyExtractor={item => item._id}
+          scrollEnabled={false}
+          renderItem={renderProject}
+          ListEmptyComponent={
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              No Data Found
+            </Text>
+          }
+        />
+      )}
     </ScrollView>
   );
 };

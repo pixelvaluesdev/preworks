@@ -1,16 +1,139 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import {
+  View,
+  Text,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
-import { FONTSIZE, HEIGHT } from '../utils/responsive';
 import SecondaryButton from './Buttons/SecondaryBtn';
 import BorderTextInput from './Inputs/BorderTextInput';
 import UploadIcon from '../assets/svgs/UploadIcon.svg';
+import ApiManager from '../apis/ApiManager';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { pick } from '@react-native-documents/picker';
+import { useNavigation } from '@react-navigation/native';
 
-const Popup = ({ title, visible, onClose, showQuotation = true }) => {
+const Popup = ({
+  title,
+  visible,
+  onClose,
+  showQuotation = true,
+  projectId,
+  userId,
+  token,
+}) => {
   const [quotation, setQuotation] = useState('');
   const [message, setMessage] = useState('');
+  const [quotationFiles, setQuotationFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation();
+
+  // ✅ SUBMIT API
+  const handleSubmit = async () => {
+    try {
+      if (!message) {
+        Alert.alert('Error', 'Please enter message');
+        return;
+      }
+
+      if (showQuotation && quotationFiles.length === 0) {
+        Alert.alert('Error', 'Please upload file');
+        return;
+      }
+
+      setLoading(true);
+
+      const formData = new FormData();
+
+      formData.append('projectId', projectId);
+      formData.append('desc', message);
+      formData.append('type', showQuotation ? 'quotation' : 'enquiry');
+      formData.append('userId', userId);
+
+      // ✅ multiple files support
+      quotationFiles.forEach(file => {
+        formData.append('files', {
+          uri: file.uri,
+          name: file.name || 'file.jpg',
+          type: file.type || 'image/jpeg',
+        });
+      });
+
+      const res = await ApiManager.projectEnquiry(formData, token);
+
+      console.log('Enquiry Response:', res?.data);
+
+      if (res?.data?.status === 'success') {
+        const selectedType = showQuotation ? 'quotation' : 'enquiry';
+
+        setMessage('');
+        setQuotation('');
+        setQuotationFiles([]);
+
+        onClose();
+
+        navigation.navigate('ProjectDetails', {
+          projectId,
+          selectedTab: selectedType,
+        });
+      }
+    } catch (error) {
+      console.log('Submit error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ IMAGE PICKER
+  const pickImage = () => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 0 }, response => {
+      if (response.didCancel || response.errorCode) return;
+
+      const files =
+        response.assets?.map(item => ({
+          uri: item.uri,
+          type: item.type,
+          name: item.fileName,
+        })) || [];
+
+      if (files.length) {
+        setQuotationFiles(prev => [...prev, ...files]);
+      }
+    });
+  };
+
+  // ✅ PDF PICKER
+  const pickDocument = async () => {
+    try {
+      const res = await pick({
+        type: ['application/pdf'],
+        allowMultiSelection: true,
+      });
+
+      const files = res.map(item => ({
+        uri: item.uri,
+        type: item.type,
+        name: item.name,
+      }));
+
+      setQuotationFiles(prev => [...prev, ...files]);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ✅ PICK OPTION
+  const pickMedia = () => {
+    Alert.alert('Upload File', 'Choose file type', [
+      { text: 'Images', onPress: pickImage },
+      { text: 'PDF', onPress: pickDocument },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
+  };
 
   return (
     <Modal transparent animationType="fade" visible={visible}>
@@ -20,15 +143,19 @@ const Popup = ({ title, visible, onClose, showQuotation = true }) => {
 
           {/* Quotation Input */}
           {showQuotation && (
-            <TouchableOpacity>
+            <TouchableOpacity onPress={pickMedia}>
               <BorderTextInput
                 label="Quotation"
-                value={quotation}
+                value={
+                  quotationFiles.length > 0
+                    ? `${quotationFiles.length} file(s) selected`
+                    : quotation
+                }
                 onChangeText={setQuotation}
                 placeholder="Select"
                 editable={false}
                 rightComponent={
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={pickMedia}>
                     <UploadIcon />
                   </TouchableOpacity>
                 }
@@ -46,9 +173,9 @@ const Popup = ({ title, visible, onClose, showQuotation = true }) => {
           />
 
           <SecondaryButton
-            title="Submit"
+            title={loading ? 'Submitting...' : 'Submit'}
             style={styles.submitBtn}
-            onPress={onClose}
+            onPress={handleSubmit} // ✅ FIXED
           />
         </View>
       </View>
@@ -78,28 +205,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 20,
     fontWeight: '600',
-  },
-
-  inputWrapper: {
-    position: 'relative',
-    marginBottom: 20,
-  },
-
-  floatingLabel: {
-    position: 'absolute',
-    top: -8,
-    left: 14,
-    backgroundColor: '#fff',
-    paddingHorizontal: 6,
-    fontSize: 14,
-    color: '#333',
-    zIndex: 1,
-    fontFamily: FONT.POPPINS_MEDIUM,
-  },
-
-  outline: {
-    borderRadius: 14, // increased radius
-    borderWidth: 0.75,
   },
 
   submitBtn: {

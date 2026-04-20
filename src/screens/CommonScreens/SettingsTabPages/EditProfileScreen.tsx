@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
@@ -22,6 +23,7 @@ import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
@@ -41,6 +43,56 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [errors, setErrors] = useState({
     email: '',
   });
+
+  const [profileImage, setProfileImage] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
+
+  const openImagePicker = type => {
+    const options = {
+      mediaType: 'photo',
+      quality: 0.7,
+    };
+
+    // OPEN GALLERY
+    launchImageLibrary(options, response => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log('Error:', response.errorMessage);
+        return;
+      }
+
+      const image = response.assets[0];
+
+      if (type === 'profile') {
+        setProfileImage(image);
+      } else {
+        setCoverImage(image);
+      }
+    });
+  };
+
+  const openCamera = type => {
+    const options = {
+      mediaType: 'photo',
+      quality: 0.7,
+    };
+
+    launchCamera(options, response => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log('Error:', response.errorMessage);
+        return;
+      }
+
+      const image = response.assets[0];
+
+      if (type === 'profile') {
+        setProfileImage(image);
+      } else {
+        setCoverImage(image);
+      }
+    });
+  };
 
   const handleInputChange = (key, value, setter) => {
     let cleaned = value;
@@ -69,6 +121,23 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
 
     setter(cleaned);
+  };
+
+  const showImageOptions = type => {
+    Alert.alert('Select Image', 'Choose option', [
+      {
+        text: 'Camera',
+        onPress: () => openCamera(type),
+      },
+      {
+        text: 'Gallery',
+        onPress: () => openImagePicker(type),
+      },
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+    ]);
   };
 
   const validateEmail = email => {
@@ -120,7 +189,10 @@ const EditProfileScreen = ({ navigation }: any) => {
               >
                 <Back />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cameraCvrBtn}>
+              <TouchableOpacity
+                style={styles.cameraCvrBtn}
+                onPress={() => showImageOptions('cover')}
+              >
                 <Camera width={35} />
               </TouchableOpacity>
             </LinearGradient>
@@ -130,10 +202,17 @@ const EditProfileScreen = ({ navigation }: any) => {
               <View style={styles.profileSection}>
                 <Image
                   style={styles.profileImage}
-                  source={require('../../../assets/pngs/BannerImg.png')}
+                  source={
+                    profileImage
+                      ? { uri: profileImage.uri }
+                      : require('../../../assets/pngs/BannerImg.png')
+                  }
                 />
 
-                <TouchableOpacity style={styles.cameraBtn}>
+                <TouchableOpacity
+                  style={styles.cameraBtn}
+                  onPress={() => showImageOptions('profile')}
+                >
                   <Camera width={35} />
                 </TouchableOpacity>
               </View>

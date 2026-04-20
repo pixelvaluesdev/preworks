@@ -41,7 +41,7 @@ export default PrimaryButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: WIDTH(65), 
+    width: WIDTH(65),
     borderRadius: 10,
     borderWidth: 0.5,
     borderColor: 'white',
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 2, 
+    paddingVertical: 2,
     paddingHorizontal: 14,
   },
 
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     color: '#FFFFFF',
-    fontFamily: FONT.POPPINS_BOLD,
-   
-    flexShrink: 1, 
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+
+    flexShrink: 1,
   },
 });

@@ -103,9 +103,9 @@ const styles = StyleSheet.create({
 
   floatingLabel: {
     position: 'absolute',
-    top: -8,
+    top: -10,
     left: 16,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'white',
     paddingHorizontal: 10,
     fontSize: 14,
     color: '#333',

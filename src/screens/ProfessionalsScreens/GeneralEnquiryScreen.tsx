@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 
 import ScreenHeader from '../../components/ScreenHeader';
@@ -20,9 +21,42 @@ import StairsIcon from '../../assets/svgs/Stairs.svg';
 import Phone2Icon from '../../assets/svgs/Phone2.svg';
 import Popup from '../../components/Popup';
 import Location from '../../assets/svgs/LocationIcon.svg';
+import { useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 
 const GeneralEnquiryScreen = () => {
+  const route = useRoute();
+  const { projectId } = route.params;
+  const token = useSelector(state => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+
   const [showPopup, setShowPopup] = useState(false);
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (projectId && token) {
+      fetchProjectDetails();
+    }
+  }, [projectId, token]);
+
+  const fetchProjectDetails = async () => {
+    try {
+      setLoading(true);
+
+      const response = await ApiManager.getProjectDetails(projectId, token);
+
+      if (response?.data?.status === 'success') {
+        setProject(response.data.data.project);
+      }
+    } catch (error) {
+      console.log('Details error', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const DetailRow = ({ label, value, icon }: any) => {
     return (
@@ -35,18 +69,26 @@ const GeneralEnquiryScreen = () => {
       </View>
     );
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
   return (
     <ScrollView style={styles.container}>
       <ScreenHeader title="General Enquiry" showBack />
 
       {/* Image */}
       <Image
-        source={require('../../assets/pngs/BannerImg.png')}
+        source={{ uri: `${IMG_URL}${project?.image?.[0]}` }}
         style={styles.image}
       />
 
       {/* Title */}
-      <Text style={styles.title}>ABC complex</Text>
+      <Text style={styles.title}>{project?.projectName}</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -56,39 +98,45 @@ const GeneralEnquiryScreen = () => {
         }}
       >
         <Location width={20} height={17} />
-        <Text style={styles.location}>202, C.G. Road Nagpur</Text>
+        <Text style={styles.location}>{project?.plotAddress}</Text>
       </View>
 
       {/* Services */}
-      <Text style={styles.sectionTitle}>services you need</Text>
-
+      <Text style={styles.sectionTitle}>services customer need</Text>
+      {/* from api services are not comming */}
       <View style={styles.tagRow}>
-        <Text style={styles.tag}>Architectural Design</Text>
-        <Text style={styles.tag}>Structural Design</Text>
-        <Text style={styles.tag}>Construction</Text>
+        {project?.services?.map((item, index) => (
+          <Text key={index} style={styles.tag}>
+            {item}
+          </Text>
+        ))}
       </View>
 
       {/* Details */}
       <Text style={styles.sectionTitle}>Project Detail</Text>
 
-      <DetailRow icon={<AreaIcon />} label="Plot Size" value="2782.0 sq.ft" />
+      <DetailRow
+        icon={<AreaIcon />}
+        label="Plot Size"
+        value={`${project?.floorArea} sq.ft`}
+      />
       <View style={styles.dashedDivider} />
       <DetailRow
         icon={<StairsIcon />}
         label="No Of Floors"
-        value="Ground Floor & 1 Floor"
+        value={project?.noOfFloors}
       />
       <View style={styles.dashedDivider} />
       <DetailRow
         icon={<CalenderIcon />}
         label="Quote Last Date"
-        value="09/08/2025"
+        value={project?.quoteLastDate}
       />
       <View style={styles.dashedDivider} />
       <DetailRow
         icon={<ConstructionIcon />}
         label="Type Of Quote"
-        value="Laboure Only"
+        value={project?.typeOfQuote}
       />
       <View style={styles.dashedDivider} />
 
@@ -109,7 +157,9 @@ const GeneralEnquiryScreen = () => {
             >
               Mobile Number
             </Text>
-            <Text style={styles.mobile}>3438545685</Text>
+            <Text style={styles.mobile}>
+              {project?.userId?.phone || 'Hidden'}
+            </Text>
           </View>
         </View>
 
@@ -137,6 +187,9 @@ const GeneralEnquiryScreen = () => {
         visible={showPopup}
         onClose={() => setShowPopup(false)}
         showQuotation={false}
+        projectId={projectId}
+        token={token}
+        userId={userId}
       />
     </ScrollView>
   );

@@ -11,29 +11,44 @@ const UploadBox = ({
   onPress,
   onRemove,
   required = true,
-  labelSize = 14,
-  TextSize = 14,
+  showPreview = true,
 }) => {
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, { fontSize: labelSize }]}>
+      <Text style={styles.label}>
         {label} {required && <Text style={styles.asterisk}>*</Text>}
       </Text>
 
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
-        {value ? (
-          <View style={styles.previewContainer}>
-            <Image source={{ uri: value }} style={styles.previewImage} />
+        {/* Upload Icon */}
+        <View style={styles.uploadIcon}>
+          <UploadIcon />
+        </View>
 
-            <TouchableOpacity style={styles.removeBtn} onPress={onRemove}>
-              <CloseIcon width={16} height={16} />
-            </TouchableOpacity>
+        {/* Content */}
+        {showPreview && Array.isArray(value) && value.length > 0 ? (
+          <View style={styles.previewWrapper}>
+            {value.map((file, index) => (
+              <View key={index} style={styles.previewContainer}>
+                <Image source={{ uri: file.uri }} style={styles.previewImage} />
+
+                <TouchableOpacity
+                  style={styles.removeBtn}
+                  onPress={() => {
+                    const updated = value.filter((_, i) => i !== index);
+                    onRemove(updated);
+                  }}
+                >
+                  <CloseIcon width={14} height={14} />
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
         ) : (
-          <Text style={styles.placeholder}>Browse image</Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.placeholder}>Browse image</Text>
+          </View>
         )}
-
-        <UploadIcon />
       </TouchableOpacity>
     </View>
   );
@@ -46,6 +61,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   label: {
     position: 'absolute',
     top: -8,
@@ -64,9 +83,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 16,
+    paddingTop: 22,
+    justifyContent: 'center',
+  },
+
+  uploadIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+
+  previewWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 10,
+    width: '100%',
   },
 
   previewContainer: {
@@ -81,8 +114,8 @@ const styles = StyleSheet.create({
 
   removeBtn: {
     position: 'absolute',
-    top: -8,
-    right: -8,
+    top: 2,
+    right: 2,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 2,
@@ -93,7 +126,6 @@ const styles = StyleSheet.create({
     color: '#a6a6a6',
     fontFamily: FONT.POPPINS_REGULAR,
   },
-
   asterisk: {
     color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,

@@ -255,8 +255,13 @@ const UploadBox = ({
       </Text>
 
       <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
+        {rightComponent && (
+          <View style={styles.uploadIcon}>{rightComponent}</View>
+        )}
+
+        {/* Content */}
         {Array.isArray(value) && value.length > 0 ? (
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          <View style={styles.previewWrapper}>
             {value.map((file, index) => {
               const isImage = file?.type?.includes('image');
               const isPDF = file?.type?.includes('pdf');
@@ -296,9 +301,11 @@ const UploadBox = ({
             })}
           </View>
         ) : (
-          <Text style={styles.placeholder}>Browse image</Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.placeholder}>Browse image</Text>
+          </View>
         )}
-        {rightComponent && <View>{rightComponent}</View>}
+        {/* {rightComponent && <View>{rightComponent}</View>} */}
       </TouchableOpacity>
     </View>
   );
@@ -308,6 +315,10 @@ const styles = StyleSheet.create({
   container: {
     gap: 20,
     paddingBottom: 50,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
 
   inputWrapper: {
@@ -332,9 +343,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 22,
   },
 
   questionContainer: {
@@ -395,7 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff', // always white
+    backgroundColor: '#fff',
   },
 
   checkboxInner: {
@@ -450,8 +460,8 @@ const styles = StyleSheet.create({
 
   removeBtn: {
     position: 'absolute',
-    top: -8,
-    right: -8,
+    top: 2,
+    right: 2,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 2,
@@ -476,5 +486,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: 'center',
     marginTop: 4,
+  },
+  uploadIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 0,
+    bottom: 0,
+    justifyContent: 'center',
+  },
+
+  previewWrapper: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    width: '100%',
   },
 });

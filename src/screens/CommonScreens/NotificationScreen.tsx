@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 
 import { FONTSIZE, WIDTH, HEIGHT } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
@@ -14,67 +16,64 @@ import Colors from '../../constants/colors';
 
 import BackIcon from '../../assets/svgs/Back.svg';
 import ScreenHeader from '../../components/ScreenHeader';
-
-const notifications = [
-  {
-    id: '1',
-    title: 'Akruti House',
-    message: 'Your profile has been updated successfully.',
-    time: '1 hour ago',
-    unread: true,
-  },
-  {
-    id: '2',
-    title: 'Akruti House',
-    message: 'Reminder: You have an appointment tomorrow at 10:00 AM.',
-    time: '3 days ago',
-    unread: true,
-  },
-  {
-    id: '3',
-    title: 'Akruti House',
-    message: 'Your profile has been updated successfully.',
-    time: '1 hour ago',
-    unread: false,
-  },
-  {
-    id: '4',
-    title: 'Akruti House',
-    message: 'Reminder: You have an appointment tomorrow at 10:00 AM.',
-    time: '3 days ago',
-    unread: false,
-  },
-];
+import { useSelector } from 'react-redux';
+import ApiManager from '../../apis/ApiManager';
 
 const NotificationScreen = () => {
   const navigation = useNavigation();
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+  const token = useSelector(state => state.auth.userToken);
+
+  const getNotifications = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
+      const res = await ApiManager.getNotifications(userId, token);
+
+      if (res?.data?.status === 'success') {
+        setNotifications(res.data.data || []);
+      }
+    } catch (error) {
+      console.log('Notification API error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getNotifications();
+  }, []);
 
   const renderItem = ({ item }: any) => {
     return (
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={() => {
-          console.log('Clicked:', item);
-
-          // navigation.navigate('NotificationDetails', { item });
-        }}
-      >
+      <TouchableOpacity activeOpacity={0.7}>
         <View
           style={[
             styles.notificationCard,
-            { backgroundColor: item.unread ? '#F3F3F3' : 'white' },
+            { backgroundColor: item?.isRead ? 'white' : '#F3F3F3' },
           ]}
         >
           <View style={styles.row}>
-            <Text style={styles.title}>{item.title}</Text>
+            <Text style={styles.title}>{item?.title || 'Notification'}</Text>
 
             <View style={styles.timeRow}>
-              <Text style={styles.time}>{item.time}</Text>
-              {item.unread && <View style={styles.dot} />}
+              <Text style={styles.time}>
+                {item?.createdAt ? moment(item.createdAt).fromNow() : ''}
+              </Text>
+
+              {!item?.isRead && <View style={styles.dot} />}
             </View>
           </View>
 
-          <Text style={styles.message}>{item.message}</Text>
+          <Text style={styles.message}>{item?.message || ''}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -89,13 +88,22 @@ const NotificationScreen = () => {
       <ScreenHeader title={'Notifications'} showBack />
 
       {/* List */}
-      <FlatList
-        data={notifications}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        // ItemSeparatorComponent={() => <View style={styles.divider} />}
-        contentContainerStyle={{ paddingBottom: HEIGHT(5) }}
-      />
+      {loading ? (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <ActivityIndicator size="large" color="black" />
+        </View>
+      ) : (
+        <FlatList
+          data={notifications}
+          keyExtractor={(item: any) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={{ paddingBottom: HEIGHT(5) }}
+          refreshing={refreshing}
+          onRefresh={() => getNotifications(true)}
+        />
+      )}
     </View>
   );
 };

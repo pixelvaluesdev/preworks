@@ -24,33 +24,71 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
           <View style={styles.popupContainer}>
             <Text style={styles.message}>{message}</Text>
 
-            <View
-              style={[
-                styles.buttonRow,
-                buttons.length === 1 && styles.singleButtonRow,
-              ]}
-            >
-              {buttons.map((btn, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.button,
-                    buttons.length === 1 && styles.singleButton,
-                    btn.type === 'primary' && styles.primaryBtn,
-                  ]}
-                  onPress={btn.onPress}
-                >
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      btn.type === 'primary' && styles.primaryBtnText,
-                    ]}
+            {/* ✅ FIX: Handle 3 buttons separately */}
+            {buttons.length === 3 ? (
+              <>
+                {/* Top row (first 2 buttons) */}
+                <View style={styles.buttonRow}>
+                  {buttons.slice(0, 2).map((btn, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.button,
+                        btn.type === 'primary' && styles.primaryBtn,
+                      ]}
+                      onPress={btn.onPress}
+                    >
+                      <Text
+                        style={[
+                          styles.buttonText,
+                          btn.type === 'primary' && styles.primaryBtnText,
+                        ]}
+                      >
+                        {btn.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Bottom centered button (Cancel) */}
+                <View style={styles.bottomButtonContainer}>
+                  <TouchableOpacity
+                    style={[styles.button, styles.singleButton]}
+                    onPress={buttons[2].onPress}
                   >
-                    {btn.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Text style={styles.buttonText}>{buttons[2].label}</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <View
+                style={[
+                  styles.buttonRow,
+                  buttons.length === 1 && styles.singleButtonRow,
+                ]}
+              >
+                {buttons.map((btn, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.button,
+                      buttons.length === 1 && styles.singleButton,
+                      btn.type === 'primary' && styles.primaryBtn,
+                    ]}
+                    onPress={btn.onPress}
+                  >
+                    <Text
+                      style={[
+                        styles.buttonText,
+                        btn.type === 'primary' && styles.primaryBtnText,
+                      ]}
+                    >
+                      {btn.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -86,7 +124,6 @@ const styles = StyleSheet.create({
 
   buttonRow: {
     flexDirection: 'row',
-
     gap: 12,
     marginTop: 10,
   },
@@ -117,9 +154,16 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     color: '#FFFFFF',
   },
+
   singleButton: {
     flex: 0,
     minWidth: 120,
     paddingHorizontal: 20,
+  },
+
+  /* ✅ NEW STYLE (only addition) */
+  bottomButtonContainer: {
+    marginTop: 12,
+    alignItems: 'center',
   },
 });
