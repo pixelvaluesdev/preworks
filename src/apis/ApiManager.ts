@@ -105,12 +105,8 @@ const ApiManager = {
       token,
     );
   },
-  updateProject: (projectId: string, data: any, token?: string) => {
-    return requests.put(
-      `${requestPath.updateProject}/${projectId}`,
-      data,
-      token,
-    );
+  updateProject: (data: any, token?: string) => {
+    return requests.put(requestPath.updateProject, data, token);
   },
   deleteProject: (projectId: string, token?: string) => {
     return requests.delete(

@@ -232,6 +232,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       setIsSuccess(false);
 
       const formData = new FormData();
+      formData.append('projectId', projectId);
 
       formData.append('projectName', form.projectName);
       formData.append('plotAddress', form.address);
@@ -282,7 +283,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       formData.append('userId', userId);
 
       const response = isEdit
-        ? await ApiManager.updateProject(projectId, formData, token)
+        ? await ApiManager.updateProject(formData, token)
         : await ApiManager.createProject(formData, token);
 
       setIsSuccess(true);
