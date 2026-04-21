@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -11,6 +11,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  PermissionsAndroid,
+  ActivityIndicator,
 } from 'react-native';
 
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
@@ -24,11 +26,22 @@ import { useSelector } from 'react-redux';
 import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useRoute } from '@react-navigation/native';
+import ApiManager from '../../../apis/ApiManager';
+import { IMG_URL } from '../../../apis/ApiManager';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
   console.log('userType:', userType);
   const isProfessional = userType !== 'customer';
+  const token = useSelector((state: any) => state.auth.userToken);
+
+  const route = useRoute();
+  const userId = route?.params?.userId;
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
@@ -47,6 +60,39 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [profileImage, setProfileImage] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
 
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const response = await ApiManager.getProfile(userId, token);
+      console.log('Profile response:', response);
+
+      if (response?.data?.status === 'success') {
+        const data = response.data.data;
+
+        setProfile(data);
+
+        //  PREFILL ALL FIELDS
+        setName(data?.firstName || '');
+        setMobile(data?.phone || '');
+        setEmail(data?.email || '');
+        setCity(data?.city || '');
+        setPin(data?.pincode || '');
+        setState(data?.state || '');
+        setAddress(data?.address || '');
+      }
+    } catch (error) {
+      console.log('Edit Profile error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const openImagePicker = type => {
     const options = {
       mediaType: 'photo',
@@ -71,7 +117,38 @@ const EditProfileScreen = ({ navigation }: any) => {
     });
   };
 
-  const openCamera = type => {
+  const requestCameraPermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'App needs camera permission to take photos',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      }
+
+      return true;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+  const openCamera = async type => {
+    const hasPermission = await requestCameraPermission();
+
+    if (!hasPermission) {
+      Alert.alert('Permission denied', 'Camera permission is required');
+      return;
+    }
+
     const options = {
       mediaType: 'photo',
       quality: 0.7,
@@ -79,10 +156,14 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     launchCamera(options, response => {
       if (response.didCancel) return;
+
       if (response.errorCode) {
         console.log('Error:', response.errorMessage);
+        Alert.alert('Camera Error', response.errorMessage);
         return;
       }
+
+      if (!response.assets || response.assets.length === 0) return;
 
       const image = response.assets[0];
 
@@ -149,7 +230,7 @@ const EditProfileScreen = ({ navigation }: any) => {
     return '';
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     let emailError = '';
 
     if (!isProfessional) {
@@ -163,8 +244,72 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     setErrors({ email: '' });
 
-    setShowPopup(true);
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      // formData.append('phone', mobile);
+
+      const [firstName, ...rest] = name.split(' ');
+      const lastName = rest.join(' ');
+
+      formData.append('firstName', firstName);
+      formData.append('lastName', lastName);
+
+      formData.append('email', email);
+      formData.append('city', city);
+      formData.append('state', state);
+      formData.append('pincode', pin);
+      formData.append('address', address);
+
+      if (experience) formData.append('experience', experience);
+      if (bio) formData.append('bio', bio);
+
+      if (links) {
+        formData.append('links', JSON.stringify([links]));
+      }
+
+      if (profileImage) {
+        formData.append('image', {
+          uri: profileImage.uri,
+          type: profileImage.type || 'image/jpeg',
+          name: profileImage.fileName || 'profile.jpg',
+        });
+      }
+
+      if (coverImage) {
+        formData.append('userBanner', {
+          uri: coverImage.uri,
+          type: coverImage.type || 'image/jpeg',
+          name: coverImage.fileName || 'banner.jpg',
+        });
+      }
+
+      console.log('USER ID:', userId);
+
+      const response = await ApiManager.updateProfile(userId, formData, token);
+
+      console.log('UPDATE RESPONSE:', response.data);
+
+      if (response?.data?.status === 'success') {
+        setShowPopup(true);
+      }
+    } catch (error) {
+      console.log('Update error:', error);
+      Alert.alert('Error', 'Update failed');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -183,6 +328,16 @@ const EditProfileScreen = ({ navigation }: any) => {
               end={{ x: 0, y: 1 }}
               style={styles.header}
             >
+              <Image
+                style={styles.coverImage}
+                source={
+                  coverImage?.uri
+                    ? { uri: coverImage.uri } // newly selected
+                    : profile?.userBanner
+                    ? { uri: `${IMG_URL}${profile.userBanner}` } // backend image
+                    : require('../../../assets/pngs/BannerImg.png')
+                }
+              />
               <TouchableOpacity
                 style={styles.backBtn}
                 onPress={() => navigation.goBack()}
@@ -203,8 +358,10 @@ const EditProfileScreen = ({ navigation }: any) => {
                 <Image
                   style={styles.profileImage}
                   source={
-                    profileImage
-                      ? { uri: profileImage.uri }
+                    profileImage?.uri
+                      ? { uri: profileImage.uri } // newly selected
+                      : profile?.image
+                      ? { uri: `${IMG_URL}${profile.image}` } // backend image
                       : require('../../../assets/pngs/BannerImg.png')
                   }
                 />
@@ -230,6 +387,8 @@ const EditProfileScreen = ({ navigation }: any) => {
               <BorderTextInput
                 label="Mobile Number"
                 value={mobile}
+                editable={false}
+                containerStyle={{ backgroundColor: '#f5f5f5' }}
                 onChangeText={text =>
                   handleInputChange('mobile', text, setMobile)
                 }
@@ -303,8 +462,8 @@ const EditProfileScreen = ({ navigation }: any) => {
               {isProfessional && (
                 <BorderTextInput
                   label="Experience"
-                  value={email}
-                  onChangeText={setEmail}
+                  value={experience}
+                  onChangeText={setExperience}
                   placeholder="Enter your experience"
                 />
               )}
@@ -369,6 +528,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
+  },
+  coverImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
 
   header: {

@@ -28,6 +28,7 @@ import Logoutcon from '../../assets/svgs/LogoutIcon.svg';
 import RightIcon from '../../assets/svgs/whiteBackIcon.svg';
 import ForwardIcon from '../../assets/svgs/ForwardArrow.svg';
 import YesIcon from '../../assets/svgs/YesIcon.svg';
+import { IMG_URL } from '../../apis/ApiManager';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -44,6 +45,9 @@ const SettingsScreen = () => {
   const userType = useSelector((state: any) => state.auth.userType);
   console.log('userType:', userType);
   const isCustomer = userType === 'customer';
+
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
 
   const handleLogout = async () => {
     try {
@@ -87,8 +91,12 @@ const SettingsScreen = () => {
         {/* PROFILE IMAGE */}
         <View style={styles.profileContainer}>
           <Image
-            source={require('../../assets/pngs/BannerImg.png')}
             style={styles.profileImage}
+            source={
+              user?.image
+                ? { uri: `${IMG_URL}${user.image}` }
+                : require('../../assets/pngs/BannerImg.png')
+            }
           />
           <Text style={styles.name}>
             {fName} {lName}
@@ -103,6 +111,7 @@ const SettingsScreen = () => {
             onPress={() =>
               navigation.navigate(
                 isCustomer ? 'ProfileScreen' : 'ProfessionalProfile',
+                { userId: userId },
               )
             }
           >

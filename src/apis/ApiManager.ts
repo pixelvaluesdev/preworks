@@ -71,6 +71,8 @@ const requestPath = {
   projectsForProfessional: '/professional/customer-Projects',
 
   projectEnquiry: '/professional/proj-Enquiry',
+  getProfile: '/customer/get-profile',
+  updateProfile: '/customer/update-profile',
 };
 
 const ApiManager = {
@@ -125,6 +127,13 @@ const ApiManager = {
   },
   projectEnquiry: (data: any, token?: string) => {
     return requests.post(requestPath.projectEnquiry, data, token);
+  },
+  getProfile: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.getProfile}/${userId}`, token);
+  },
+
+  updateProfile: (userId: string, data: any, token?: string) => {
+    return requests.put(`${requestPath.updateProfile}/${userId}`, data, token);
   },
 };
 

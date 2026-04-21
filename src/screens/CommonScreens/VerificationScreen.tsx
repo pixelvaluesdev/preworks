@@ -89,6 +89,7 @@ const VerificationScreen = () => {
       }
     } catch (error) {
       const serverMessage = error?.response?.data?.message;
+      console.log('OTP verification error:', error);
 
       if (serverMessage === 'Invalid OTP') {
         setOtp('');
@@ -144,6 +145,7 @@ const VerificationScreen = () => {
     } catch (error: any) {
       const serverMessage =
         error?.response?.data?.message || 'Something went wrong';
+      console.log('OTP resend error:', error);
 
       showSnackbar(serverMessage, 'error');
     } finally {

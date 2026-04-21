@@ -35,11 +35,6 @@ import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
 
-const attachments = [
-  { id: '1', name: 'Akruti mall.png' },
-  { id: '2', name: 'Akruti mall.pdf' },
-];
-
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId } = route.params || {};
   const flatListRef = React.useRef(null);
@@ -52,6 +47,8 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const isProfessional = userTypeRed === 'professional';
 
   const [project, setProject] = useState(null);
+  const drawings = project?.drawing || [];
+
   const [loading, setLoading] = useState(false);
   const [enquiryCount, setEnquiryCount] = useState(0);
 

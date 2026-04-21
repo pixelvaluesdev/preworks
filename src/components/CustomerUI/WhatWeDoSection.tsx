@@ -28,7 +28,7 @@ const services = [
   {
     title: 'Interior Designer',
     Icon: InteriorIcon,
-    type: 'interior',
+    type: 'designer',
     subtitle: 'Design Your Space',
   },
 ];

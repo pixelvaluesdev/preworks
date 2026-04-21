@@ -144,8 +144,7 @@ const CustomerHomeScreen = () => {
           <TouchableOpacity
             onPress={() =>
               navigation.navigate('ProfessionalList', {
-                type: 'All',
-                professionals,
+                type: 'all',
               })
             }
           >

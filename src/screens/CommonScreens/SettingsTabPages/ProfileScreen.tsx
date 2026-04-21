@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 
 import { WIDTH, HEIGHT } from '../../../utils/responsive';
@@ -19,8 +20,52 @@ import Pincode from '../../../assets/svgs/GreenLocation.svg';
 import Building from '../../../assets/svgs/BuildingIcon.svg';
 import Address from '../../../assets/svgs/AddressIcon.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
+import { useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
+import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
 const ProfileScreen = ({ navigation }: any) => {
+  const route = useRoute();
+  const userId = route?.params?.userId;
+  console.log('Received userId:', userId);
+
+  const token = useSelector((state: any) => state.auth.userToken);
+  console.log('Token from Redux:', token);
+
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (userId) {
+      fetchProfile();
+    }
+  }, [userId]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const response = await ApiManager.getProfile(userId, token);
+
+      if (response?.data?.status === 'success') {
+        setProfile(response.data.data);
+        console.log('Profile data:', response.data.data);
+      }
+    } catch (error) {
+      console.log('Profile error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -31,7 +76,14 @@ const ProfileScreen = ({ navigation }: any) => {
           end={{ x: 0, y: 1 }}
           style={styles.header}
         >
-          <Image style={styles.coverImage} />
+          <Image
+            style={styles.coverImage}
+            source={
+              profile?.userBanner
+                ? { uri: `${IMG_URL}${profile.userBanner}` }
+                : require('../../../assets/pngs/BannerImg.png')
+            }
+          />
 
           <TouchableOpacity
             style={styles.backBtn}
@@ -45,20 +97,28 @@ const ProfileScreen = ({ navigation }: any) => {
         <View style={styles.profileWrapper}>
           <View style={styles.profileSection}>
             <Image
-              source={require('../../../assets/pngs/BannerImg.png')}
               style={styles.profileImage}
+              source={
+                profile?.image
+                  ? { uri: `${IMG_URL}${profile.image}` }
+                  : require('../../../assets/pngs/BannerImg.png')
+              }
             />
 
             <TouchableOpacity
               style={styles.editBtn}
-              onPress={() => navigation.navigate('EditProfileScreen')}
+              onPress={() =>
+                navigation.navigate('EditProfileScreen', { userId })
+              }
             >
               <Text style={styles.editText}>Edit</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.name}>Pratik Shah</Text>
-          <Text style={styles.id}>#P484864</Text>
+          <Text style={styles.name}>
+            {profile?.firstName} {profile?.lastName}
+          </Text>
+          <Text style={styles.id}>#{profile?._id?.slice(-6)}</Text>
         </View>
 
         {/* DETAILS CARD */}
@@ -69,7 +129,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.label}>Mobile number</Text>
-                <Text style={styles.value}>+91 9595965161</Text>
+                <Text style={styles.value}>+91 {profile?.phone ?? 'NA'}</Text>
               </View>
             </View>
           </View>
@@ -82,7 +142,10 @@ const ProfileScreen = ({ navigation }: any) => {
 
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.label}>Email</Text>
-                <Text style={styles.value}>ron@gmail.com</Text>
+                <Text style={styles.value}>
+                  {' '}
+                  {profile?.email?.trim() ? profile.email : 'NA'}
+                </Text>
               </View>
             </View>
           </View>
@@ -96,7 +159,10 @@ const ProfileScreen = ({ navigation }: any) => {
                 <City />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.label}>City</Text>
-                  <Text style={styles.value}>Mumbai</Text>
+                  <Text style={styles.value}>
+                    {' '}
+                    {profile?.city?.trim() ? profile.city : 'NA'}
+                  </Text>
                 </View>
               </View>
 
@@ -110,7 +176,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Pincode />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.label}>Pincode</Text>
-                  <Text style={styles.value}>440024</Text>
+                  <Text style={styles.value}>{profile?.pin ?? 'NA'}</Text>
                 </View>
               </View>
 
@@ -125,7 +191,9 @@ const ProfileScreen = ({ navigation }: any) => {
 
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.label}>State</Text>
-                <Text style={styles.value}>Maharashtra</Text>
+                <Text style={styles.value}>
+                  {profile?.state?.trim() ? profile.state : 'NA'}
+                </Text>
               </View>
             </View>
           </View>
@@ -138,7 +206,10 @@ const ProfileScreen = ({ navigation }: any) => {
 
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.label}>Address</Text>
-                <Text style={styles.value}>ueeu, wuewiu</Text>
+                <Text style={styles.value}>
+                  {' '}
+                  {profile?.address?.trim() ? profile.address : 'NA'}
+                </Text>
               </View>
             </View>
             <View style={styles.divider} />

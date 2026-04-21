@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -19,6 +20,9 @@ import SearchHeader from '../../../components/SearchHeader';
 import Location from '../../../assets/svgs/LocationIcon.svg';
 import SuitCaseIcon from '../../../assets/svgs/suitcaseIcon.svg';
 import { IMG_URL } from '../../../apis/ApiManager';
+import ApiManager from '../../../apis/ApiManager';
+import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 const suggestions = [
   'Residential',
@@ -33,18 +37,45 @@ const ProfessionalListScreen = () => {
   const route = useRoute();
 
   const type = route?.params?.type;
-  const professionals = route?.params?.professionals || [];
+  // const professionals = route?.params?.professionals || [];
 
   const [search, setSearch] = useState('');
 
-  const filteredList = professionals.filter(item => {
-    if (type === 'All' || !type) return true;
-    return item.type === type;
-  });
+  const token = useSelector((state: any) => state.auth.userToken);
 
-  const finalList = filteredList.filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
+  const [professionals, setProfessionals] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // const filteredList = professionals.filter(item => {
+  //   if (type === 'All' || !type) return true;
+  //   return item.type === type;
+  // });
+
+  const finalList = professionals.filter(item =>
+    (item.name || '').toLowerCase().includes(search.toLowerCase()),
   );
+
+  useEffect(() => {
+    fetchProfessionals();
+  }, [type]);
+
+  const fetchProfessionals = async () => {
+    try {
+      setLoading(true);
+
+      const apiType = type ? type : 'all'; // fallback
+
+      const response = await ApiManager.getProfessionals(apiType, token);
+
+      if (response?.data?.status === 'success') {
+        setProfessionals(response.data.data);
+      }
+    } catch (error) {
+      console.log('Error fetching professionals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -77,64 +108,71 @@ const ProfessionalListScreen = () => {
       )}
 
       {/* Professionals Grid */}
-      {(type || search) && (
-        <FlatList
-          data={finalList}
-          keyExtractor={item => item.id}
-          numColumns={2}
-          columnWrapperStyle={{ justifyContent: 'space-between' }}
-          contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
-          renderItem={({ item }) => {
-            const hasValidImage =
-              item.image &&
-              Array.isArray(item.image) &&
-              item.image.length > 0 &&
-              typeof item.image[0] === 'string' &&
-              item.image[0].trim() !== '';
+      {(type || search) &&
+        (loading ? (
+          <ActivityIndicator
+            size="large"
+            color={Colors.primary}
+            style={{ marginTop: HEIGHT(5), alignSelf: 'center' }}
+          />
+        ) : (
+          <FlatList
+            data={finalList}
+            keyExtractor={item => item._id}
+            numColumns={2}
+            columnWrapperStyle={{ justifyContent: 'space-between' }}
+            contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
+            renderItem={({ item }) => {
+              const hasValidImage =
+                item.image &&
+                Array.isArray(item.image) &&
+                item.image.length > 0 &&
+                typeof item.image[0] === 'string' &&
+                item.image[0].trim() !== '';
 
-            return (
-              <TouchableOpacity
-                style={styles.card}
-                onPress={() =>
-                  navigation.navigate('ProfessionalProfile', { id: item.id })
-                }
-              >
-                <Image
-                  source={
-                    hasValidImage
-                      ? { uri: `${IMG_URL}${item.image[0]}` }
-                      : require('../../../assets/pngs/Placeholder.png')
+              return (
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={() =>
+                    navigation.navigate('ProfessionalProfile', { id: item._id })
                   }
-                  style={styles.image}
-                />
-
-                <View
-                  style={{
-                    backgroundColor: '#F0F0F0',
-                    borderBottomRightRadius: 5,
-                    borderBottomLeftRadius: 5,
-                    paddingHorizontal: 10,
-                  }}
                 >
-                  <Text style={styles.name}>
-                    {item.firstName} {item.lastName}
-                  </Text>
+                  <Image
+                    source={
+                      hasValidImage
+                        ? { uri: `${IMG_URL}${item.image[0]}` }
+                        : require('../../../assets/pngs/Placeholder.png')
+                    }
+                    style={styles.image}
+                  />
 
-                  <View style={{ flexDirection: 'row', gap: 4 }}>
-                    <SuitCaseIcon width={16} height={16} />
-                    <Text style={styles.exp}>{item.exp}</Text>
-                  </View>
+                  <View
+                    style={{
+                      backgroundColor: '#F0F0F0',
+                      borderBottomRightRadius: 5,
+                      borderBottomLeftRadius: 5,
+                      paddingHorizontal: 10,
+                    }}
+                  >
+                    <Text style={styles.name}>
+                      {item.firstName} {item.lastName}
+                    </Text>
 
-                  <View style={{ flexDirection: 'row', gap: 4 }}>
-                    <Location width={16} height={16} />
-                    <Text style={styles.location}>{item.location}</Text>
+                    <View style={{ flexDirection: 'row', gap: 4 }}>
+                      <SuitCaseIcon width={16} height={16} />
+                      <Text style={styles.exp}>{item.exp}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', gap: 4 }}>
+                      <Location width={16} height={16} />
+                      <Text style={styles.location}>{item.location}</Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      )}
+                </TouchableOpacity>
+              );
+            }}
+          />
+        ))}
     </View>
   );
 };
