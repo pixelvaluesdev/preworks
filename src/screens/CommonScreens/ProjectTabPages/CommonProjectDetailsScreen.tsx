@@ -500,6 +500,11 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: HEIGHT(35),
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 
   quoteBadge: {
     position: 'absolute',

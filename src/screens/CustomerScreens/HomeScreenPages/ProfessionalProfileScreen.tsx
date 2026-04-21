@@ -7,6 +7,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
+  ActivityIndicator,
+  Linking,
+  Alert,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -21,38 +24,28 @@ import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import MultiImg from '../../../assets/svgs/MultiImgIcon.svg';
-
-const portfolioData = [
-  {
-    id: 1,
-    images: [
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c',
-      'https://images.unsplash.com/photo-1600607687644-c94bf45c6d3e',
-    ],
-  },
-  {
-    id: 2,
-    images: ['https://images.unsplash.com/photo-1600566752355-35792bedcfea'],
-  },
-  {
-    id: 3,
-    images: [
-      'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c',
-      'https://images.unsplash.com/photo-1600607688969-a5bfcd646154',
-    ],
-  },
-];
+import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
+import Clipboard from '@react-native-clipboard/clipboard';
+import Redirect from '../../../assets/svgs/RedirectIcon.svg';
+import Copy from '../../../assets/svgs/CopyIcon.svg';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  // const { id } = route.params as { id: any };
+  const { id } = route.params as { id: any };
 
+  const token = useSelector((state: any) => state.auth.userToken);
+  console.log('ProfessionalProfileScreen token:', token);
   const navigation = useNavigation();
   const userType = useSelector((state: any) => state.auth.userType);
   const isProffesional = userType !== 'customer';
 
   const [showComingSoon, setShowComingSoon] = useState(false);
+
+  const [profile, setProfile] = useState<any>(null);
+  const workList = profile?.workList || [];
+  const [showLinks, setShowLinks] = useState(false);
+
+  const [loading, setLoading] = useState(false);
   const blinkAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -79,13 +72,85 @@ const ProfessionalProfileScreen = () => {
     }
   }, [showComingSoon]);
 
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getProfile(id, token);
+
+      if (res?.data?.status === 'success') {
+        setProfile(res.data.data);
+      }
+    } catch (error) {
+      console.log('Profile Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCall = () => {
+    const phone = profile?.user?.phone;
+
+    if (!phone) {
+      Alert.alert('No Phone Number', 'Phone number not available');
+      return;
+    }
+
+    Linking.openURL(`tel:${phone}`);
+  };
+  const handleLinks = () => {
+    const links = profile?.user?.links;
+
+    console.log('Links:', links); // 👈 debug
+
+    if (!links || links.length === 0) {
+      Alert.alert('No Links', 'No links available');
+      return;
+    }
+
+    setShowLinks(true);
+  };
+
+  const copyToClipboard = (text: string) => {
+    Clipboard.setString(text);
+    Alert.alert('Copied', 'Link copied to clipboard');
+  };
+
+  const openLink = (url: string) => {
+    let fixedUrl = url;
+
+    if (url.startsWith('https:/') && !url.startsWith('https://')) {
+      fixedUrl = url.replace('https:/', 'https://');
+    }
+
+    if (!fixedUrl.startsWith('http')) {
+      fixedUrl = `https://${fixedUrl}`;
+    }
+
+    Linking.openURL(fixedUrl);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Banner */}
         <Image
           source={{
-            uri: 'https://images.unsplash.com/photo-1501183638710-841dd1904471',
+            uri: profile?.user?.userBanner
+              ? IMG_URL + profile.user.userBanner
+              : 'https://images.unsplash.com/photo-1501183638710-841dd1904471',
           }}
           style={styles.banner}
         />
@@ -101,7 +166,11 @@ const ProfessionalProfileScreen = () => {
         <View style={styles.card}>
           {/* Profile Image */}
           <Image
-            source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+            source={{
+              uri: profile?.user?.image
+                ? IMG_URL + profile.user.image
+                : 'https://randomuser.me/api/portraits/men/32.jpg',
+            }}
             style={styles.profileImage}
           />
 
@@ -114,18 +183,25 @@ const ProfessionalProfileScreen = () => {
             </TouchableOpacity>
           )}
 
-          <Text style={styles.name}>Rajendra singh</Text>
-          <Text style={styles.role}>Contractor</Text>
-          <Text style={styles.phone}>Nagpur 441624</Text>
+          <Text style={styles.name}>
+            {profile?.user?.firstName} {profile?.user?.lastName}
+          </Text>
+          <Text style={styles.role}>
+            {profile?.user?.userType || 'Not specified'}
+          </Text>
+          <Text style={styles.phone}>
+            {profile?.user?.city && profile?.user?.pincode
+              ? `${profile.user.city}, ${profile.user.pincode}`
+              : 'Location not specified'}
+          </Text>
 
           <Text style={styles.description}>
-            Reliable contractor specializing in quality builds, renovations, and
-            repairs with a focus on client satisfaction.
+            {profile?.user?.bio || 'No description available'}
           </Text>
 
           {/* Action Buttons */}
           <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.actionItem}>
+            <TouchableOpacity style={styles.actionItem} onPress={handleCall}>
               <View style={styles.iconCircle}>
                 <CallIcon width={40} height={40} />
               </View>
@@ -154,13 +230,43 @@ const ProfessionalProfileScreen = () => {
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.actionItem}>
+            <TouchableOpacity style={styles.actionItem} onPress={handleLinks}>
               <View style={styles.iconCircle}>
                 <LinkIcon width={40} height={40} />
               </View>
               <Text style={styles.actionText}>links</Text>
             </TouchableOpacity>
           </View>
+
+          {showLinks && (
+            <View style={styles.linksPopup}>
+              {profile?.user?.links.map((link: string, index: number) => (
+                <View key={index} style={styles.linkRow}>
+                  {/* White box (ONLY text) */}
+                  <View style={styles.linkBox}>
+                    <Text numberOfLines={1} style={styles.linkText}>
+                      {link}
+                    </Text>
+                  </View>
+
+                  {/* Icons OUTSIDE */}
+                  <View style={styles.iconRow}>
+                    <TouchableOpacity onPress={() => copyToClipboard(link)}>
+                      <Text style={styles.icon}>
+                        <Copy />
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => openLink(link)}>
+                      <Text style={styles.icon}>
+                        <Redirect />
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
 
         {/* Portfolio */}
@@ -168,34 +274,31 @@ const ProfessionalProfileScreen = () => {
           <Text style={styles.portfolioTitle}>My Portfolio</Text>
 
           <View style={styles.grid}>
-            {portfolioData.map((item, index) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.gridItem}
-                onPress={() =>
-                  navigation.navigate('ProfessionalsProject', {
-                    projectId: item.id,
-                    images: item.images,
-                  })
-                }
-              >
-                <View style={{ position: 'relative' }}>
-                  {/* Show first image */}
+            {workList.length === 0 ? (
+              <View style={styles.noDataContainer}>
+                <Text style={styles.noDataText}>No Work Available</Text>
+              </View>
+            ) : (
+              workList.map((item: any, index: number) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.gridItem}
+                  onPress={() =>
+                    navigation.navigate('ProfessionalsProject', {
+                      projectId: item._id,
+                      images: item.images,
+                    })
+                  }
+                >
                   <Image
-                    source={{ uri: item.images[0] }}
+                    source={{
+                      uri: IMG_URL + item.images[0],
+                    }}
                     style={styles.gridImage}
                   />
-
-                  {/* Show icon if multiple images */}
-                  {item.images.length > 1 && (
-                    <View style={styles.multiIcon}>
-                      {/* Option 1: Icon */}
-                      <MultiImg width={16} height={16} />
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            )}
           </View>
         </View>
       </ScrollView>
@@ -209,6 +312,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F5F5',
+  },
+  linksContainer: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#eee',
+    borderRadius: 10,
+  },
+
+  linkItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
 
   banner: {
@@ -380,5 +495,47 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 10,
     fontFamily: FONT.POPPINS_MEDIUM,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  linksPopup: {
+    position: 'absolute',
+    right: 10,
+    top: 220, // adjust based on placement
+    backgroundColor: '#c0c0c0',
+    padding: 10,
+    borderRadius: 10,
+    width: WIDTH(55),
+    zIndex: 100,
+  },
+  linkBox: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+
+  linkText: {
+    color: '#007AFF',
+    fontSize: 12,
+  },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  iconRow: {
+    flexDirection: 'row',
+    marginLeft: 8,
+  },
+
+  icon: {
+    fontSize: 16,
+    marginLeft: 10,
   },
 });

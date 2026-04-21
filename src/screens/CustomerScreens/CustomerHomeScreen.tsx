@@ -68,6 +68,7 @@ const CustomerHomeScreen = () => {
 
       if (response?.data?.status === 'success') {
         setProfessionals(response?.data?.data);
+        console.log('Professionals fetched:', response.data.data);
       }
     } catch (error) {
       console.log('Error fetching professionals:', error);
