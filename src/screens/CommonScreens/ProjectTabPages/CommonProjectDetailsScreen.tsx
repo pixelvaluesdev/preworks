@@ -34,6 +34,8 @@ import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
+import FileViewer from 'react-native-file-viewer';
+import RNFS from 'react-native-fs';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId } = route.params || {};
@@ -65,10 +67,19 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
 
-  const imageUrls = images.map(img => ({
+  const allImages = [
+    ...(project?.image || []),
+    ...drawings.filter(
+      file =>
+        file.endsWith('.jpg') ||
+        file.endsWith('.png') ||
+        file.endsWith('.jpeg'),
+    ),
+  ];
+
+  const imageUrls = allImages.map(img => ({
     uri: `${IMG_URL}/${img}`,
   }));
-  console.log('Image URL:', `${IMG_URL}/${images[0]}`);
 
   useEffect(() => {
     if (imageCount <= 1) return;
@@ -98,6 +109,38 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       }
     }, [projectId]),
   );
+
+  const openFile = async (file, index) => {
+    const fileUrl = `${IMG_URL}/${file}`;
+
+    // If image → open in image viewer
+    if (
+      file.endsWith('.jpg') ||
+      file.endsWith('.png') ||
+      file.endsWith('.jpeg')
+    ) {
+      setCurrentIndex(index);
+      setViewerVisible(true);
+    } else {
+      // If PDF → download + open
+      try {
+        const localPath = `${RNFS.DocumentDirectoryPath}/${file
+          .split('/')
+          .pop()}`;
+
+        const res = await RNFS.downloadFile({
+          fromUrl: fileUrl,
+          toFile: localPath,
+        }).promise;
+
+        if (res.statusCode === 200) {
+          await FileViewer.open(localPath);
+        }
+      } catch (error) {
+        console.log('Error opening file:', error);
+      }
+    }
+  };
 
   const fetchProjectDetails = async () => {
     try {
@@ -361,15 +404,23 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
           {/* Attachments */}
           <FlatList
-            data={attachments}
-            keyExtractor={item => item.id}
+            data={drawings}
+            keyExtractor={(item, index) => index.toString()}
             scrollEnabled={false}
-            renderItem={({ item }) => (
-              <View style={styles.fileCard}>
-                <View style={styles.fileIcon} />
-                <Text style={styles.fileName}>{item.name}</Text>
-              </View>
-            )}
+            renderItem={({ item, index }) => {
+              const fileName = item.split('/').pop();
+
+              return (
+                <TouchableOpacity
+                  style={styles.fileCard}
+                  onPress={() => openFile(item, index)}
+                >
+                  <View style={styles.fileIcon} />
+
+                  <Text style={styles.fileName}>{fileName}</Text>
+                </TouchableOpacity>
+              );
+            }}
           />
           {!isCustomer && (
             <>
