@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import LocationIcon from '../../assets/svgs/LocationIcon.svg';
 const CustomerHomeScreen = () => {
   const navigation = useNavigation();
   const token = useSelector((state: any) => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
 
   const [helpPopupVisible, setHelpPopupVisible] = useState(false);
   const [banners, setBanners] = useState([]);
@@ -34,6 +35,8 @@ const CustomerHomeScreen = () => {
 
   const [professionals, setProfessionals] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState('');
+  const flatListRef = useRef(null);
 
   useEffect(() => {
     console.log(token, 'Tokennnn here');
@@ -77,11 +80,33 @@ const CustomerHomeScreen = () => {
     }
   };
 
+  useEffect(() => {
+    if (banners.length === 0) return;
+
+    const interval = setInterval(() => {
+      let nextIndex = currentIndex + 1;
+
+      if (nextIndex >= banners.length) {
+        nextIndex = 0;
+      }
+
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+
+      setCurrentIndex(nextIndex);
+    }, 2000); // change time here (3 sec)
+
+    return () => clearInterval(interval);
+  }, [currentIndex, banners]);
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Banner Section */}
       <View style={styles.banner}>
         <FlatList
+          ref={flatListRef}
           data={banners}
           horizontal
           pagingEnabled
@@ -96,7 +121,7 @@ const CustomerHomeScreen = () => {
           renderItem={({ item }: any) => (
             <>
               <Image
-                source={{ uri: item?.image }}
+                source={{ uri: `${IMG_URL}${item?.image}` }}
                 style={styles.bannerImage}
                 resizeMode="cover"
               />
@@ -109,7 +134,17 @@ const CustomerHomeScreen = () => {
           )}
         />
         {/* Search Bar */}
-        <SearchHeader containerStyle={styles.searchHeader} />
+        <SearchHeader
+          value={search}
+          onChangeText={setSearch}
+          onFocus={() => {
+            navigation.navigate('ProfessionalList');
+          }}
+          containerStyle={styles.searchHeader}
+          onProfilePress={() =>
+            navigation.navigate('ProfileScreen', { userId: user?._id })
+          }
+        />
 
         <View style={styles.dotContainer}>
           {banners.map((_, index) => (

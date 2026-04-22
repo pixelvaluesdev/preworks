@@ -72,10 +72,14 @@ const QuoteListScreen = ({ route }: any) => {
           <Text style={styles.name}>{user?.firstName}</Text>
 
           <Text style={styles.exp}>
-            {item?.exp ? item.exp : 'Experience not available'}
+            <Text style={styles.exp}>
+              {user?.experience
+                ? `${user.experience} Years`
+                : 'Experience not available'}
+            </Text>
           </Text>
           <Text style={styles.location}>
-            {item?.address ? item.address : 'Location not available'}
+            {user?.city ? user.city : 'Location not available'}
           </Text>
         </View>
       </TouchableOpacity>

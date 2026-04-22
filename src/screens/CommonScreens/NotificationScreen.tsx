@@ -24,6 +24,7 @@ const NotificationScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
   const token = useSelector(state => state.auth.userToken);
@@ -45,6 +46,7 @@ const NotificationScreen = () => {
       console.log('Notification API error:', error);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -58,7 +60,9 @@ const NotificationScreen = () => {
         <View
           style={[
             styles.notificationCard,
-            { backgroundColor: item?.isRead ? 'white' : '#F3F3F3' },
+            {
+              backgroundColor: item?.isRead ? '#FFFFFF' : '#F3F3F3',
+            },
           ]}
         >
           <View style={styles.row}>
@@ -83,16 +87,22 @@ const NotificationScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-
       <ScreenHeader title={'Notifications'} showBack />
 
-      {/* List */}
       {loading ? (
         <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
-          <ActivityIndicator size="large" color="black" />
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      ) : notifications.length === 0 ? (
+        // ✅ EMPTY STATE
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No notifications yet</Text>
         </View>
       ) : (
         <FlatList
@@ -115,13 +125,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  emptyText: {
+    fontSize: 16,
+    color: 'grey',
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: WIDTH(4),
-    // paddingVertical: HEIGHT(2),
     backgroundColor: '#fff',
   },
 

@@ -166,13 +166,13 @@ const ProfessionalProfileScreen = () => {
         <View style={styles.card}>
           {/* Profile Image */}
           <Image
-            source={{
-              uri: profile?.user?.image
-                ? IMG_URL + profile.user.image
-                : 'https://randomuser.me/api/portraits/men/32.jpg',
-            }}
-            style={styles.profileImage}
-          />
+  source={
+    profile?.user?.image
+      ? { uri: `${IMG_URL}${profile.user.image}` }
+      : require('../../../assets/pngs/Placeholder.png')
+  }
+  style={styles.profileImage}
+/>
 
           {isProffesional && (
             <TouchableOpacity

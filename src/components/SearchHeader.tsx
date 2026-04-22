@@ -12,6 +12,8 @@ import SearchIcon from '../assets/svgs/Search.svg';
 import { WIDTH } from '../utils/responsive';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
+import { useSelector } from 'react-redux';
+import { IMG_URL } from '../apis/ApiManager';
 
 interface Props {
   value?: string;
@@ -21,6 +23,7 @@ interface Props {
   showProfile?: boolean;
   style?: ViewStyle;
   containerStyle?: ViewStyle;
+  onFocus?: () => void;
 }
 
 const SearchHeader: React.FC<Props> = ({
@@ -31,7 +34,10 @@ const SearchHeader: React.FC<Props> = ({
   showProfile = true,
   style,
   containerStyle,
+  onFocus,
 }) => {
+  const user = useSelector(state => state.auth.user);
+  const profileImage = user?.image;
   return (
     <View
       style={[
@@ -49,6 +55,7 @@ const SearchHeader: React.FC<Props> = ({
           value={value}
           onChangeText={onChangeText}
           style={styles.input}
+          onFocus={onFocus}
           placeholderTextColor="#757575"
         />
       </View>
@@ -57,9 +64,11 @@ const SearchHeader: React.FC<Props> = ({
       {showProfile && (
         <TouchableOpacity onPress={onProfilePress}>
           <Image
-            source={{
-              uri: 'https://randomuser.me/api/portraits/men/32.jpg',
-            }}
+            source={
+              profileImage
+                ? { uri: `${IMG_URL}${profileImage}` }
+                : require('../assets/pngs/Placeholder.png')
+            }
             style={styles.avatar}
           />
         </TouchableOpacity>

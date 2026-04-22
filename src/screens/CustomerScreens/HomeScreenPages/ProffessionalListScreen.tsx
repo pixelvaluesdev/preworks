@@ -46,14 +46,27 @@ const ProfessionalListScreen = () => {
   const [professionals, setProfessionals] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // const filteredList = professionals.filter(item => {
-  //   if (type === 'All' || !type) return true;
-  //   return item.type === type;
-  // });
+  useEffect(() => {
+    if (route?.params?.search) {
+      setSearch(route.params.search);
+    }
+  }, [route?.params?.search]);
 
-  const finalList = professionals.filter(item =>
-    (item.name || '').toLowerCase().includes(search.toLowerCase()),
-  );
+  const finalList = professionals.filter(item => {
+    const searchText = search.toLowerCase();
+
+    const fullName = `${item.firstName || ''} ${
+      item.lastName || ''
+    }`.toLowerCase();
+    const experience = (item.experience || '').toLowerCase();
+    const location = (item.city || item.location || '').toLowerCase();
+
+    return (
+      fullName.includes(searchText) ||
+      experience.includes(searchText) ||
+      location.includes(searchText)
+    );
+  });
 
   useEffect(() => {
     fetchProfessionals();
@@ -94,7 +107,7 @@ const ProfessionalListScreen = () => {
         }}
       />
 
-      {/* Suggestion List */}
+      {/* Suggestion List
       {!search && !type && (
         <FlatList
           data={suggestions}
@@ -105,74 +118,73 @@ const ProfessionalListScreen = () => {
             </TouchableOpacity>
           )}
         />
-      )}
+      )} */}
 
       {/* Professionals Grid */}
-      {(type || search) &&
-        (loading ? (
-          <ActivityIndicator
-            size="large"
-            color={Colors.primary}
-            style={{ marginTop: HEIGHT(5), alignSelf: 'center' }}
-          />
-        ) : (
-          <FlatList
-            data={finalList}
-            keyExtractor={item => item._id}
-            numColumns={2}
-            columnWrapperStyle={{ justifyContent: 'space-between' }}
-            contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
-            renderItem={({ item }) => {
-              const hasValidImage =
-                item.image &&
-                Array.isArray(item.image) &&
-                item.image.length > 0 &&
-                typeof item.image[0] === 'string' &&
-                item.image[0].trim() !== '';
+      {loading ? (
+        <ActivityIndicator
+          size="large"
+          color={Colors.primary}
+          style={{ marginTop: HEIGHT(5), alignSelf: 'center' }}
+        />
+      ) : (
+        <FlatList
+          data={finalList}
+          keyExtractor={item => item._id}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between' }}
+          contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
+          renderItem={({ item }) => {
+            const hasValidImage =
+              item.image &&
+              Array.isArray(item.image) &&
+              item.image.length > 0 &&
+              typeof item.image[0] === 'string' &&
+              item.image[0].trim() !== '';
 
-              return (
-                <TouchableOpacity
-                  style={styles.card}
-                  onPress={() =>
-                    navigation.navigate('ProfessionalProfile', { id: item._id })
+            return (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() =>
+                  navigation.navigate('ProfessionalProfile', { id: item._id })
+                }
+              >
+                <Image
+                  source={
+                    hasValidImage
+                      ? { uri: `${IMG_URL}${item.image[0]}` }
+                      : require('../../../assets/pngs/Placeholder.png')
                   }
+                  style={styles.image}
+                />
+
+                <View
+                  style={{
+                    backgroundColor: '#F0F0F0',
+                    borderBottomRightRadius: 5,
+                    borderBottomLeftRadius: 5,
+                    paddingHorizontal: 10,
+                  }}
                 >
-                  <Image
-                    source={
-                      hasValidImage
-                        ? { uri: `${IMG_URL}${item.image[0]}` }
-                        : require('../../../assets/pngs/Placeholder.png')
-                    }
-                    style={styles.image}
-                  />
+                  <Text style={styles.name}>
+                    {item.firstName} {item.lastName}
+                  </Text>
 
-                  <View
-                    style={{
-                      backgroundColor: '#F0F0F0',
-                      borderBottomRightRadius: 5,
-                      borderBottomLeftRadius: 5,
-                      paddingHorizontal: 10,
-                    }}
-                  >
-                    <Text style={styles.name}>
-                      {item.firstName} {item.lastName}
-                    </Text>
-
-                    <View style={{ flexDirection: 'row', gap: 4 }}>
-                      <SuitCaseIcon width={16} height={16} />
-                      <Text style={styles.exp}>{item.exp}</Text>
-                    </View>
-
-                    <View style={{ flexDirection: 'row', gap: 4 }}>
-                      <Location width={16} height={16} />
-                      <Text style={styles.location}>{item.location}</Text>
-                    </View>
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <SuitCaseIcon width={16} height={16} />
+                    <Text style={styles.exp}>{item.experience}</Text>
                   </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        ))}
+
+                  <View style={{ flexDirection: 'row', gap: 4 }}>
+                    <Location width={16} height={16} />
+                    <Text style={styles.location}>{item.city}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      )}
     </View>
   );
 };

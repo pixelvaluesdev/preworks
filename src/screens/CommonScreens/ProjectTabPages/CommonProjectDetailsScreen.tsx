@@ -77,7 +77,15 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
     ),
   ];
 
-  const imageUrls = allImages.map(img => ({
+  const imageUrls = [
+    ...(project?.image || []),
+    ...drawings.filter(
+      file =>
+        file.endsWith('.jpg') ||
+        file.endsWith('.png') ||
+        file.endsWith('.jpeg'),
+    ),
+  ].map(img => ({
     uri: `${IMG_URL}/${img}`,
   }));
 
@@ -113,7 +121,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const openFile = async (file, index) => {
     const fileUrl = `${IMG_URL}/${file}`;
 
-    // If image → open in image viewer
+    // ✅ IMAGE
     if (
       file.endsWith('.jpg') ||
       file.endsWith('.png') ||
@@ -122,7 +130,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       setCurrentIndex(index);
       setViewerVisible(true);
     } else {
-      // If PDF → download + open
+      // ✅ PDF
       try {
         const localPath = `${RNFS.DocumentDirectoryPath}/${file
           .split('/')
