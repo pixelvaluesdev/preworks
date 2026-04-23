@@ -56,7 +56,11 @@ const ProjectsScreen = ({ route }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       if (userId) {
-        fetchProjects();
+        if (isCustomer) {
+          fetchProjects();
+        } else {
+          fetchProfessionalProjects();
+        }
       }
     }, [userId]),
   );
@@ -76,6 +80,29 @@ const ProjectsScreen = ({ route }: any) => {
     } finally {
       setLoading(false);
       setApiFinished(true);
+    }
+  };
+
+  const fetchProfessionalProjects = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.appliedProjects(userId, token);
+
+      if (res?.data?.status === 'success') {
+        const data = res.data.data || [];
+
+        // Split into two lists
+        const quoted = data.filter(item => item.type === 'quotation');
+        const interested = data.filter(item => item.type === 'enquiry');
+
+        setQuotedProjects(quoted);
+        setInterestedProjects(interested);
+      }
+    } catch (error) {
+      console.log('Professional Projects Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,57 +137,52 @@ const ProjectsScreen = ({ route }: any) => {
   };
 
   const renderItem = ({ item }: any) => {
+    const project = isCustomer ? item : item.projectId;
+
     const imageUrl =
-      item?.image?.length > 0
-        ? { uri: `${IMG_URL}/${item.image[0]}` }
+      !isCustomer && item?.files?.length > 0
+        ? { uri: `${IMG_URL}/${item.files[0]}` }
+        : project?.image?.length > 0
+        ? { uri: `${IMG_URL}/${project.image[0]}` }
         : require('../../../assets/pngs/DummyImg.png');
 
-    const statusText = item.status ? 'Active' : 'Closed';
+    const statusText = project?.status ? 'Active' : 'Closed';
 
     return (
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() =>
-          navigation.navigate('CommonProjectDetails', { projectId: item._id })
-        }
+        onPress={() => {
+          if (!isCustomer && item.type === 'enquiry') {
+            //  Interested project → go to General Enquiry
+            navigation.navigate('GeneralEnquiry', {
+              projectId: item.projectId?._id,
+            });
+          } else {
+            // Default (customer + quoted projects)
+            navigation.navigate('CommonProjectDetails', {
+              projectId: isCustomer ? item._id : item.projectId?._id,
+            });
+          }
+        }}
       >
         <View style={styles.card}>
-          <Image
-            source={imageUrl}
-            style={[styles.projectImage, !item.status && styles.closedImage]}
-          />
-
-          {/* ❌ Only show menu for customer */}
-          {isCustomer && (
-            <TouchableOpacity
-              style={styles.deleteIcon}
-              onPress={event => {
-                const { pageX, pageY } = event.nativeEvent;
-                setSelectedProject(item);
-                setMenuPosition({ x: pageX, y: pageY });
-                setMenuVisible(true);
-              }}
-            >
-              <OptionsIcon width={20} height={20} />
-            </TouchableOpacity>
-          )}
+          <Image source={imageUrl} style={styles.projectImage} />
 
           <View style={styles.rowBetween}>
             <View>
               <Text style={styles.projectName}>
-                {item.projectName || item.name}
+                {project?.projectName || 'No Name'}
               </Text>
 
-              {/* ❗ fallback for dummy data */}
-              <Text style={styles.projectCode}>#{item._id || item.id}</Text>
+              <Text style={styles.projectCode}>#{project?._id}</Text>
             </View>
 
-            {/* ❌ Status only for customer */}
+            {/* Only customer shows status */}
             {isCustomer && (
               <Text
                 style={[
                   styles.status,
-                  item.status ? styles.activeStatus : styles.closedStatus,
+                  project?.status ? styles.activeStatus : styles.closedStatus,
                 ]}
               >
                 {statusText}

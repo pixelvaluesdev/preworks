@@ -209,7 +209,9 @@ const CustomerHomeScreen = () => {
               <TouchableOpacity
                 style={styles.proCard}
                 onPress={() =>
-                  navigation.navigate('ProfessionalProfile', { id: item._id })
+                  navigation.navigate('ProfessionalProfile', {
+                    userId: item._id,
+                  })
                 }
               >
                 <Image

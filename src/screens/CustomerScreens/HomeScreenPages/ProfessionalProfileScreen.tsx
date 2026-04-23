@@ -31,7 +31,7 @@ import Copy from '../../../assets/svgs/CopyIcon.svg';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  const { id } = route.params as { id: any };
+  const { userId } = route.params;
 
   const token = useSelector((state: any) => state.auth.userToken);
   console.log('ProfessionalProfileScreen token:', token);
@@ -80,10 +80,11 @@ const ProfessionalProfileScreen = () => {
     try {
       setLoading(true);
 
-      const res = await ApiManager.getProfile(id, token);
+      const res = await ApiManager.getProfile(userId, token);
 
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
+        console.log('Profile data:', res.data.data);
       }
     } catch (error) {
       console.log('Profile Error:', error);
@@ -105,7 +106,7 @@ const ProfessionalProfileScreen = () => {
   const handleLinks = () => {
     const links = profile?.user?.links;
 
-    console.log('Links:', links); // 👈 debug
+    console.log('Links:', links);
 
     if (!links || links.length === 0) {
       Alert.alert('No Links', 'No links available');
@@ -147,11 +148,11 @@ const ProfessionalProfileScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Banner */}
         <Image
-          source={{
-            uri: profile?.user?.userBanner
-              ? IMG_URL + profile.user.userBanner
-              : 'https://images.unsplash.com/photo-1501183638710-841dd1904471',
-          }}
+          source={
+            profile?.user?.userBanner
+              ? { uri: IMG_URL + profile.user.userBanner }
+              : require('../../../assets/pngs/Placeholder.png')
+          }
           style={styles.banner}
         />
 
@@ -166,18 +167,22 @@ const ProfessionalProfileScreen = () => {
         <View style={styles.card}>
           {/* Profile Image */}
           <Image
-  source={
-    profile?.user?.image
-      ? { uri: `${IMG_URL}${profile.user.image}` }
-      : require('../../../assets/pngs/Placeholder.png')
-  }
-  style={styles.profileImage}
-/>
+            source={
+              profile?.user?.image
+                ? { uri: `${IMG_URL}${profile.user.image}` }
+                : require('../../../assets/pngs/Placeholder.png')
+            }
+            style={styles.profileImage}
+          />
 
           {isProffesional && (
             <TouchableOpacity
               style={styles.editBtn}
-              onPress={() => navigation.navigate('EditProfileScreen')}
+              onPress={() =>
+                navigation.navigate('EditProfileScreen', {
+                  userId: profile?.user?._id,
+                })
+              }
             >
               <Text style={styles.editText}>Edit</Text>
             </TouchableOpacity>
@@ -285,17 +290,25 @@ const ProfessionalProfileScreen = () => {
                   style={styles.gridItem}
                   onPress={() =>
                     navigation.navigate('ProfessionalsProject', {
-                      projectId: item._id,
-                      images: item.images,
+                      project: item,
                     })
                   }
                 >
-                  <Image
-                    source={{
-                      uri: IMG_URL + item.images[0],
-                    }}
-                    style={styles.gridImage}
-                  />
+                  <View>
+                    <Image
+                      source={{
+                        uri: IMG_URL + item.images[0],
+                      }}
+                      style={styles.gridImage}
+                    />
+
+                    {/* MULTI IMAGE ICON */}
+                    {item.images?.length > 1 && (
+                      <View style={styles.multiIcon}>
+                        <MultiImg width={14} height={14} />
+                      </View>
+                    )}
+                  </View>
                 </TouchableOpacity>
               ))
             )}

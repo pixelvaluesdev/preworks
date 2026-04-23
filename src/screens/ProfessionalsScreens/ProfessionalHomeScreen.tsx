@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from 'react';
 import {
   View,
   Text,
@@ -17,52 +23,14 @@ import ProjectCard from '../../components/ProfessionalUI/ProjectCard';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
-
-const projectList = [
-  {
-    id: '1',
-    title: 'ABC Complex',
-    location: '202, C.G. Road Nagpur',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-  {
-    id: '2',
-    title: 'XYZ Villa',
-    location: 'Manish Nagar Nagpur',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-];
-
-const enquiryList = [
-  {
-    id: '1',
-    title: 'House Renovation',
-    location: 'Trimurti Nagar Nagpur',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-  {
-    id: '2',
-    title: 'Interior Work',
-    location: 'Dharampeth Nagpur',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-];
-
-const aa = [
-  {
-    id: '1',
-    title: 'House Renovation',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-  {
-    id: '2',
-    title: 'Interior Work',
-    image: require('../../assets/pngs/BannerImg.png'),
-  },
-];
+import { useNavigation } from '@react-navigation/native';
 
 const ProfessionalHomeScreen = () => {
   const token = useSelector(state => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+
+  const navigation = useNavigation();
 
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -70,6 +38,29 @@ const ProfessionalHomeScreen = () => {
   const [projects, setProjects] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (banners.length === 0) return;
+
+    const interval = setInterval(() => {
+      let nextIndex = currentIndex + 1;
+
+      if (nextIndex >= banners.length) {
+        nextIndex = 0;
+      }
+
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+
+      setCurrentIndex(nextIndex);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex, banners]);
 
   useEffect(() => {
     if (token) {
@@ -139,6 +130,7 @@ const ProfessionalHomeScreen = () => {
       {/* Banner */}
       <View style={styles.banner}>
         <FlatList
+          ref={flatListRef}
           data={banners}
           horizontal
           pagingEnabled
@@ -153,7 +145,7 @@ const ProfessionalHomeScreen = () => {
           renderItem={({ item }: any) => (
             <>
               <Image
-                source={{ uri: item?.image }}
+                source={{ uri: `${IMG_URL}${item?.image}` }}
                 style={styles.bannerImage}
                 resizeMode="cover"
               />
@@ -168,7 +160,12 @@ const ProfessionalHomeScreen = () => {
         />
 
         {/* Search Bar (keep if already exists) */}
-        <SearchHeader containerStyle={styles.searchHeader} />
+        <SearchHeader
+          containerStyle={styles.searchHeader}
+          onProfilePress={() =>
+            navigation.navigate('ProfessionalProfile', { userId: userId })
+          }
+        />
 
         {/* Dots */}
         <View style={styles.dotContainer}>

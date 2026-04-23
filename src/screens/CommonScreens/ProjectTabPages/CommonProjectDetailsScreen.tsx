@@ -10,6 +10,7 @@ import {
   ImageBackground,
   ActivityIndicator,
   Dimensions,
+  Linking,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -67,6 +68,14 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
 
+  const handleCall = () => {
+    const phone = project?.userId?.phone;
+
+    if (!phone) return;
+
+    Linking.openURL(`tel:${phone}`);
+  };
+
   const allImages = [
     ...(project?.image || []),
     ...drawings.filter(
@@ -121,7 +130,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const openFile = async (file, index) => {
     const fileUrl = `${IMG_URL}/${file}`;
 
-    // ✅ IMAGE
+    // IMAGE
     if (
       file.endsWith('.jpg') ||
       file.endsWith('.png') ||
@@ -130,7 +139,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       setCurrentIndex(index);
       setViewerVisible(true);
     } else {
-      // ✅ PDF
+      //  PDF
       try {
         const localPath = `${RNFS.DocumentDirectoryPath}/${file
           .split('/')
@@ -180,6 +189,28 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       </View>
     );
   }
+
+  const priceRanges = [
+    { max: 0, label: '0' },
+    { max: 10, label: '0 - 5 Lakh' },
+    { max: 20, label: '5 - 10 Lakh' },
+    { max: 30, label: '10 - 15 Lakh' },
+    { max: 40, label: '15 - 20 Lakh' },
+    { max: 50, label: '20 - 30 Lakh' },
+    { max: 60, label: '30 - 50 Lakh' },
+    { max: 70, label: '50 - 75 Lakh' },
+    { max: 80, label: '75L - 1 CR' },
+    { max: 90, label: '1 - 2 CR' },
+    { max: 100, label: '2 CR+' },
+  ];
+
+  const getPriceLabel = value => {
+    if (value === undefined || value === null) return 'N/A';
+
+    const range = priceRanges.find(r => value <= r.max);
+
+    return range ? range.label : '2 CR+';
+  };
 
   return (
     <View style={styles.container}>
@@ -306,7 +337,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
               {/* RIGHT SIDE */}
               {!isCustomer && (
-                <TouchableOpacity style={styles.callBtn}>
+                <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
                   <CallIcon height={40} width={40} />
                   <Text style={styles.callText}>Call</Text>
                 </TouchableOpacity>
@@ -400,7 +431,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                 </Text>
               </View>
 
-              <Text style={styles.value}>₹{project?.priceRange}</Text>
+              <Text style={styles.value}>
+                {getPriceLabel(project?.priceRange)}
+              </Text>
             </View>
           </View>
 
@@ -409,6 +442,10 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           {/* Scope */}
           <Text style={styles.scopeTitle}>Scope Of Work Description</Text>
           <Text style={styles.scopeText}>{project?.requirementDesc}</Text>
+
+          <Text style={[styles.scopeTitle, { marginBottom: 10 }]}>
+            Architectural Drawings
+          </Text>
 
           {/* Attachments */}
           <FlatList
@@ -433,7 +470,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           {!isCustomer && (
             <>
               <View style={{ marginTop: 15 }}>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                   <BorderTextInput
                     label="Architectural Drawing"
                     placeholder="Architectural Drawing.PDF"
@@ -449,7 +486,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                       </>
                     }
                   />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 <SecondaryButton
                   title="Send Your Quotation"
@@ -709,7 +746,7 @@ const styles = StyleSheet.create({
   callText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    fontSize: 18,
+    fontSize: 16,
   },
   rowWithIcon: {
     flexDirection: 'row',

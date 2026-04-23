@@ -188,7 +188,7 @@ const Projectfile = ({ data, handleChange }: any) => {
         </>
       )}
 
-      {/* ✅ ALWAYS VISIBLE */}
+      {/* ALWAYS VISIBLE */}
       <View style={styles.toggleContainer}>
         <Text style={styles.questionText}>
           Do you want to hide your number?{' '}

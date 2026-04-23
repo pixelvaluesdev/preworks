@@ -9,6 +9,7 @@ import {
   ScrollView,
   FlatList,
   TouchableOpacity,
+  LayoutAnimation,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -20,20 +21,28 @@ import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import OptionIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { useSelector } from 'react-redux';
+import { IMG_URL } from '../../../apis/ApiManager';
 
 const ProjectDetailsScreen = () => {
   const route = useRoute();
-  const { projectId, images = [] } = route.params;
+  const { project } = route.params;
+  console.log('Received project data:', project);
+  const images = project?.images || [];
+
   const navigation = useNavigation();
   const userType = useSelector(state => state.auth.userType);
   const isCustomer = userType === 'customer';
 
   const [activeIndex, setActiveIndex] = React.useState(0);
 
-  // Later you will call API using projectId
+  const toggleExpand = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded(!expanded);
+  };
 
   const [showMenu, setShowMenu] = React.useState(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
 
   return (
     <ScrollView style={styles.container}>
@@ -49,7 +58,10 @@ const ProjectDetailsScreen = () => {
             setActiveIndex(index);
           }}
           renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={styles.projectImage} />
+            <Image
+              source={{ uri: IMG_URL + item }}
+              style={styles.projectImage}
+            />
           )}
         />
         {!isCustomer && (
@@ -69,7 +81,11 @@ const ProjectDetailsScreen = () => {
                 setShowMenu(false);
                 navigation.navigate('ProfTabNav', {
                   screen: 'AddWork',
-                  params: { projectId },
+                  params: {
+                    isEdit: true,
+                    workId: project._id,
+                    workData: project,
+                  },
                 });
               }}
             >
@@ -108,30 +124,35 @@ const ProjectDetailsScreen = () => {
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.title}>ABC complex</Text>
+        <Text style={styles.title}>{project?.projectName}</Text>
 
         <View style={{ flexDirection: 'row' }}>
           <LocationIcon width={20} height={20} />
-          <Text style={styles.location}> Location</Text>
+          <Text style={styles.location}> {project?.siteAddress}</Text>
         </View>
 
         <Text style={styles.budget}>
-          Project Budget : <Text style={{ fontWeight: '600' }}>2 Crore</Text>
+          Project Budget :{' '}
+          <Text style={{ fontWeight: '600' }}>{project?.budget}</Text>
         </Text>
 
-        <Text style={styles.description}>
-          This is a placeholder description created purely for testing purposes.
-          It is used to demonstrate how text content will appear within a layout
-          or design without using actual data.
-        </Text>
-
-        <TouchableOpacity
-          style={{
-            alignItems: 'center',
-          }}
+        <Text
+          style={styles.description}
+          numberOfLines={expanded ? undefined : 3}
         >
-          <Text style={styles.showMore}>Show More</Text>
-        </TouchableOpacity>
+          {project?.caption || 'No description available'}
+        </Text>
+
+        {project?.caption?.length > 80 && (
+          <TouchableOpacity
+            style={{ alignItems: 'center' }}
+            onPress={toggleExpand}
+          >
+            <Text style={styles.showMore}>
+              {expanded ? 'Show Less' : 'Show More'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <CustomPopup
           visible={showDeleteModal}

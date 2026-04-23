@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,8 +7,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import ScreenHeader from '../../components/ScreenHeader';
@@ -21,12 +26,81 @@ import { WIDTH, HEIGHT } from '../../utils/responsive';
 import UploadIcon from '../../assets/svgs/UploadIcon.svg';
 import UploadBox from '../../components/Inputs/UploadBox';
 import CloseIcon from '../../assets/svgs/Delete.svg';
+import { useSelector } from 'react-redux';
+import ApiManager, { IMG_URL } from '../../apis/ApiManager';
+import CustomPopup from '../../components/Popups/CustomPopup';
 
 const PortfolioScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { isEdit, workId, workData } = route.params || {};
+  const token = useSelector(state => state.auth.userToken);
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+
+  const [loading, setLoading] = useState(false);
+  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupMessage, setPopupMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const [isStepTwo, setIsStepTwo] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  const prefillForm = data => {
+    setForm({
+      projectName: data?.projectName || '',
+      siteName: data?.siteAddress || '',
+      budget: data?.budget || '',
+      caption: data?.caption || '',
+
+      image:
+        data?.images?.map(img => ({
+          uri: IMG_URL + img, // important
+          name: img,
+          type: 'image/jpeg',
+          isOld: true, // mark old images
+        })) || [],
+    });
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (!isEdit) {
+        setForm({
+          projectName: '',
+          siteName: '',
+          budget: '',
+          image: [],
+          caption: '',
+        });
+        setIsStepTwo(false);
+      }
+    }, [isEdit]),
+  );
+
+  useEffect(() => {
+    if (isEdit && workData) {
+      prefillForm(workData);
+    } else {
+      // RESET FORM for fresh Add Work
+      setForm({
+        projectName: '',
+        siteName: '',
+        budget: '',
+        image: [],
+        caption: '',
+      });
+    }
+
+    setInitialLoading(false);
+  }, [isEdit, workData]);
+
+  useEffect(() => {
+    if (!isEdit) {
+      setIsStepTwo(false);
+    }
+  }, [isEdit]);
 
   const [form, setForm] = useState({
     projectName: '',
@@ -35,6 +109,47 @@ const PortfolioScreen = () => {
     image: [],
     caption: '',
   });
+
+  const submitPortfolio = async () => {
+    try {
+      setLoading(true);
+      setIsSuccess(false);
+
+      const formData = new FormData();
+
+      formData.append('userId', userId);
+      formData.append('projectName', form.projectName);
+      formData.append('siteAddress', form.siteName);
+      formData.append('budget', form.budget.replace(/,/g, ''));
+      formData.append('caption', form.caption);
+
+      // Images
+      form.image.forEach((file, index) => {
+        if (!file.isOld) {
+          formData.append('images', {
+            uri: file.uri,
+            type: file.type || 'image/jpeg',
+            name: file.name || `image_${index}.jpg`,
+          });
+        }
+      });
+
+      const res = isEdit
+        ? await ApiManager.updateWork(workId, formData, token)
+        : await ApiManager.addWork(formData, token);
+
+      if (res?.data?.status === 'success') {
+        setIsSuccess(true);
+        setPopupMessage(res?.data?.message || 'Work added successfully');
+      }
+    } catch (error) {
+      setIsSuccess(false);
+      setPopupMessage(error?.response?.data?.message || 'Something went wrong');
+    } finally {
+      setLoading(false);
+      setPopupVisible(true);
+    }
+  };
 
   const handleChange = useCallback((key: string, value: string) => {
     let cleaned = value;
@@ -103,6 +218,14 @@ const PortfolioScreen = () => {
     });
   };
 
+  if (initialLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -110,7 +233,7 @@ const PortfolioScreen = () => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
       <View style={styles.container}>
-        <ScreenHeader title="Add Work" showBack />
+        <ScreenHeader title={isEdit ? 'Edit Work' : 'Add Work'} showBack />
 
         {/* Step Indicator */}
         <View style={styles.stepContainer}>
@@ -255,18 +378,42 @@ const PortfolioScreen = () => {
               style={{ flex: 1 }}
             />
             <AppButton
-              title="Submit"
-              onPress={() => {
-                console.log('Form Data:', form);
-              }}
-              disabled={!validateStep()}
+              title={
+                loading ? 'Submitting...' : isEdit ? 'Update Work' : 'Submit'
+              }
+              onPress={submitPortfolio}
+              disabled={!validateStep() || loading}
               style={{
                 flex: 1,
-                opacity: validateStep() ? 1 : 0.5,
+                opacity: validateStep() && !loading ? 1 : 0.5,
               }}
             />
           </View>
         )}
+
+        <CustomPopup
+          visible={popupVisible}
+          title={isSuccess ? 'Success' : 'Error'}
+          message={popupMessage}
+          onClose={() => setPopupVisible(false)}
+          buttons={[
+            {
+              label: 'OK',
+              type: 'primary',
+              onPress: () => {
+                setPopupVisible(false);
+
+                if (isSuccess) {
+                  navigation.navigate('AddWork', {
+                    isEdit: false,
+                    workId: null,
+                    workData: null,
+                  });
+                }
+              },
+            },
+          ]}
+        />
       </View>
     </KeyboardAvoidingView>
   );

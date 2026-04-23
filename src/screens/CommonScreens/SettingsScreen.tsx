@@ -48,6 +48,7 @@ const SettingsScreen = () => {
 
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
+  console.log('User ID:', userId);
 
   const handleLogout = async () => {
     try {
@@ -95,7 +96,7 @@ const SettingsScreen = () => {
             source={
               user?.image
                 ? { uri: `${IMG_URL}${user.image}` }
-                : require('../../assets/pngs/BannerImg.png')
+                : require('../../assets/pngs/Placeholder.png')
             }
           />
           <Text style={styles.name}>
@@ -126,7 +127,7 @@ const SettingsScreen = () => {
           {!isCustomer && (
             <TouchableOpacity
               style={styles.row}
-              onPress={() => navigation.navigate('AppliedProjects')}
+              onPress={() => navigation.navigate('ProjectDetails')}
             >
               <View style={styles.rowLeft}>
                 <YesIcon />

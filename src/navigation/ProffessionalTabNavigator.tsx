@@ -162,7 +162,16 @@ const ProfessionalTabNavigator = () => {
         options={({ navigation, route }) => ({
           tabBarButton: props =>
             AnimatedTabButton(
-              props,
+              {
+                ...props,
+                onPress: () => {
+                  navigation.navigate('AddWork', {
+                    isEdit: false,
+                    workId: null,
+                    workData: null,
+                  });
+                },
+              },
               ActAdd,
               AddIcon,
               'Add Work',

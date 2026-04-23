@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  TouchableWithoutFeedback, 
 } from 'react-native';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
@@ -32,7 +33,7 @@ const Popup = ({
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  // ✅ SUBMIT API
+ 
   const handleSubmit = async () => {
     try {
       if (!message) {
@@ -54,7 +55,6 @@ const Popup = ({
       formData.append('type', showQuotation ? 'quotation' : 'enquiry');
       formData.append('userId', userId);
 
-      // ✅ multiple files support
       quotationFiles.forEach(file => {
         formData.append('files', {
           uri: file.uri,
@@ -88,7 +88,7 @@ const Popup = ({
     }
   };
 
-  // ✅ IMAGE PICKER
+  // IMAGE PICKER
   const pickImage = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 0 }, response => {
       if (response.didCancel || response.errorCode) return;
@@ -106,7 +106,7 @@ const Popup = ({
     });
   };
 
-  // ✅ PDF PICKER
+  // PDF PICKER
   const pickDocument = async () => {
     try {
       const res = await pick({
@@ -126,7 +126,7 @@ const Popup = ({
     }
   };
 
-  // ✅ PICK OPTION
+  // PICK OPTION
   const pickMedia = () => {
     Alert.alert('Upload File', 'Choose file type', [
       { text: 'Images', onPress: pickImage },
@@ -136,49 +136,60 @@ const Popup = ({
   };
 
   return (
-    <Modal transparent animationType="fade" visible={visible}>
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-          <Text style={styles.title}>{title}</Text>
+    <Modal
+      transparent
+      animationType="fade"
+      visible={visible}
+      onRequestClose={onClose} //  Android back button
+    >
+      {/*  OUTSIDE CLICK HANDLER */}
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.overlay}>
+          {/*  INSIDE CLICK BLOCK */}
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <View style={styles.container}>
+              <Text style={styles.title}>{title}</Text>
 
-          {/* Quotation Input */}
-          {showQuotation && (
-            <TouchableOpacity onPress={pickMedia}>
+              {/* Quotation Input */}
+              {showQuotation && (
+                <TouchableOpacity onPress={pickMedia}>
+                  <BorderTextInput
+                    label="Quotation"
+                    value={
+                      quotationFiles.length > 0
+                        ? `${quotationFiles.length} file(s) selected`
+                        : quotation
+                    }
+                    onChangeText={setQuotation}
+                    placeholder="Select"
+                    editable={false}
+                    rightComponent={
+                      <TouchableOpacity onPress={pickMedia}>
+                        <UploadIcon />
+                      </TouchableOpacity>
+                    }
+                  />
+                </TouchableOpacity>
+              )}
+
+              {/* Message Input */}
               <BorderTextInput
-                label="Quotation"
-                value={
-                  quotationFiles.length > 0
-                    ? `${quotationFiles.length} file(s) selected`
-                    : quotation
-                }
-                onChangeText={setQuotation}
-                placeholder="Select"
-                editable={false}
-                rightComponent={
-                  <TouchableOpacity onPress={pickMedia}>
-                    <UploadIcon />
-                  </TouchableOpacity>
-                }
+                label="Any Message"
+                value={message}
+                onChangeText={setMessage}
+                multiline
+                placeholder="Type here..."
               />
-            </TouchableOpacity>
-          )}
 
-          {/* Message Input */}
-          <BorderTextInput
-            label="Any Message"
-            value={message}
-            onChangeText={setMessage}
-            multiline
-            placeholder="Type here..."
-          />
-
-          <SecondaryButton
-            title={loading ? 'Submitting...' : 'Submit'}
-            style={styles.submitBtn}
-            onPress={handleSubmit} // ✅ FIXED
-          />
+              <SecondaryButton
+                title={loading ? 'Submitting...' : 'Submit'}
+                style={styles.submitBtn}
+                onPress={handleSubmit}
+              />
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };

@@ -38,6 +38,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const route = useRoute();
   const userId = route?.params?.userId;
+  console.log('EditProfileScreen userId:', userId);
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -50,7 +51,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [state, setState] = useState('');
   const [address, setAddress] = useState('');
   const [experience, setExperience] = useState('');
-  const [links, setLinks] = useState('');
+  const [links, setLinks] = useState(['']);
   const [bio, setBio] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [errors, setErrors] = useState({
@@ -66,26 +67,53 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
   }, [userId]);
 
+  const handleLinkChange = (text, index) => {
+  const updatedLinks = [...links];
+  updatedLinks[index] = text;
+  setLinks(updatedLinks);
+};
+
+const addMoreLinks = () => {
+  setLinks([...links, '']);
+};
+
+const removeLink = index => {
+  const updatedLinks = links.filter((_, i) => i !== index);
+  setLinks(updatedLinks.length ? updatedLinks : ['']);
+};
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
 
       const response = await ApiManager.getProfile(userId, token);
-      console.log('Profile response:', response);
 
       if (response?.data?.status === 'success') {
-        const data = response.data.data;
+        let data = response.data.data;
+
+        if (data?.user) {
+          data = data.user; // contractor case
+        }
 
         setProfile(data);
 
-        //  PREFILL ALL FIELDS
-        setName(data?.firstName || '');
+        setName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
         setMobile(data?.phone || '');
         setEmail(data?.email || '');
         setCity(data?.city || '');
         setPin(data?.pincode || '');
         setState(data?.state || '');
         setAddress(data?.address || '');
+
+        // optional
+        setExperience(data?.experience || '');
+        setBio(data?.bio || '');
+
+       if (data?.links?.length > 0) {
+  setLinks(data.links);
+} else {
+  setLinks(['']);
+}
       }
     } catch (error) {
       console.log('Edit Profile error:', error);
@@ -93,6 +121,7 @@ const EditProfileScreen = ({ navigation }: any) => {
       setLoading(false);
     }
   };
+
   const openImagePicker = type => {
     const options = {
       mediaType: 'photo',
@@ -266,9 +295,11 @@ const EditProfileScreen = ({ navigation }: any) => {
       if (experience) formData.append('experience', experience);
       if (bio) formData.append('bio', bio);
 
-      if (links) {
-        formData.append('links', JSON.stringify([links]));
-      }
+     const filteredLinks = links.filter(link => link.trim() !== '');
+
+if (filteredLinks.length > 0) {
+  formData.append('links', JSON.stringify(filteredLinks));
+}
 
       if (profileImage) {
         formData.append('image', {
@@ -335,7 +366,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                     ? { uri: coverImage.uri } // newly selected
                     : profile?.userBanner
                     ? { uri: `${IMG_URL}${profile.userBanner}` } // backend image
-                    : require('../../../assets/pngs/BannerImg.png')
+                    : require('../../../assets/pngs/Placeholder.png')
                 }
               />
               <TouchableOpacity
@@ -362,7 +393,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                       ? { uri: profileImage.uri } // newly selected
                       : profile?.image
                       ? { uri: `${IMG_URL}${profile.image}` } // backend image
-                      : require('../../../assets/pngs/BannerImg.png')
+                      : require('../../../assets/pngs/Placeholder.png')
                   }
                 />
 
@@ -468,20 +499,31 @@ const EditProfileScreen = ({ navigation }: any) => {
                 />
               )}
               <View style={{}}>
-                {isProfessional && (
-                  <BorderTextInput
-                    label="Links"
-                    value={links}
-                    onChangeText={setLinks}
-                    placeholder="Prework.com/follow/."
-                  />
-                )}
+                {isProfessional &&
+  links.map((item, index) => (
+    <View key={index} style={{ marginBottom: 10 }}>
+      <BorderTextInput
+        label={`Link ${index + 1}`}
+        value={item}
+        onChangeText={text => handleLinkChange(text, index)}
+        placeholder="Enter link"
+      />
+
+      {links.length > 1 && (
+        <TouchableOpacity onPress={() => removeLink(index)}>
+          <Text style={{ color: 'red', fontSize: 12 }}>
+            Remove
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  ))}
 
                 {isProfessional && (
-                  <TouchableOpacity style={styles.addMoreBtn}>
-                    <AddIcon />
-                    <Text style={styles.addMoreText}>Add more links</Text>
-                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.addMoreBtn} onPress={addMoreLinks}>
+  <AddIcon />
+  <Text style={styles.addMoreText}>Add more links</Text>
+</TouchableOpacity>
                 )}
               </View>
 

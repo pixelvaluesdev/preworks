@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Linking,
+  Alert,
 } from 'react-native';
 
 import ScreenHeader from '../../components/ScreenHeader';
@@ -24,6 +26,7 @@ import Location from '../../assets/svgs/LocationIcon.svg';
 import { useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
+import ImageViewing from 'react-native-image-viewing';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
@@ -35,12 +38,30 @@ const GeneralEnquiryScreen = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (projectId && token) {
       fetchProjectDetails();
     }
   }, [projectId, token]);
+
+  const imageUrls =
+    project?.image?.map(img => ({
+      uri: `${IMG_URL}${img}`,
+    })) || [];
+
+  const handleCall = () => {
+    const phone = project?.userId?.phone;
+
+    if (!phone) {
+      Alert.alert('Phone number not available');
+      return;
+    }
+
+    Linking.openURL(`tel:${phone}`);
+  };
 
   const fetchProjectDetails = async () => {
     try {
@@ -82,10 +103,17 @@ const GeneralEnquiryScreen = () => {
       <ScreenHeader title="General Enquiry" showBack />
 
       {/* Image */}
-      <Image
-        source={{ uri: `${IMG_URL}${project?.image?.[0]}` }}
-        style={styles.image}
-      />
+      <TouchableOpacity
+        onPress={() => {
+          setCurrentIndex(0);
+          setViewerVisible(true);
+        }}
+      >
+        <Image
+          source={{ uri: `${IMG_URL}${project?.image?.[0]}` }}
+          style={styles.image}
+        />
+      </TouchableOpacity>
 
       {/* Title */}
       <Text style={styles.title}>{project?.projectName}</Text>
@@ -106,9 +134,9 @@ const GeneralEnquiryScreen = () => {
       {/* from api services are not comming */}
       <View style={styles.tagRow}>
         {project?.services?.map((item, index) => (
-          <Text key={index} style={styles.tag}>
-            {item}
-          </Text>
+          <View key={index} style={styles.tag}>
+            <Text style={styles.tagText}>{item}</Text>
+          </View>
         ))}
       </View>
 
@@ -130,7 +158,11 @@ const GeneralEnquiryScreen = () => {
       <DetailRow
         icon={<CalenderIcon />}
         label="Quote Last Date"
-        value={project?.quoteLastDate}
+        value={
+          project?.quoteLastDate
+            ? new Date(project.quoteLastDate).toDateString()
+            : 'N/A'
+        }
       />
       <View style={styles.dashedDivider} />
       <DetailRow
@@ -163,7 +195,7 @@ const GeneralEnquiryScreen = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.callBtn}>
+        <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             <Phone2Icon />
 
@@ -190,6 +222,13 @@ const GeneralEnquiryScreen = () => {
         projectId={projectId}
         token={token}
         userId={userId}
+      />
+
+      <ImageViewing
+        images={imageUrls}
+        imageIndex={currentIndex}
+        visible={viewerVisible}
+        onRequestClose={() => setViewerVisible(false)}
       />
     </ScrollView>
   );
@@ -241,16 +280,19 @@ const styles = StyleSheet.create({
 
   tag: {
     backgroundColor: '#9FEDA8',
-    color: 'black',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
     marginRight: 8,
     marginBottom: 8,
-    height: HEIGHT(4),
+    minHeight: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    textAlignVertical: 'center',
+  },
+  tagText: {
+    color: 'black',
+    fontSize: 12,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   detailRow: {
@@ -296,7 +338,7 @@ const styles = StyleSheet.create({
 
   callText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',
   },

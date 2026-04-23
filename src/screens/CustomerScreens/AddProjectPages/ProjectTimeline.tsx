@@ -9,18 +9,27 @@ import { HEIGHT } from '../../../utils/responsive';
 import CalenderIcon from '../../../assets/svgs/CalenderIcon.svg';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
+const ranges = [
+  { max: 0, label: '0' },
+  { max: 10, label: '0 - 5 Lakh' },
+  { max: 20, label: '5 - 10 Lakh' },
+  { max: 30, label: '10 - 15 Lakh' },
+  { max: 40, label: '15 - 20 Lakh' },
+  { max: 50, label: '20 - 30 Lakh' },
+  { max: 60, label: '30 - 50 Lakh' },
+  { max: 70, label: '50 - 75 Lakh' },
+  { max: 80, label: '75L - 1 CR' },
+  { max: 90, label: '1 - 2 CR' },
+  { max: 100, label: '2 CR+' },
+];
+
 const ProjectTimeline = ({ data, handleChange }: any) => {
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedField, setSelectedField] = useState(null);
+  const [selectedField, setSelectedField] = useState<any>(null);
   const [sliderWidth, setSliderWidth] = useState(0);
+
+  const showDatePicker = () => setDatePickerVisibility(true);
+  const hideDatePicker = () => setDatePickerVisibility(false);
 
   const handleConfirm = (date: Date) => {
     const formatted = date.toISOString().split('T')[0];
@@ -35,19 +44,15 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
     hideDatePicker();
   };
 
-  const getBudgetLabel = val => {
-    if (val <= 20) return '5 - 10 Lakh';
-    if (val <= 40) return '10 - 25 Lakh';
-    if (val <= 60) return '25 - 50 Lakh';
-    if (val <= 75) return '50 Lakh - 1 Cr';
-    if (val <= 90) return '1 Cr - 2 Cr';
-    return '2 Cr+';
+  // 🔥 Get label from percentage
+  const getLabelFromPercentage = (value: number) => {
+    const range = ranges.find(r => value <= r.max);
+    return range ? range.label : '';
   };
-  const getThumbPosition = () => {
-    const min = 500000;
-    const max = 20000000;
 
-    const ratio = (data.budget - min) / (max - min);
+  // 🔥 Tooltip position
+  const getThumbPosition = () => {
+    const ratio = data.budget / 100;
     const position = ratio * sliderWidth;
 
     const labelWidth = 90;
@@ -58,34 +63,9 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
     );
   };
 
-  const formatBudgetRange = val => {
-    const step = 500000;
-    const max = 20000000;
-
-    if (val >= max) {
-      return '2 Cr+';
-    }
-
-    const start = val;
-    const end = Math.min(val + step, max);
-
-    const toLakh = v => Math.round(v / 100000);
-
-    // If >= 1 Cr → show in Cr
-    if (start >= 10000000) {
-      const startCr = start / 10000000;
-      const endCr = end / 10000000;
-
-      return `${startCr.toFixed(2)} - ${endCr.toFixed(2)} Cr`;
-    }
-
-    return `${toLakh(start)} - ${toLakh(end)} Lakh`;
-  };
-
   return (
     <View style={styles.container}>
       {/* LAST DATE */}
-
       <BorderTextInput
         label="Last Date of Receiving Quotation"
         placeholder="Enter your Last Date"
@@ -106,7 +86,6 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       />
 
       {/* START DATE */}
-
       <BorderTextInput
         label="Plan to start your construction"
         placeholder="Enter your start date"
@@ -144,37 +123,40 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
           Select Price Range <Text style={styles.asterisk}> *</Text>
         </Text>
 
-        <View style={{ position: 'relative', width: '100%' }}>
+        <View
+          style={{ position: 'relative', width: '100%' }}
+          onLayout={e => {
+            setSliderWidth(e.nativeEvent.layout.width);
+          }}
+        >
           <Slider
             style={{ width: '100%', height: 40 }}
-            minimumValue={500000} // 5 Lakh
-            maximumValue={20000000} // 2 Crore
-            step={500000} // 5 Lakh step
+            minimumValue={0}
+            maximumValue={100}
+            step={10}
             value={data.budget}
             minimumTrackTintColor={Colors.primary}
             maximumTrackTintColor="#ccc"
             thumbTintColor={Colors.primary}
             onValueChange={val => {
-              handleChange('budget', val);
-            }}
-            onLayout={e => {
-              setSliderWidth(e.nativeEvent.layout.width);
+              handleChange('budget', val); // store percentage
             }}
           />
 
+          {/* TOOLTIP */}
           <View style={[styles.tooltipContainer, { left: getThumbPosition() }]}>
             <View style={styles.tooltipBox}>
               <Text style={styles.tooltipText}>
-                {formatBudgetRange(data.budget)}
+                {getLabelFromPercentage(data.budget)}
               </Text>
             </View>
 
-            {/* Triangle pointer */}
             <View style={styles.tooltipArrow} />
           </View>
         </View>
       </View>
 
+      {/* DATE PICKER */}
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
@@ -206,30 +188,11 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 
-  rangeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  rangeText: {
-    color: '#2DBE7F',
-    fontSize: 14,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
-  },
-  floatingLabel: {
-    position: 'absolute',
-    top: 35,
-  },
-
-  selectedValue: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
-  },
   asterisk: {
     color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
+
   charCount: {
     textAlign: 'right',
     fontSize: 12,
@@ -237,6 +200,7 @@ const styles = StyleSheet.create({
     marginTop: -30,
     marginRight: 10,
   },
+
   tooltipContainer: {
     position: 'absolute',
     top: -30,
@@ -266,7 +230,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 8,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#B4F2BB', // same as box
+    borderTopColor: '#B4F2BB',
     marginTop: -1,
   },
 });

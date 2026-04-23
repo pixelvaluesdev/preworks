@@ -24,7 +24,7 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
           <View style={styles.popupContainer}>
             <Text style={styles.message}>{message}</Text>
 
-            {/* ✅ FIX: Handle 3 buttons separately */}
+            {/*  FIX: Handle 3 buttons separately */}
             {buttons.length === 3 ? (
               <>
                 {/* Top row (first 2 buttons) */}
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
-  /* ✅ NEW STYLE (only addition) */
+ 
   bottomButtonContainer: {
     marginTop: 12,
     alignItems: 'center',

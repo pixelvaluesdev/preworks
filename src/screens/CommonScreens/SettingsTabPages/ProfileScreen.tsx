@@ -81,7 +81,7 @@ const ProfileScreen = ({ navigation }: any) => {
             source={
               profile?.userBanner
                 ? { uri: `${IMG_URL}${profile.userBanner}` }
-                : require('../../../assets/pngs/BannerImg.png')
+                : require('../../../assets/pngs/Placeholder.png')
             }
           />
 
@@ -101,7 +101,7 @@ const ProfileScreen = ({ navigation }: any) => {
               source={
                 profile?.image
                   ? { uri: `${IMG_URL}${profile.image}` }
-                  : require('../../../assets/pngs/BannerImg.png')
+                  : require('../../../assets/pngs/Placeholder.png')
               }
             />
 

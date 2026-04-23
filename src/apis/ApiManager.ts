@@ -73,6 +73,10 @@ const requestPath = {
   projectEnquiry: '/professional/proj-Enquiry',
   getProfile: '/customer/get-profile',
   updateProfile: '/customer/update-profile',
+  appliedProjects: '/professional/applied-Projects',
+
+  addWork: '/professional/add-Work',
+  updateWork: '/professional/update-Work',
 };
 
 const ApiManager = {
@@ -130,6 +134,15 @@ const ApiManager = {
 
   updateProfile: (userId: string, data: any, token?: string) => {
     return requests.put(`${requestPath.updateProfile}/${userId}`, data, token);
+  },
+  appliedProjects: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.appliedProjects}/${userId}`, token);
+  },
+  addWork: (data: any, token?: string) => {
+    return requests.post(requestPath.addWork, data, token);
+  },
+  updateWork: (workId: string, data: any, token?: string) => {
+    return requests.put(`${requestPath.updateWork}/${workId}`, data, token);
   },
 };
 

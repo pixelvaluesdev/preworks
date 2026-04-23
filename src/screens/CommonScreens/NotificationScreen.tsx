@@ -100,7 +100,7 @@ const NotificationScreen = () => {
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : notifications.length === 0 ? (
-        // ✅ EMPTY STATE
+        // EMPTY STATE
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>No notifications yet</Text>
         </View>

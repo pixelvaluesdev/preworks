@@ -91,7 +91,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ EXPERIENCE REAL */}
+        {/* EXPERIENCE REAL */}
         <View style={styles.detailRow}>
           <Text style={styles.label}>Experience</Text>
           <Text style={styles.value}>
@@ -101,7 +101,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
 
         <View style={styles.dash} />
 
-        {/* ✅ CITY */}
+        {/*  CITY */}
         <View style={styles.detailRow}>
           <Text style={styles.label}>City</Text>
           <Text style={styles.value}>{user?.city || 'N/A'}</Text>
@@ -142,12 +142,12 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           </View>
         )}
 
-        {/* ✅ PROFILE NAVIGATION */}
+        {/*  PROFILE NAVIGATION */}
         <TouchableOpacity
           style={styles.profileBtn}
           onPress={() =>
             navigation.navigate('ProfessionalProfile', {
-              id: user?._id, // ✅ correct id
+              id: user?._id, //  correct id
             })
           }
         >

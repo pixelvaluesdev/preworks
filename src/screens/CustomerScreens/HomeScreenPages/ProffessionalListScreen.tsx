@@ -82,6 +82,7 @@ const ProfessionalListScreen = () => {
 
       if (response?.data?.status === 'success') {
         setProfessionals(response.data.data);
+        console.log('Fetched professionals:', response.data.data);
       }
     } catch (error) {
       console.log('Error fetching professionals:', error);
@@ -135,24 +136,21 @@ const ProfessionalListScreen = () => {
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           contentContainerStyle={{ paddingHorizontal: WIDTH(3) }}
           renderItem={({ item }) => {
-            const hasValidImage =
-              item.image &&
-              Array.isArray(item.image) &&
-              item.image.length > 0 &&
-              typeof item.image[0] === 'string' &&
-              item.image[0].trim() !== '';
+            const hasValidImage = item.image && typeof item.image === 'string';
 
             return (
               <TouchableOpacity
                 style={styles.card}
                 onPress={() =>
-                  navigation.navigate('ProfessionalProfile', { id: item._id })
+                  navigation.navigate('ProfessionalProfile', {
+                    userId: item._id,
+                  })
                 }
               >
                 <Image
                   source={
                     hasValidImage
-                      ? { uri: `${IMG_URL}${item.image[0]}` }
+                      ? { uri: `${IMG_URL}${item.image}` }
                       : require('../../../assets/pngs/Placeholder.png')
                   }
                   style={styles.image}
