@@ -40,7 +40,11 @@ const SplashScreen = () => {
       }
 
       if (token && user?.firstName) {
-        if (userType === 'professional') {
+        if (
+          userType === 'contractor' ||
+          userType === 'architect' ||
+          userType === 'designer'
+        ) {
           if (!hasSeenProfessionalOnboarding) {
             navigation.replace('ProfOnboarding');
           } else {

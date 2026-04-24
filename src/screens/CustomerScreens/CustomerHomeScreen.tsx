@@ -37,6 +37,7 @@ const CustomerHomeScreen = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const flatListRef = useRef(null);
+  const [helpLoading, setHelpLoading] = useState(false);
 
   useEffect(() => {
     console.log(token, 'Tokennnn here');
@@ -77,6 +78,23 @@ const CustomerHomeScreen = () => {
       console.log('Error fetching professionals:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleHelpRequest = async () => {
+    try {
+      setHelpLoading(true);
+
+      const res = await ApiManager.helpRequest(user?._id, token);
+
+      if (res?.data?.status === 'success') {
+        setHelpPopupVisible(false);
+        navigation.navigate('HelpRequestSuccess');
+      }
+    } catch (error) {
+      console.log('Help request error:', error);
+    } finally {
+      setHelpLoading(false);
     }
   };
 
@@ -259,11 +277,10 @@ const CustomerHomeScreen = () => {
             onPress: () => setHelpPopupVisible(false),
           },
           {
-            label: 'Yes, Create',
+            label: helpLoading ? 'Creating...' : 'Yes, Create',
             type: 'primary',
             onPress: () => {
-              setHelpPopupVisible(false);
-              navigation.navigate('HelpRequestSuccess');
+              handleHelpRequest();
             },
           },
         ]}

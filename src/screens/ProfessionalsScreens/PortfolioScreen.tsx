@@ -8,6 +8,7 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import {
   useFocusEffect,
@@ -37,6 +38,7 @@ const PortfolioScreen = () => {
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
+  const SCREEN_WIDTH = Dimensions.get('window').width;
 
   const [loading, setLoading] = useState(false);
   const [popupVisible, setPopupVisible] = useState(false);
@@ -271,38 +273,45 @@ const PortfolioScreen = () => {
               />
 
               {form.image.length > 0 && (
-                <View>
+                <View style={{ marginHorizontal: -WIDTH(4) }}>
                   <ScrollView
                     horizontal
-                    pagingEnabled
+                    pagingEnabled={false}
                     showsHorizontalScrollIndicator={false}
                     onScroll={e => {
                       const index = Math.round(
-                        e.nativeEvent.contentOffset.x / WIDTH(94),
+                        e.nativeEvent.contentOffset.x / SCREEN_WIDTH,
                       );
                       setCurrentIndex(index);
                     }}
+                    decelerationRate="fast"
+                    snapToInterval={SCREEN_WIDTH}
+                    snapToAlignment="center"
                   >
                     {form.image.map((item, index) => (
-                      <View key={index}>
-                        <Image
-                          source={{ uri: item.uri }}
-                          style={styles.image}
-                        />
+                      <View
+                        key={index}
+                        style={{ width: SCREEN_WIDTH, alignItems: 'center' }}
+                      >
+                        <View style={{ width: '92%', marginBottom: 10 }}>
+                          <Image
+                            source={{ uri: item?.uri }}
+                            style={styles.image}
+                          />
 
-                        {/* Delete Button */}
-                        <TouchableOpacity
-                          style={styles.imageDelete}
-                          onPress={() => {
-                            const updated = form.image.filter(
-                              (_, i) => i !== index,
-                            );
-                            setForm(prev => ({ ...prev, image: updated }));
-                            setCurrentIndex(0);
-                          }}
-                        >
-                          <CloseIcon width={16} height={16} />
-                        </TouchableOpacity>
+                          <TouchableOpacity
+                            style={styles.imageDelete}
+                            onPress={() => {
+                              const updated = form.image.filter(
+                                (_, i) => i !== index,
+                              );
+                              setForm(prev => ({ ...prev, image: updated }));
+                              setCurrentIndex(0);
+                            }}
+                          >
+                            <CloseIcon width={16} height={16} />
+                          </TouchableOpacity>
+                        </View>
                       </View>
                     ))}
                   </ScrollView>
@@ -449,10 +458,9 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: WIDTH(94),
+    width: '100%',
     height: HEIGHT(40),
     borderRadius: 10,
-    marginBottom: 20,
   },
 
   footer: {

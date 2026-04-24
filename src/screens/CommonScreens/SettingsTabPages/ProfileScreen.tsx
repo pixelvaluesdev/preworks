@@ -20,7 +20,7 @@ import Pincode from '../../../assets/svgs/GreenLocation.svg';
 import Building from '../../../assets/svgs/BuildingIcon.svg';
 import Address from '../../../assets/svgs/AddressIcon.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
-import { useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
@@ -35,11 +35,19 @@ const ProfileScreen = ({ navigation }: any) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [userId]);
+  // useEffect(() => {
+  //   if (userId) {
+  //     fetchProfile();
+  //   }
+  // }, [userId]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId) {
+        fetchProfile();
+      }
+    }, [userId]),
+  );
 
   const fetchProfile = async () => {
     try {

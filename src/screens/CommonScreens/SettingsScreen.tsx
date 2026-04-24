@@ -40,7 +40,7 @@ const SettingsScreen = () => {
   const dispatch = useDispatch();
 
   const fName = useSelector(state => state.auth.user?.firstName);
-  const lName = useSelector(state => state.auth.user?.LastName);
+  const lName = useSelector(state => state.auth.user?.lastName);
 
   const userType = useSelector((state: any) => state.auth.userType);
   console.log('userType:', userType);

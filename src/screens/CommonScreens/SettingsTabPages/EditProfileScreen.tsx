@@ -29,6 +29,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useRoute } from '@react-navigation/native';
 import ApiManager from '../../../apis/ApiManager';
 import { IMG_URL } from '../../../apis/ApiManager';
+import { setUser } from '../../../redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
@@ -39,6 +41,8 @@ const EditProfileScreen = ({ navigation }: any) => {
   const route = useRoute();
   const userId = route?.params?.userId;
   console.log('EditProfileScreen userId:', userId);
+
+  const dispatch = useDispatch();
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -68,19 +72,19 @@ const EditProfileScreen = ({ navigation }: any) => {
   }, [userId]);
 
   const handleLinkChange = (text, index) => {
-  const updatedLinks = [...links];
-  updatedLinks[index] = text;
-  setLinks(updatedLinks);
-};
+    const updatedLinks = [...links];
+    updatedLinks[index] = text;
+    setLinks(updatedLinks);
+  };
 
-const addMoreLinks = () => {
-  setLinks([...links, '']);
-};
+  const addMoreLinks = () => {
+    setLinks([...links, '']);
+  };
 
-const removeLink = index => {
-  const updatedLinks = links.filter((_, i) => i !== index);
-  setLinks(updatedLinks.length ? updatedLinks : ['']);
-};
+  const removeLink = index => {
+    const updatedLinks = links.filter((_, i) => i !== index);
+    setLinks(updatedLinks.length ? updatedLinks : ['']);
+  };
 
   const fetchProfile = async () => {
     try {
@@ -109,11 +113,11 @@ const removeLink = index => {
         setExperience(data?.experience || '');
         setBio(data?.bio || '');
 
-       if (data?.links?.length > 0) {
-  setLinks(data.links);
-} else {
-  setLinks(['']);
-}
+        if (data?.links?.length > 0) {
+          setLinks(data.links);
+        } else {
+          setLinks(['']);
+        }
       }
     } catch (error) {
       console.log('Edit Profile error:', error);
@@ -259,6 +263,29 @@ const removeLink = index => {
     return '';
   };
 
+  const isFormValid = () => {
+    if (!name.trim()) return false;
+    if (!mobile.trim()) return false;
+    if (!city.trim()) return false;
+    if (!pin.trim()) return false;
+    if (!state.trim()) return false;
+    if (!address.trim()) return false;
+
+    // Only for customer (email required)
+    if (!isProfessional && !email.trim()) return false;
+
+    // Only for professional
+    if (isProfessional) {
+      if (!experience.trim()) return false;
+      if (!bio.trim()) return false;
+
+      const hasValidLink = links.some(link => link.trim() !== '');
+      if (!hasValidLink) return false;
+    }
+
+    return true;
+  };
+
   const handleSave = async () => {
     let emailError = '';
 
@@ -295,11 +322,11 @@ const removeLink = index => {
       if (experience) formData.append('experience', experience);
       if (bio) formData.append('bio', bio);
 
-     const filteredLinks = links.filter(link => link.trim() !== '');
+      const filteredLinks = links.filter(link => link.trim() !== '');
 
-if (filteredLinks.length > 0) {
-  formData.append('links', JSON.stringify(filteredLinks));
-}
+      if (filteredLinks.length > 0) {
+        formData.append('links', JSON.stringify(filteredLinks));
+      }
 
       if (profileImage) {
         formData.append('image', {
@@ -324,6 +351,8 @@ if (filteredLinks.length > 0) {
       console.log('UPDATE RESPONSE:', response.data);
 
       if (response?.data?.status === 'success') {
+        const updatedUser = response.data.data;
+        dispatch(setUser(updatedUser));
         setShowPopup(true);
       }
     } catch (error) {
@@ -500,30 +529,33 @@ if (filteredLinks.length > 0) {
               )}
               <View style={{}}>
                 {isProfessional &&
-  links.map((item, index) => (
-    <View key={index} style={{ marginBottom: 10 }}>
-      <BorderTextInput
-        label={`Link ${index + 1}`}
-        value={item}
-        onChangeText={text => handleLinkChange(text, index)}
-        placeholder="Enter link"
-      />
+                  links.map((item, index) => (
+                    <View key={index} style={{ marginBottom: 10 }}>
+                      <BorderTextInput
+                        label={`Link ${index + 1}`}
+                        value={item}
+                        onChangeText={text => handleLinkChange(text, index)}
+                        placeholder="Enter link"
+                      />
 
-      {links.length > 1 && (
-        <TouchableOpacity onPress={() => removeLink(index)}>
-          <Text style={{ color: 'red', fontSize: 12 }}>
-            Remove
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  ))}
+                      {links.length > 1 && (
+                        <TouchableOpacity onPress={() => removeLink(index)}>
+                          <Text style={{ color: 'red', fontSize: 12 }}>
+                            Remove
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))}
 
                 {isProfessional && (
-                  <TouchableOpacity style={styles.addMoreBtn} onPress={addMoreLinks}>
-  <AddIcon />
-  <Text style={styles.addMoreText}>Add more links</Text>
-</TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.addMoreBtn}
+                    onPress={addMoreLinks}
+                  >
+                    <AddIcon />
+                    <Text style={styles.addMoreText}>Add more links</Text>
+                  </TouchableOpacity>
                 )}
               </View>
 
@@ -537,7 +569,11 @@ if (filteredLinks.length > 0) {
                 />
               )}
               {/* SAVE BUTTON */}
-              <TouchableOpacity style={styles.saveBtn} onPress={handleSave}>
+              <TouchableOpacity
+                style={[styles.saveBtn, { opacity: isFormValid() ? 1 : 0.5 }]}
+                onPress={handleSave}
+                disabled={!isFormValid()}
+              >
                 <Text style={styles.saveText}>Save</Text>
               </TouchableOpacity>
             </View>

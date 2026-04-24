@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,11 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 
 import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
 import { FONT } from '../../../theme/fonts';
@@ -72,9 +76,11 @@ const ProfessionalProfileScreen = () => {
     }
   }, [showComingSoon]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, []),
+  );
 
   const fetchProfile = async () => {
     try {

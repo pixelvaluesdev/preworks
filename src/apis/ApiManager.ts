@@ -77,6 +77,8 @@ const requestPath = {
 
   addWork: '/professional/add-Work',
   updateWork: '/professional/update-Work',
+
+  helpRequest: '/customer/helpUs',
 };
 
 const ApiManager = {
@@ -143,6 +145,9 @@ const ApiManager = {
   },
   updateWork: (workId: string, data: any, token?: string) => {
     return requests.put(`${requestPath.updateWork}/${workId}`, data, token);
+  },
+  helpRequest: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.helpRequest}/${userId}`, token);
   },
 };
 

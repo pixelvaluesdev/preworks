@@ -61,11 +61,12 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           }}
           style={[
             styles.input,
+
             {
               height: multiline
                 ? Math.max(height || HEIGHT(6), inputHeight)
                 : height || HEIGHT(6),
-              paddingRight: 50,
+              paddingRight: 0,
               fontSize: 14,
               fontFamily: FONT.POPPINS_REGULAR,
               textAlignVertical: multiline ? 'top' : 'center',
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     color: 'black',
   },
 
