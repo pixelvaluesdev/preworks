@@ -16,6 +16,7 @@ import ScreenHeader from '../../../components/ScreenHeader';
 import { useNavigation } from '@react-navigation/native';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
+import { ActivityIndicator } from 'react-native-paper';
 
 const QuoteListScreen = ({ route }: any) => {
   const token = useSelector(state => state.auth.userToken);
@@ -51,6 +52,14 @@ const QuoteListScreen = ({ route }: any) => {
 
   const renderItem = ({ item }) => {
     const user = item?.userId;
+
+    if (loading) {
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      );
+    }
 
     return (
       <TouchableOpacity
@@ -97,8 +106,19 @@ const QuoteListScreen = ({ route }: any) => {
         data={list}
         keyExtractor={item => item._id}
         renderItem={renderItem}
-        contentContainerStyle={{ padding: WIDTH(4) }}
+        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => {
+          if (loading) return null;
+
+          return (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>
+                {isQuote ? 'No quotes yet' : 'No one has shown interest yet'}
+              </Text>
+            </View>
+          );
+        }}
       />
     </View>
   );
@@ -147,5 +167,22 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 14,
     color: '#000000',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    verticalAlign: 'middle',
+  },
+
+  emptyText: {
+    fontSize: 16,
+    color: '#777',
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

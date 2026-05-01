@@ -26,35 +26,28 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         </View>
       </View>
 
-      <View style={styles.toggleRow}>
-        <TouchableOpacity
-          onPress={() => handleChange('selectedType', 'floor')}
-          style={styles.radioRow}
-        >
-          <View
-            style={[
-              styles.radio,
-              data.selectedType === 'floor' && styles.radioActive,
-            ]}
-          />
-          <Text style={styles.toggletext}>Floor area</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => handleChange('selectedType', 'plot')}
-          style={styles.radioRow}
-        >
-          <View
-            style={[
-              styles.radio,
-              data.selectedType === 'plot' && styles.radioActive,
-            ]}
-          />
-          <Text style={styles.toggletext}>Plot size</Text>
-        </TouchableOpacity>
-      </View>
+      <BorderTextInput
+        label="Floor Area"
+        keyboardType="number-pad"
+        placeholder="Enter floor area"
+        value={data.floorArea}
+        onChangeText={text => handleChange('floorArea', text)}
+        height={HEIGHT(7)}
+        rightComponent={<Text style={{ fontSize: 16 }}>sq.ft</Text>}
+      />
 
       <BorderTextInput
+        label="Plot Size (Optional)"
+        keyboardType="number-pad"
+        placeholder="Enter plot size"
+        value={data.plotSize}
+        onChangeText={text => handleChange('plotSize', text)}
+        height={HEIGHT(7)}
+        rightComponent={<Text style={{ fontSize: 16 }}>sq.ft</Text>}
+        mandotory={false}
+      />
+
+      {/* <BorderTextInput
         label={data.selectedType === 'floor' ? 'Floor area' : 'Plot size'}
         keyboardType="number-pad"
         placeholder={`Enter your ${
@@ -73,7 +66,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
             sq.ft
           </Text>
         }
-      />
+      /> */}
 
       <BorderDropdown
         label="No of Floors"
@@ -130,6 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderRadius: 10,
+    marginBottom: 10,
   },
 
   infoText: {

@@ -149,6 +149,14 @@ const ApiManager = {
   helpRequest: (userId: string, token?: string) => {
     return requests.get(`${requestPath.helpRequest}/${userId}`, token);
   },
+
+  deleteWork: (workId: string, token?: string) => {
+    return requests.delete(`/professional/delete-Work/${workId}`, {}, token);
+  },
+
+  deleteFile: (data: any, token?: string) => {
+    return requests.post('/customer/delete-file', data, token);
+  },
 };
 
 export default ApiManager;

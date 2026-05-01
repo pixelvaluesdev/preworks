@@ -12,6 +12,10 @@ import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
 
 const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
+  const isObject = typeof message === 'object';
+
+  const title = isObject ? message?.title : message;
+  const subtitle = isObject ? message?.subtitle : null;
   return (
     <Modal
       transparent
@@ -22,8 +26,9 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <View style={styles.popupContainer}>
-            <Text style={styles.message}>{message}</Text>
+            <Text style={styles.title}>{title}</Text>
 
+            {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
             {/*  FIX: Handle 3 buttons separately */}
             {buttons.length === 3 ? (
               <>
@@ -161,9 +166,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
 
- 
   bottomButtonContainer: {
     marginTop: 12,
     alignItems: 'center',
+  },
+  title: {
+    fontSize: 17,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    textAlign: 'center',
+    color: Colors.primary,
+  },
+
+  subtitle: {
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_REGULAR,
+    textAlign: 'center',
+    color: '#777',
+    marginTop: 6,
+    lineHeight: 20,
   },
 });

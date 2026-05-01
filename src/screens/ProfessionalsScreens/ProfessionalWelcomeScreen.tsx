@@ -4,15 +4,19 @@ import { FONT } from '../../theme/fonts';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import Architect from '../../assets/svgs/Architect.svg';
 import { useNavigation } from '@react-navigation/native';
-import { useDispatch, UseDispatch } from 'react-redux';
+import { useDispatch, UseDispatch, useSelector } from 'react-redux';
 import { setUserType } from '../../redux/slices/authSlice';
 import Architect2 from '../../assets/svgs/Architect2 (2).svg';
 import Interior from '../../assets/svgs/Interior2.svg';
 import { WIDTH } from '../../utils/responsive';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const ProfessionalWelcomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const hasSeenProfessionalOnboarding = useSelector(
+    state => state.auth.hasSeenProfessionalOnboarding,
+  );
 
   return (
     <ImageBackground
@@ -29,8 +33,13 @@ const ProfessionalWelcomeScreen = () => {
           width={WIDTH(65)}
           Icon={Architect}
           onPress={() => {
+            triggerHaptic('impactLight');
             dispatch(setUserType('contractor'));
-            navigation.navigate('Login');
+            if (!hasSeenProfessionalOnboarding) {
+              navigation.navigate('ProfOnboarding');
+            } else {
+              navigation.navigate('Login');
+            }
           }}
         />
 
@@ -39,8 +48,13 @@ const ProfessionalWelcomeScreen = () => {
           Icon={Architect2}
           width={WIDTH(65)}
           onPress={() => {
+            triggerHaptic('impactHeavy');
             dispatch(setUserType('architect'));
-            navigation.navigate('Login');
+            if (!hasSeenProfessionalOnboarding) {
+              navigation.navigate('ProfOnboarding');
+            } else {
+              navigation.navigate('Login');
+            }
           }}
         />
 
@@ -49,8 +63,13 @@ const ProfessionalWelcomeScreen = () => {
           Icon={Interior}
           width={WIDTH(65)}
           onPress={() => {
+            triggerHaptic('impactHeavy');
             dispatch(setUserType('designer'));
-            navigation.navigate('Login');
+            if (!hasSeenProfessionalOnboarding) {
+              navigation.navigate('ProfOnboarding');
+            } else {
+              navigation.navigate('Login');
+            }
           }}
         />
       </View>

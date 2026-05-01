@@ -63,8 +63,12 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const [viewerVisible, setViewerVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const screenWidth = Dimensions.get('window').width;
+  const [imgError, setImgError] = useState(false);
 
-  const images = project?.image || [];
+  const [loadingFileIndex, setLoadingFileIndex] = useState(null);
+
+  const images =
+    project?.image && project.image.length > 0 ? project.image : [null];
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
 
@@ -139,7 +143,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       setCurrentIndex(index);
       setViewerVisible(true);
     } else {
-      //  PDF
+      // PDF LOADING START
+      setLoadingFileIndex(index);
+
       try {
         const localPath = `${RNFS.DocumentDirectoryPath}/${file
           .split('/')
@@ -155,6 +161,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         }
       } catch (error) {
         console.log('Error opening file:', error);
+      } finally {
+        // PDF LOADING STOP
+        setLoadingFileIndex(null);
       }
     }
   };
@@ -223,13 +232,20 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           {imageCount === 1 ? (
             <TouchableOpacity onPress={() => openViewer(0)}>
               <Image
-                source={{
-                  uri: `${IMG_URL}${
-                    images[0].startsWith('/') ? images[0] : '/' + images[0]
-                  }`,
-                }}
+                source={
+                  images.length > 0 && !imgError
+                    ? {
+                        uri: `${IMG_URL}${
+                          images[0].startsWith('/')
+                            ? images[0]
+                            : '/' + images[0]
+                        }`,
+                      }
+                    : require('../../../assets/pngs/NoImg.png')
+                }
                 style={styles.banner}
                 resizeMode="cover"
+                onError={() => setImgError(true)}
               />
             </TouchableOpacity>
           ) : (
@@ -252,13 +268,18 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               renderItem={({ item, index }) => (
                 <TouchableOpacity onPress={() => openViewer(index)}>
                   <Image
-                    source={{
-                      uri: `${IMG_URL}${
-                        item.startsWith('/') ? item : '/' + item
-                      }`,
-                    }}
+                    source={
+                      item && !imgError
+                        ? {
+                            uri: `${IMG_URL}${
+                              item.startsWith('/') ? item : '/' + item
+                            }`,
+                          }
+                        : require('../../../assets/pngs/NoImg.png')
+                    }
                     style={styles.banner}
                     resizeMode="cover"
+                    onError={() => setImgError(true)}
                   />
                 </TouchableOpacity>
               )}
@@ -304,7 +325,11 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               {images.slice(0, 3).map((img, index) => (
                 <TouchableOpacity key={index} onPress={() => openViewer(index)}>
                   <Image
-                    source={{ uri: `${IMG_URL}/${img}` }}
+                    source={
+                      img
+                        ? { uri: `${IMG_URL}/${img}` }
+                        : require('../../../assets/pngs/NoImg.png')
+                    }
                     style={styles.thumbnail}
                   />
                 </TouchableOpacity>
@@ -443,30 +468,42 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           <Text style={styles.scopeTitle}>Scope Of Work Description</Text>
           <Text style={styles.scopeText}>{project?.requirementDesc}</Text>
 
-          <Text style={[styles.scopeTitle, { marginBottom: 10 }]}>
-            Architectural Drawings
-          </Text>
+          {drawings && drawings.length > 0 && (
+            <>
+              <Text style={[styles.scopeTitle, { marginBottom: 10 }]}>
+                Architectural Drawings
+              </Text>
 
-          {/* Attachments */}
-          <FlatList
-            data={drawings}
-            keyExtractor={(item, index) => index.toString()}
-            scrollEnabled={false}
-            renderItem={({ item, index }) => {
-              const fileName = item.split('/').pop();
+              {/* Attachments */}
+              <FlatList
+                data={drawings}
+                keyExtractor={(item, index) => index.toString()}
+                scrollEnabled={false}
+                renderItem={({ item, index }) => {
+                  const fileName = item.split('/').pop();
 
-              return (
-                <TouchableOpacity
-                  style={styles.fileCard}
-                  onPress={() => openFile(item, index)}
-                >
-                  <View style={styles.fileIcon} />
+                  return (
+                    <TouchableOpacity
+                      style={styles.fileCard}
+                      onPress={() => openFile(item, index)}
+                    >
+                      <View style={styles.fileIcon}>
+                        {loadingFileIndex === index ? (
+                          <ActivityIndicator
+                            size="small"
+                            color={Colors.primary}
+                          />
+                        ) : null}
+                      </View>
 
-                  <Text style={styles.fileName}>{fileName}</Text>
-                </TouchableOpacity>
-              );
-            }}
-          />
+                      <Text style={styles.fileName}>{fileName}</Text>
+                    </TouchableOpacity>
+                  );
+                }}
+              />
+            </>
+          )}
+
           {!isCustomer && (
             <>
               <View style={{ marginTop: 15 }}>
@@ -708,6 +745,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     borderRadius: 6,
     marginRight: 10,
+    alignItems: 'center',
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    justifyContent: 'center',
   },
 
   fileName: {

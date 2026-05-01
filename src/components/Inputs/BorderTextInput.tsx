@@ -18,6 +18,7 @@ interface BorderTextInputProps {
   editable?: boolean;
   keyboardType?: any;
   maxLength?: number;
+  mandotory?: boolean;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -32,13 +33,14 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   editable = true,
   keyboardType = 'default',
   maxLength,
+  mandotory = true,
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   return (
     <View style={[styles.inputWrapper, containerStyle]}>
       <Text style={styles.floatingLabel}>
         {label}
-        <Text style={styles.asterisk}> *</Text>
+        {mandotory ? <Text style={styles.asterisk}> *</Text> : null}
       </Text>
 
       <View style={styles.inputContainer}>

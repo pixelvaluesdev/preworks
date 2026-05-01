@@ -51,16 +51,19 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     address: '',
     city: '',
     pinCode: '',
-    selectedType: '',
-    area: '',
+    floorArea: '',
+    plotSize: '',
     floors: '',
     quoteType: '',
     startDate: '',
     lastDate: '',
     description: '',
     budget: '',
-    siteImage: [],
-    archDrawing: [],
+    siteImage: [], // new images
+    archDrawing: [], // new drawings
+
+    existingImages: [], //  API images
+    existingDrawings: [], // API drawings
   });
 
   const handleChange = (key: string, value: string) => {
@@ -86,10 +89,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     }
 
     //  For area field (numbers only)
-    if (key === 'area') {
-      let cleaned = value.replace(/[^0-9.]/g, ''); // only integers
-
-      setForm(prev => ({ ...prev, area: cleaned }));
+    if (key === 'floorArea' || key === 'plotSize') {
+      let cleaned = value.replace(/[^0-9.]/g, '');
+      setForm(prev => ({ ...prev, [key]: cleaned }));
       return;
     }
 
@@ -118,8 +120,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
     // STEP 1 validation (PlotWorkDetails)
     if (step === 1) {
-      if (!form.selectedType) return false;
-      if (!form.area) return false;
+      if (!form.floorArea) return false;
       if (!form.floors) return false;
       if (!form.quoteType) return false;
     }
@@ -134,10 +135,17 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
     // STEP 3 validation (Files)
     if (step === 3) {
-      if (!form.siteImage?.length) return false;
+      const totalImages =
+        (form.siteImage?.length || 0) + (form.existingImages?.length || 0);
+
+      if (totalImages === 0) return false;
 
       if (form.hasDrawing) {
-        if (!form.archDrawing?.length) return false;
+        const totalDrawings =
+          (form.archDrawing?.length || 0) +
+          (form.existingDrawings?.length || 0);
+
+        if (totalDrawings === 0) return false;
       } else {
         if (!form.services || form.services.length === 0) return false;
         // hideNumber is NOT mandatory → no need to validate
@@ -183,9 +191,10 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       city: project?.city || '',
       pinCode: project?.pinCode || '',
 
-      selectedType: 'floor', // default (or adjust later)
+      // selectedType: 'floor', // default (or adjust later)
 
-      area: project?.floorArea?.toString() || '',
+      floorArea: project?.floorArea?.toString() || '',
+      plotSize: project?.plotSize?.toString() || '',
       floors: project?.noOfFloors || '',
 
       quoteType:
@@ -197,9 +206,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       description: project?.requirementDesc || '',
       budget: project?.priceRange || '',
 
-      siteImage: [], // new uploads only
+      siteImage: [],
       archDrawing: [],
 
+      existingImages: project?.image || [],
+      existingDrawings: project?.drawing || [],
       hasDrawing: project?.drawingStatus || false,
       services: project?.services || [],
       hideNumber: project?.hideNumber || false,
@@ -215,6 +226,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       if (res?.data?.status === 'success') {
         const project = res?.data?.data?.project;
+        console.log('Myy gert ppriereo', project);
 
         prefillForm(project);
       }
@@ -238,7 +250,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       formData.append('plotAddress', form.address);
       formData.append('city', form.city);
       formData.append('pinCode', form.pinCode);
-      formData.append('floorArea', form.area);
+      formData.append('floorArea', form.floorArea);
+
+      if (form.plotSize) {
+        formData.append('plotSize', form.plotSize);
+      }
       formData.append('noOfFloors', form.floors);
 
       formData.append(
@@ -251,8 +267,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       formData.append('requirementDesc', form.description);
       formData.append('priceRange', form.budget);
 
-      formData.append('drawingStatus', form.hasDrawing ? 'true' : 'false');
-      formData.append('hideNumber', form.hideNumber ? 'true' : 'false');
+      formData.append('drawingStatus', form.hasDrawing ? true : false);
+      formData.append('hideNumber', form.hideNumber ? true : false);
 
       if (!form.hasDrawing) {
         formData.append('services', JSON.stringify(form.services));
@@ -282,20 +298,42 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       formData.append('userId', userId);
 
+      if (form.existingImages?.length) {
+        formData.append('existingImages', JSON.stringify(form.existingImages));
+      }
+
+      // EXISTING DRAWINGS
+      if (form.existingDrawings?.length) {
+        formData.append(
+          'existingDrawings',
+          JSON.stringify(form.existingDrawings),
+        );
+      }
+
+      console.log('FORM DATA DEBUG', {
+        siteImage: form.siteImage,
+        existingImages: form.existingImages,
+        archDrawing: form.archDrawing,
+        existingDrawings: form.existingDrawings,
+      });
+      console.log('FormDataaaaaa', formData);
+
       const response = isEdit
         ? await ApiManager.updateProject(formData, token)
         : await ApiManager.createProject(formData, token);
 
+      console.log(response?.data?.message, 'Thiisssss is ss ewmewemn');
+
       setIsSuccess(true);
-      setPopupMessage(
-        response?.data?.message ||
-          (isEdit
-            ? 'Project updated successfully'
-            : 'Project created successfully'),
-      );
+      setPopupMessage({
+        title: 'Project Created Successfully',
+        subtitle:
+          'You will start receiving quotations soon.\nYou can track your project in the Projects tab.',
+      });
     } catch (error) {
       setIsSuccess(false);
       setPopupMessage(error?.response?.data?.message || 'Something went wrong');
+      console.log(error?.response?.data?.message);
     } finally {
       setLoading(false);
       setPopupVisible(true);
@@ -351,7 +389,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
             <ProjectTimeline data={form} handleChange={handleChange} />
           )}
           {step === 3 && (
-            <Projectfiles data={form} handleChange={handleChange} />
+            <Projectfiles
+              data={{ ...form, projectId }}
+              handleChange={handleChange}
+              loading={fetchLoading}
+            />
           )}
         </ScrollView>
 
@@ -412,7 +454,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                 setPopupVisible(false);
 
                 if (isSuccess) {
-                  navigation.goBack();
+                  navigation.navigate('ProjectDetails');
                 }
               },
             },

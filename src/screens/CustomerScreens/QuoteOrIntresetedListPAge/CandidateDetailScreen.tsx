@@ -147,7 +147,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           style={styles.profileBtn}
           onPress={() =>
             navigation.navigate('ProfessionalProfile', {
-              id: user?._id, //  correct id
+              userId: user?._id, //  correct id
             })
           }
         >

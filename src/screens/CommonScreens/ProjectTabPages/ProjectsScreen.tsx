@@ -166,7 +166,25 @@ const ProjectsScreen = ({ route }: any) => {
         }}
       >
         <View style={styles.card}>
-          <Image source={imageUrl} style={styles.projectImage} />
+          <Image
+            source={imageUrl}
+            style={[styles.projectImage, !item.status && styles.closedImage]}
+          />
+
+          {/* ❌ Only show menu for customer */}
+          {isCustomer && (
+            <TouchableOpacity
+              style={styles.deleteIcon}
+              onPress={event => {
+                const { pageX, pageY } = event.nativeEvent;
+                setSelectedProject(item);
+                setMenuPosition({ x: pageX, y: pageY });
+                setMenuVisible(true);
+              }}
+            >
+              <OptionsIcon width={20} height={20} />
+            </TouchableOpacity>
+          )}
 
           <View style={styles.rowBetween}>
             <View>

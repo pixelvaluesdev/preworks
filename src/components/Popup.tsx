@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  TouchableWithoutFeedback, 
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
@@ -33,7 +33,10 @@ const Popup = ({
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
- 
+  const removeFile = index => {
+    setQuotationFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async () => {
     try {
       if (!message) {
@@ -172,6 +175,26 @@ const Popup = ({
                 </TouchableOpacity>
               )}
 
+              {quotationFiles.length > 0 && (
+                <View style={styles.filesContainer}>
+                  {quotationFiles.map((file, index) => (
+                    <View key={index} style={styles.fileChip}>
+                      <Text
+                        style={styles.fileText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {file.name}
+                      </Text>
+
+                      <TouchableOpacity onPress={() => removeFile(index)}>
+                        <Text style={styles.cross}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
+
               {/* Message Input */}
               <BorderTextInput
                 label="Any Message"
@@ -224,5 +247,35 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 5,
+  },
+  filesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: -10,
+    marginBottom: 10,
+  },
+
+  fileChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EAEAEA',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 6,
+    marginBottom: 6,
+    maxWidth: '45%',
+  },
+
+  fileText: {
+    fontSize: 12,
+    flex: 1,
+  },
+
+  cross: {
+    marginLeft: 6,
+    color: 'red',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

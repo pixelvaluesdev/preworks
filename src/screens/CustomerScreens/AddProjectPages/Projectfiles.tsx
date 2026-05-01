@@ -16,8 +16,14 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import CloseIcon from '../../../assets/svgs/Delete.svg';
 import { pick } from '@react-native-documents/picker';
 import CustomPopup from '../../../components/Popups/CustomPopup';
+import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
+import { useSelector } from 'react-redux';
+import { ActivityIndicator } from 'react-native-paper';
+import { Image as Compressor } from 'react-native-compressor';
 
-const Projectfile = ({ data, handleChange }: any) => {
+const Projectfile = ({ data, handleChange, loading }: any) => {
+  const token = useSelector(state => state.auth.userToken);
+
   const hasDrawing = data?.hasDrawing ?? false;
   const services = data?.services || [];
 
@@ -35,34 +41,64 @@ const Projectfile = ({ data, handleChange }: any) => {
 
     handleChange('services', updated);
   };
+
+  const compressImage = async uri => {
+    try {
+      const result = await Compressor.compress(uri, {
+        quality: 0.6, // 0 to 1
+        maxWidth: 1000,
+        maxHeight: 1000,
+      });
+
+      return result;
+    } catch (err) {
+      console.log('Compression error', err);
+      return uri;
+    }
+  };
+  const MAX_FILES = 5;
+
   const pickImage = key => {
+    const existingCount = (data[key] || []).length;
+
+    if (existingCount >= MAX_FILES) {
+      Alert.alert('Limit reached', 'You can upload max 5 images');
+      return;
+    }
+
     const options = {
       mediaType: 'photo',
       quality: 0.7,
-      selectionLimit: 0,
+      selectionLimit: MAX_FILES - existingCount, // ✅ limit remaining
     };
 
-    launchImageLibrary(options, response => {
+    launchImageLibrary(options, async response => {
       if (response.didCancel) return;
-      if (response.errorCode) {
-        console.log(response.errorMessage);
-        return;
-      }
 
-      const files =
-        response.assets?.map(item => ({
-          uri: item.uri,
+      let files = [];
+
+      for (let item of response.assets || []) {
+        const compressedUri = await compressImage(item.uri);
+
+        files.push({
+          uri: compressedUri,
           type: item.type,
           name: item.fileName,
-        })) || [];
-
-      if (files.length) {
-        handleChange(key, [...(data[key] || []), ...files]);
+        });
       }
+
+      handleChange(key, [...(data[key] || []), ...files]);
     });
   };
 
   const pickDocument = async key => {
+    const existingCount = (data[key] || []).length;
+
+    if (existingCount >= MAX_FILES) {
+      Alert.alert('Limit reached', 'You can upload max 5 files');
+      return;
+    }
+
     try {
       const res = await pick({
         type: ['application/pdf'],
@@ -75,9 +111,14 @@ const Projectfile = ({ data, handleChange }: any) => {
         name: item.name,
       }));
 
-      if (files.length) {
-        handleChange(key, [...(data[key] || []), ...files]);
+      const total = existingCount + files.length;
+
+      if (total > MAX_FILES) {
+        Alert.alert('Limit exceeded', 'Max 5 files allowed');
+        return;
       }
+
+      handleChange(key, [...(data[key] || []), ...files]);
     } catch (err) {
       console.log(err);
     }
@@ -105,14 +146,54 @@ const Projectfile = ({ data, handleChange }: any) => {
     setPopupVisible(true);
   };
 
+  const handleRemove = async (file, index, type) => {
+    // NEW FILE (local)
+    if (file.uri) {
+      const key = type === 'image' ? 'siteImage' : 'archDrawing';
+      const updated = data[key].filter((_, i) => i !== index);
+      handleChange(key, updated);
+      return;
+    }
+
+    // EXISTING FILE
+    try {
+      await ApiManager.deleteFile(
+        {
+          projectId: data.projectId,
+          fileUrl: file,
+          field: type === 'image' ? 'image' : 'drawing',
+        },
+        token,
+      );
+
+      if (type === 'image') {
+        const updated = data.existingImages.filter(item => item !== file);
+        handleChange('existingImages', updated);
+      } else {
+        const updated = data.existingDrawings.filter(item => item !== file);
+        handleChange('existingDrawings', updated);
+      }
+    } catch (err) {
+      console.log('Delete error', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={{ paddingTop: 40 }}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <UploadBox
         label="Upload Site images (Required)"
-        value={data.siteImage}
+        value={[...(data.existingImages || []), ...(data.siteImage || [])]}
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
-        onRemove={updatedArray => handleChange('siteImage', updatedArray)}
+        onRemove={(file, index) => handleRemove(file, index, 'image')}
       />
 
       <View style={styles.questionContainer}>
@@ -147,10 +228,13 @@ const Projectfile = ({ data, handleChange }: any) => {
       {hasDrawing && (
         <UploadBox
           label="Upload architectural drawings (Preferred PDF)"
-          value={data.archDrawing}
+          value={[
+            ...(data.existingDrawings || []),
+            ...(data.archDrawing || []),
+          ]}
+          onRemove={(file, index) => handleRemove(file, index, 'drawing')}
           onPress={() => openPickerPopup('archDrawing')}
           rightComponent={<UploadIcon />}
-          onRemove={updatedArray => handleChange('archDrawing', updatedArray)}
           textStyle={{ fontSize: 12 }}
         />
       )}
@@ -263,17 +347,22 @@ const UploadBox = ({
         {Array.isArray(value) && value.length > 0 ? (
           <View style={styles.previewWrapper}>
             {value.map((file, index) => {
-              const isImage = file?.type?.includes('image');
-              const isPDF = file?.type?.includes('pdf');
+              const isExisting = typeof file === 'string';
 
+              const isImage = isExisting
+                ? file.match(/\.(jpg|jpeg|png)$/)
+                : file?.type?.includes('image');
+
+              const isPDF = isExisting
+                ? file.endsWith('.pdf')
+                : file?.type?.includes('pdf');
+
+              const uri = isExisting ? `${IMG_URL}${file}` : file.uri;
               return (
                 <View key={index} style={styles.previewContainer}>
                   {/* IMAGE */}
                   {isImage && (
-                    <Image
-                      source={{ uri: file.uri }}
-                      style={styles.previewImage}
-                    />
+                    <Image source={{ uri }} style={styles.previewImage} />
                   )}
 
                   {/* PDF */}
@@ -281,7 +370,7 @@ const UploadBox = ({
                     <View style={styles.pdfBox}>
                       <Text style={{ fontSize: 22 }}>📄</Text>
                       <Text numberOfLines={1} style={styles.pdfText}>
-                        {file.name}
+                        {isExisting ? file.split('/').pop() : file.name}
                       </Text>
                     </View>
                   )}
@@ -289,10 +378,7 @@ const UploadBox = ({
                   {/* REMOVE BUTTON */}
                   <TouchableOpacity
                     style={styles.removeBtn}
-                    onPress={() => {
-                      const updated = value.filter((_, i) => i !== index);
-                      onRemove(updated);
-                    }}
+                    onPress={() => onRemove(file, index)}
                   >
                     <CloseIcon width={14} height={14} />
                   </TouchableOpacity>

@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 15,
     justifyContent: 'center',
+    borderWidth: 0.5,
+    borderColor: Colors.primary,
   },
 
   input: {

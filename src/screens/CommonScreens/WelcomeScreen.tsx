@@ -10,6 +10,7 @@ import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { setUserType } from '../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -40,6 +41,7 @@ const WelcomeScreen = () => {
           width={WIDTH(50)}
           Icon={Customer}
           onPress={() => {
+            triggerHaptic('impactHeavy');
             dispatch(setUserType('customer'));
 
             if (!hasSeenOnboarding) {
@@ -55,13 +57,10 @@ const WelcomeScreen = () => {
           Icon={Professional}
           width={WIDTH(50)}
           onPress={() => {
+            triggerHaptic('impactHeavy');
             dispatch(setUserType('professional'));
 
-            if (!hasSeenProfessionalOnboarding) {
-              navigation.navigate('ProfOnboarding');
-            } else {
-              navigation.navigate('ProfWelc');
-            }
+            navigation.navigate('ProfWelc');
           }}
         />
       </View>

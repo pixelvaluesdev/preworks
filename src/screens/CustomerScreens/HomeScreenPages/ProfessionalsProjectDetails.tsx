@@ -10,6 +10,7 @@ import {
   FlatList,
   TouchableOpacity,
   LayoutAnimation,
+  ActivityIndicator,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -22,10 +23,12 @@ import OptionIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { useSelector } from 'react-redux';
 import { IMG_URL } from '../../../apis/ApiManager';
+import ApiManager from '../../../apis/ApiManager';
 
 const ProjectDetailsScreen = () => {
   const route = useRoute();
   const { project } = route.params;
+  const token = useSelector(state => state.auth.userToken);
   console.log('Received project data:', project);
   const images = project?.images || [];
 
@@ -34,6 +37,10 @@ const ProjectDetailsScreen = () => {
   const isCustomer = userType === 'customer';
 
   const [activeIndex, setActiveIndex] = React.useState(0);
+
+  const [loading, setLoading] = React.useState(false);
+  const [successModal, setSuccessModal] = React.useState(false);
+  const [message, setMessage] = React.useState('');
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -44,139 +51,188 @@ const ProjectDetailsScreen = () => {
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
 
+  const handleDeleteWork = async () => {
+    try {
+      setShowDeleteModal(false); // close confirm popup
+      setLoading(true); // show loader
+
+      const response = await ApiManager.deleteWork(project?._id, token);
+
+      if (response?.data?.status === 'success') {
+        setMessage('Work deleted successfully');
+      } else {
+        setMessage('Failed to delete work');
+      }
+      setSuccessModal(true);
+    } catch (error) {
+      setMessage(error?.response?.data?.message || 'Something went wrong');
+      setSuccessModal(true);
+      console.log('Delete error:', error?.response);
+
+      setSuccessModal(true); // reuse popup for error
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.imageWrapper}>
-        <FlatList
-          data={images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(_, index) => index.toString()}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(e.nativeEvent.contentOffset.x / WIDTH(92));
-            setActiveIndex(index);
-          }}
-          renderItem={({ item }) => (
-            <Image
-              source={{ uri: IMG_URL + item }}
-              style={styles.projectImage}
-            />
-          )}
-        />
-        {!isCustomer && (
-          <TouchableOpacity
-            style={styles.optionBtn}
-            onPress={() => setShowMenu(!showMenu)}
-          >
-            <OptionIcon width={20} height={20} />
-          </TouchableOpacity>
-        )}
-
-        {showMenu && (
-          <View style={styles.menuBox}>
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
-                navigation.navigate('ProfTabNav', {
-                  screen: 'AddWork',
-                  params: {
-                    isEdit: true,
-                    workId: project._id,
-                    workData: project,
-                  },
-                });
-              }}
-            >
-              <Text style={styles.menuText}>Edit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setShowMenu(false);
-                setShowDeleteModal(true);
-              }}
-            >
-              <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        {/* DOT INDICATOR (only if multiple images) */}
-        {images.length > 1 && (
-          <View style={styles.dotContainer}>
-            {images.map((_, index) => (
-              <View
-                key={index}
-                style={[styles.dot, activeIndex === index && styles.activeDot]}
+    <View style={{ flex: 1 }}>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      )}
+      <ScrollView style={styles.container}>
+        <View style={styles.imageWrapper}>
+          <FlatList
+            data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(_, index) => index.toString()}
+            onMomentumScrollEnd={e => {
+              const index = Math.round(
+                e.nativeEvent.contentOffset.x / WIDTH(92),
+              );
+              setActiveIndex(index);
+            }}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: IMG_URL + item }}
+                style={styles.projectImage}
               />
-            ))}
-          </View>
-        )}
-      </View>
+            )}
+          />
+          {!isCustomer && (
+            <TouchableOpacity
+              style={styles.optionBtn}
+              onPress={() => setShowMenu(!showMenu)}
+            >
+              <OptionIcon width={20} height={20} />
+            </TouchableOpacity>
+          )}
 
-      <TouchableOpacity
-        style={styles.backBtn}
-        onPress={() => navigation.goBack()}
-      >
-        <BackArrow width={25} height={25} />
-      </TouchableOpacity>
+          {showMenu && (
+            <View style={styles.menuBox}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  navigation.navigate('ProfTabNav', {
+                    screen: 'AddWork',
+                    params: {
+                      isEdit: true,
+                      workId: project._id,
+                      workData: project,
+                    },
+                  });
+                }}
+              >
+                <Text style={styles.menuText}>Edit</Text>
+              </TouchableOpacity>
 
-      <View style={styles.content}>
-        <Text style={styles.title}>{project?.projectName}</Text>
-
-        <View style={{ flexDirection: 'row' }}>
-          <LocationIcon width={20} height={20} />
-          <Text style={styles.location}> {project?.siteAddress}</Text>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  setShowDeleteModal(true);
+                }}
+              >
+                <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {/* DOT INDICATOR (only if multiple images) */}
+          {images.length > 1 && (
+            <View style={styles.dotContainer}>
+              {images.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.dot,
+                    activeIndex === index && styles.activeDot,
+                  ]}
+                />
+              ))}
+            </View>
+          )}
         </View>
 
-        <Text style={styles.budget}>
-          Project Budget :{' '}
-          <Text style={{ fontWeight: '600' }}>{project?.budget}</Text>
-        </Text>
-
-        <Text
-          style={styles.description}
-          numberOfLines={expanded ? undefined : 3}
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
         >
-          {project?.caption || 'No description available'}
-        </Text>
+          <BackArrow width={25} height={25} />
+        </TouchableOpacity>
 
-        {project?.caption?.length > 80 && (
-          <TouchableOpacity
-            style={{ alignItems: 'center' }}
-            onPress={toggleExpand}
+        <View style={styles.content}>
+          <Text style={styles.title}>{project?.projectName}</Text>
+
+          <View style={{ flexDirection: 'row' }}>
+            <LocationIcon width={20} height={20} />
+            <Text style={styles.location}> {project?.siteAddress}</Text>
+          </View>
+
+          <Text style={styles.budget}>
+            Project Budget :{' '}
+            <Text style={{ fontWeight: '600' }}>{project?.budget}</Text>
+          </Text>
+
+          <Text
+            style={styles.description}
+            numberOfLines={expanded ? undefined : 3}
           >
-            <Text style={styles.showMore}>
-              {expanded ? 'Show Less' : 'Show More'}
-            </Text>
-          </TouchableOpacity>
-        )}
+            {project?.caption || 'No description available'}
+          </Text>
 
-        <CustomPopup
-          visible={showDeleteModal}
-          message="Are you sure you want to delete this project?"
-          onClose={() => setShowDeleteModal(false)}
-          buttons={[
-            {
-              label: 'Cancel',
-              onPress: () => setShowDeleteModal(false),
-            },
-            {
-              label: 'Delete',
-              type: 'primary',
-              onPress: () => {
-                setShowDeleteModal(false);
+          {project?.caption?.length > 80 && (
+            <TouchableOpacity
+              style={{ alignItems: 'center' }}
+              onPress={toggleExpand}
+            >
+              <Text style={styles.showMore}>
+                {expanded ? 'Show Less' : 'Show More'}
+              </Text>
+            </TouchableOpacity>
+          )}
 
-                //  CALL DELETE API HERE
-                console.log('Delete project:', projectId);
+          <CustomPopup
+            visible={showDeleteModal}
+            message="Are you sure you want to delete this project?"
+            onClose={() => setShowDeleteModal(false)}
+            buttons={[
+              {
+                label: 'Cancel',
+                onPress: () => setShowDeleteModal(false),
               },
-            },
-          ]}
-        />
-      </View>
-    </ScrollView>
+              {
+                label: 'Yes, Delete',
+                type: 'primary',
+                onPress: handleDeleteWork,
+              },
+            ]}
+          />
+
+          <CustomPopup
+            visible={successModal}
+            message={message}
+            onClose={() => setSuccessModal(false)}
+            buttons={[
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setSuccessModal(false);
+                  if (message === 'Work deleted successfully') {
+                    navigation.goBack();
+                  }
+                },
+              },
+            ]}
+          />
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -296,5 +352,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(75, 75, 75, 0.4)',
     padding: 6,
     borderRadius: 20,
+  },
+  loaderOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 999,
   },
 });

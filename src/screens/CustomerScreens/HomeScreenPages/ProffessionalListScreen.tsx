@@ -168,6 +168,11 @@ const ProfessionalListScreen = () => {
                     {item.firstName} {item.lastName}
                   </Text>
 
+                  <Text style={styles.exp}>
+                    {' '}
+                    {item.userType?.toUpperCase()}
+                  </Text>
+
                   <View style={{ flexDirection: 'row', gap: 4 }}>
                     <SuitCaseIcon width={16} height={16} />
                     <Text style={styles.exp}>{item.experience}</Text>

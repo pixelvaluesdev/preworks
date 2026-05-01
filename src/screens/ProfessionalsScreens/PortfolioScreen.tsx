@@ -140,6 +140,8 @@ const PortfolioScreen = () => {
         ? await ApiManager.updateWork(workId, formData, token)
         : await ApiManager.addWork(formData, token);
 
+      console.log(res?.data?.message, 'Thid id the msgh');
+
       if (res?.data?.status === 'success') {
         setIsSuccess(true);
         setPopupMessage(res?.data?.message || 'Work added successfully');
@@ -358,7 +360,7 @@ const PortfolioScreen = () => {
 
               <BorderTextInput
                 label="Budget"
-                placeholder="Enter your Budget"
+                placeholder="Enter amount (e.g. 50,00,000)"
                 value={form.budget}
                 onChangeText={text => handleChange('budget', text)}
                 keyboardType="number-pad"
@@ -413,10 +415,8 @@ const PortfolioScreen = () => {
                 setPopupVisible(false);
 
                 if (isSuccess) {
-                  navigation.navigate('AddWork', {
-                    isEdit: false,
-                    workId: null,
-                    workData: null,
+                  navigation.navigate('ProfessionalProfile', {
+                    userId: userId,
                   });
                 }
               },

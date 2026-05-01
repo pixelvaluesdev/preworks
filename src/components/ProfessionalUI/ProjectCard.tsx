@@ -6,11 +6,28 @@ import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
 
-const ProjectCard = ({ title, location, image, selectedTab, item }) => {
+const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
+  const [imgError, setImgError] = React.useState(false);
   const navigation = useNavigation();
   return (
     <View style={styles.card}>
-      <Image source={image} style={styles.image} />
+      <View style={styles.imageWrapper}>
+        <Image
+          source={
+            image && !imgError
+              ? { uri: image }
+              : require('../../assets/pngs/NoImg.png')
+          }
+          style={styles.image}
+          onError={() => setImgError(true)}
+        />
+        {/* 🔥 TIME BADGE */}
+        {time && (
+          <View style={styles.timeBadge}>
+            <Text style={styles.timeText}>{time}</Text>
+          </View>
+        )}
+      </View>
 
       <View style={styles.content}>
         <View style={styles.row}>
@@ -105,5 +122,24 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_MEDIUM,
+  },
+  imageWrapper: {
+    position: 'relative',
+  },
+
+  timeBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(59, 59, 59, 0.6)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+
+  timeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 });

@@ -52,7 +52,7 @@ const ProfOnboardingScreen = () => {
     } else {
       dispatch(setHasSeenProfessionalOnboarding(true));
       console.log('SETTING ONBOARDING TRUE');
-      navigation.replace('ProfWelc');
+      navigation.replace('Login');
     }
   };
 
@@ -104,7 +104,7 @@ const ProfOnboardingScreen = () => {
               style={styles.skipBtn}
               onPress={() => {
                 dispatch(setHasSeenProfessionalOnboarding(true));
-                navigation.replace('ProfWelc');
+                navigation.replace('Login');
               }}
             >
               <Text style={styles.skipText}>Skip</Text>

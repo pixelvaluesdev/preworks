@@ -184,6 +184,16 @@ const SettingsScreen = () => {
             <ForwardIcon />
           </TouchableOpacity>
 
+          {/* FAQ's */}
+          <TouchableOpacity style={styles.row}>
+            <View style={styles.rowLeft}>
+              <PolicyIcon />
+              <Text style={styles.rowText}>FAQ's</Text>
+            </View>
+
+            <ForwardIcon />
+          </TouchableOpacity>
+
           {/* Logout */}
           <TouchableOpacity
             style={styles.logoutRow}

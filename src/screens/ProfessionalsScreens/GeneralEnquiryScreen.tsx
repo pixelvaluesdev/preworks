@@ -40,6 +40,7 @@ const GeneralEnquiryScreen = () => {
   const [loading, setLoading] = useState(false);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
     if (projectId && token) {
@@ -110,8 +111,13 @@ const GeneralEnquiryScreen = () => {
         }}
       >
         <Image
-          source={{ uri: `${IMG_URL}${project?.image?.[0]}` }}
+          source={
+            project?.image && project.image.length > 0 && !imgError
+              ? { uri: `${IMG_URL}${project.image[0]}` }
+              : require('../../assets/pngs/NoImg.png')
+          }
           style={styles.image}
+          onError={() => setImgError(true)}
         />
       </TouchableOpacity>
 

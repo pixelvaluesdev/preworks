@@ -24,6 +24,7 @@ import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 
 const ProfessionalHomeScreen = () => {
   const token = useSelector(state => state.auth.userToken);
@@ -88,11 +89,14 @@ const ProfessionalHomeScreen = () => {
         <ProjectCard
           title={item.projectName}
           location={item.plotAddress}
-          image={{
-            uri: `${IMG_URL}${item.image?.[0]}`,
-          }}
+          image={
+            item.image && item.image.length > 0
+              ? `${IMG_URL}${item.image[0]}`
+              : null
+          }
           selectedTab={selectedTab}
           item={item}
+          time={moment(item.createdAt).fromNow()}
         />
       );
     },

@@ -80,64 +80,68 @@ const OnboardingScreen = () => {
           <Text style={styles.title}>{item.title}</Text>
 
           <Text style={styles.subtitle}>{item.subtitle}</Text>
-
-          {/* DOTS */}
-          <View style={styles.dots}>
-            {slides.map((_, index) => {
-              const isActive = currentIndex === index;
-
-              return (
-                <View
-                  key={index}
-                  style={[
-                    styles.dot,
-                    isActive ? styles.activeDot : styles.inactiveDot,
-                  ]}
-                />
-              );
-            })}
-          </View>
-
-          {/* BUTTONS */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={styles.skipBtn}
-              onPress={() => {
-                dispatch(setHasSeenOnboarding(true));
-                navigation.replace('Login');
-              }}
-            >
-              <Text style={styles.skipText}>Skip</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-              <View style={styles.nextContent}>
-                <Text style={styles.nextText}>
-                  {currentIndex === 2 ? 'Start' : 'Next'}
-                </Text>
-
-                <NextIcon width={20} height={20} />
-              </View>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     </View>
   );
 
   return (
-    <FlatList
-      ref={flatListRef}
-      data={slides}
-      renderItem={renderItem}
-      horizontal
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      onMomentumScrollEnd={event => {
-        const index = Math.round(event.nativeEvent.contentOffset.x / width);
-        setCurrentIndex(index);
-      }}
-    />
+    <View style={{ flex: 1 }}>
+      <FlatList
+        ref={flatListRef}
+        data={slides}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={event => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / width);
+          setCurrentIndex(index);
+        }}
+      />
+
+      {/* ✅ STATIC BOTTOM SECTION */}
+      <View style={styles.fixedBottom}>
+        {/* DOTS */}
+        <View style={styles.dots}>
+          {slides.map((_, index) => {
+            const isActive = currentIndex === index;
+
+            return (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  isActive ? styles.activeDot : styles.inactiveDot,
+                ]}
+              />
+            );
+          })}
+        </View>
+
+        {/* BUTTONS */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.skipBtn}
+            onPress={() => {
+              dispatch(setHasSeenOnboarding(true));
+              navigation.replace('Login');
+            }}
+          >
+            <Text style={styles.skipText}>Skip</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
+            <View style={styles.nextContent}>
+              <Text style={styles.nextText}>
+                {currentIndex === 2 ? 'Start' : 'Next'}
+              </Text>
+              <NextIcon width={20} height={20} />
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 };
 
@@ -276,5 +280,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fixedBottom: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    paddingBottom: HEIGHT(4),
+    alignItems: 'center',
+    backgroundColor: 'transparent', // or add overlay if needed
   },
 });

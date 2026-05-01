@@ -23,8 +23,14 @@ import { useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
 import { useBackExit } from '../../hooks/useBackExit';
 import LocationIcon from '../../assets/svgs/LocationIcon.svg';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const CustomerHomeScreen = () => {
+  useEffect(() => {
+    setTimeout(() => {
+      triggerHaptic('impactHeavy');
+    }, 2000);
+  }, []);
   const navigation = useNavigation();
   const token = useSelector((state: any) => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
@@ -120,172 +126,177 @@ const CustomerHomeScreen = () => {
   }, [currentIndex, banners]);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Banner Section */}
-      <View style={styles.banner}>
-        <FlatList
-          ref={flatListRef}
-          data={banners}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item: any) => item._id}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(
-              e.nativeEvent.contentOffset.x / WIDTH(100),
-            );
-            setCurrentIndex(index);
-          }}
-          renderItem={({ item }: any) => (
-            <>
-              <Image
-                source={{ uri: `${IMG_URL}${item?.image}` }}
-                style={styles.bannerImage}
-                resizeMode="cover"
-              />
-              <View style={styles.bannerTextContainer}>
-                <Text style={styles.bannerSmall}>Your Trusted</Text>
-                <Text style={styles.bannerTitle}>Construction</Text>
-                <Text style={styles.bannerSmall}>Make Your Dream House</Text>
-              </View>
-            </>
-          )}
-        />
-        {/* Search Bar */}
-        <SearchHeader
-          value={search}
-          onChangeText={setSearch}
-          onFocus={() => {
-            navigation.navigate('ProfessionalList');
-          }}
-          containerStyle={styles.searchHeader}
-          onProfilePress={() =>
-            navigation.navigate('ProfileScreen', { userId: user?._id })
-          }
-        />
-
-        <View style={styles.dotContainer}>
-          {banners.map((_, index) => (
-            <View
-              key={index}
-              style={[styles.dot, currentIndex === index && styles.activeDot]}
-            />
-          ))}
-        </View>
-      </View>
+    <View style={{ flex: 1 }}>
+      {/* Search Bar */}
+      <SearchHeader
+        value={search}
+        onChangeText={setSearch}
+        onFocus={() => {
+          navigation.navigate('ProfessionalList');
+        }}
+        containerStyle={styles.searchHeader}
+        onProfilePress={() =>
+          navigation.navigate('ProfileScreen', { userId: user?._id })
+        }
+      />
 
       <TouchableOpacity
-        style={styles.helpButton}
-        onPress={() => setHelpPopupVisible(true)}
+        style={styles.helpButtonFixed}
+        onPress={() => {
+          triggerHaptic('impactHeavy');
+          setHelpPopupVisible(true);
+        }}
       >
         <View style={styles.helpIconCircle}>
-          {/* Replace with your SVG if available */}
-          <Text style={{ fontSize: 16 }}>
-            <HelpIcon />
-          </Text>
+          <HelpIcon />
         </View>
-
         <Text style={styles.helpText}>Help Us</Text>
       </TouchableOpacity>
 
-      {/* What We Do */}
-      <WhatWeDoSection />
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Banner Section */}
+        <View style={styles.banner}>
+          <FlatList
+            ref={flatListRef}
+            data={banners}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item: any) => item._id}
+            onMomentumScrollEnd={e => {
+              const index = Math.round(
+                e.nativeEvent.contentOffset.x / WIDTH(100),
+              );
+              setCurrentIndex(index);
+            }}
+            renderItem={({ item }: any) => (
+              <>
+                <Image
+                  source={{ uri: `${IMG_URL}${item?.image}` }}
+                  style={styles.bannerImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.bannerTextContainer}>
+                  <Text style={styles.bannerSmall}>Your Trusted</Text>
+                  <Text style={styles.bannerTitle}>Construction</Text>
+                  <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+                </View>
+              </>
+            )}
+          />
 
-      {/* Professionals */}
-      <View style={styles.section}>
-        <View style={styles.rowBetween}>
-          <Text style={styles.sectionTitle}>Professionals List</Text>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate('ProfessionalList', {
-                type: 'all',
-              })
-            }
-          >
-            <Text style={styles.seeAll}>See All</Text>
-          </TouchableOpacity>
+          <View style={styles.dotContainer}>
+            {banners.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, currentIndex === index && styles.activeDot]}
+              />
+            ))}
+          </View>
         </View>
 
-        <FlatList
-          data={professionals?.slice(0, 5) || []}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => item._id || index.toString()}
-          renderItem={({ item }) => {
-            const hasValidImage =
-              item.image &&
-              item.image.length > 0 &&
-              typeof item.image[0] === 'string' &&
-              item.image[0].trim() !== '';
+        {/* What We Do */}
+        <WhatWeDoSection />
 
-            const fullName =
-              item.name ||
-              `${item.firstName || ''} ${item.lastName || ''}`.trim() ||
-              'No Name';
+        {/* Professionals */}
+        <View style={styles.section}>
+          <View style={styles.rowBetween}>
+            <Text style={styles.sectionTitle}>Professionals List</Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('ProfessionalList', {
+                  type: 'all',
+                })
+              }
+            >
+              <Text style={styles.seeAll}>See All</Text>
+            </TouchableOpacity>
+          </View>
 
-            return (
-              <TouchableOpacity
-                style={styles.proCard}
-                onPress={() =>
-                  navigation.navigate('ProfessionalProfile', {
-                    userId: item._id,
-                  })
-                }
-              >
-                <Image
-                  source={
-                    hasValidImage
-                      ? { uri: `${IMG_URL}${item.image[0]}` }
-                      : require('../../assets/pngs/Placeholder.png')
+          <FlatList
+            data={professionals?.slice(0, 5) || []}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => item._id || index.toString()}
+            renderItem={({ item }) => {
+              const hasValidImage =
+                item.image &&
+                item.image.length > 0 &&
+                typeof item.image[0] === 'string' &&
+                item.image[0].trim() !== '';
+
+              const fullName =
+                item.name ||
+                `${item.firstName || ''} ${item.lastName || ''}`.trim() ||
+                'No Name';
+
+              return (
+                <TouchableOpacity
+                  style={styles.proCard}
+                  onPress={() =>
+                    navigation.navigate('ProfessionalProfile', {
+                      userId: item._id,
+                    })
                   }
-                  style={styles.proImage}
-                />
+                >
+                  <Image
+                    source={
+                      hasValidImage
+                        ? { uri: `${IMG_URL}${item.image[0]}` }
+                        : require('../../assets/pngs/Placeholder.png')
+                    }
+                    style={styles.proImage}
+                  />
 
-                <Text style={styles.proName}>{fullName}</Text>
+                  <Text style={styles.proName}>{fullName}</Text>
 
-                <Text style={styles.proExp}>
-                  {item.userType?.toUpperCase()}
-                </Text>
-
-                <View style={styles.locationRow}>
-                  <LocationIcon width={12} height={12} />
-                  <Text style={styles.proLocation}>
-                    {item.city || 'No City'}
+                  <Text style={styles.proExp}>
+                    {item.userType?.toUpperCase()}
                   </Text>
-                </View>
-              </TouchableOpacity>
-            );
+
+                  <View style={styles.locationRow}>
+                    <LocationIcon width={12} height={12} />
+                    <Text style={styles.proLocation}>
+                      {item.city || 'No City'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+
+        {/* Add Project Button */}
+        <SecondaryButton
+          title="Add Project Details"
+          style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
+          textStyle={{ fontSize: 18 }}
+          icon={<PlusIcon height={20} width={20} />}
+          onPress={() => {
+            navigation.navigate('AddProjectInformation');
+            triggerHaptic('notificationSuccess');
           }}
         />
-      </View>
 
-      {/* Add Project Button */}
-      <SecondaryButton
-        title="Add Project Details"
-        style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
-        textStyle={{ fontSize: 18 }}
-        icon={<PlusIcon height={20} width={20} />}
-        onPress={() => navigation.navigate('AddProjectInformation')}
-      />
-
-      <CustomPopup
-        visible={helpPopupVisible}
-        message="Are you sure you want to create a help request?"
-        buttons={[
-          {
-            label: 'No, leave it.',
-            onPress: () => setHelpPopupVisible(false),
-          },
-          {
-            label: helpLoading ? 'Creating...' : 'Yes, Create',
-            type: 'primary',
-            onPress: () => {
-              handleHelpRequest();
+        <CustomPopup
+          visible={helpPopupVisible}
+          message="Are you sure you want to create a help request?"
+          buttons={[
+            {
+              label: 'No, leave it.',
+              onPress: () => setHelpPopupVisible(false),
             },
-          },
-        ]}
-      />
-    </ScrollView>
+            {
+              label: helpLoading ? 'Creating...' : 'Yes, Create',
+              type: 'primary',
+              onPress: () => {
+                handleHelpRequest();
+              },
+            },
+          ]}
+        />
+      </ScrollView>
+    </View>
   );
 };
 
@@ -489,5 +500,27 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 20,
+  },
+  searchHeaderFixed: {
+    position: 'absolute',
+    top: 50,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+  },
+
+  helpButtonFixed: {
+    position: 'absolute',
+    right: 20,
+    top: 110,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    borderTopLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 30,
+    zIndex: 100,
   },
 });
