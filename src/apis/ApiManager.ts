@@ -157,6 +157,13 @@ const ApiManager = {
   deleteFile: (data: any, token?: string) => {
     return requests.post('/customer/delete-file', data, token);
   },
+  getSubscriptions: (token?: string) => {
+    return requests.get('/admin/getSubscription', token);
+  },
+
+  createOrder: (data: any, token?: string) => {
+    return requests.post('/professional/create-order', data, token);
+  },
 };
 
 export default ApiManager;

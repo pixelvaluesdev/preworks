@@ -62,6 +62,7 @@ const VerificationScreen = () => {
       };
 
       const response = await ApiManager.verifyOtp(body);
+      console.log(response, 'Verificationnn resp');
 
       if (response.data.status === 'success') {
         const user = response.data.data;
@@ -82,7 +83,11 @@ const VerificationScreen = () => {
           userType === 'architect' ||
           userType === 'designer'
         ) {
-          navigation.replace('ProfTabNav');
+          if (user.isSubscribed) {
+            navigation.replace('ProfTabNav');
+          } else {
+            navigation.replace('Subscription');
+          }
         } else {
           navigation.replace('CustmTabNav');
         }

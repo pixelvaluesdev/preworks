@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Linking,
+  Alert,
 } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
-import Colors from '../../constants/colors';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import ApiManager from '../../apis/ApiManager';
+import { useSelector } from 'react-redux';
 
 /* ---------------- TYPES ---------------- */
 
 type Plan = {
-  id: number;
+  _id: string;
   title: string;
   price: string;
-  features: string[];
+  period: 'Monthly' | 'Yearly';
+  description: string;
 };
 
 // (optional) navigation type (you can adjust later)
@@ -27,60 +31,98 @@ type RootStackParamList = {
 
 const SubscriptionScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+  const token = useSelector((state: any) => state.auth.userToken);
+  console.log(token, 'tokennn in sinnnn');
+
   const [selectedTab, setSelectedTab] = useState<'monthly' | 'yearly'>(
     'monthly',
   );
 
-  const plans: Plan[] = [
-    {
-      id: 1,
-      title: 'Basic',
-      price: '$9/month',
-      features: [
-        'Lorem ipsum',
-        'Lorem ipsum sit dolor',
-        'Lorem ipsum dolor amet',
-        'Lorem ipsum dolor amet',
-      ],
-    },
-    {
-      id: 2,
-      title: 'Advance',
-      price: '$16/month',
-      features: [
-        'Lorem ipsum',
-        'Lorem ipsum sit dolor',
-        'Lorem ipsum dolor amet',
-        'Lorem ipsum dolor amet',
-      ],
-    },
-  ];
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getSubscriptions();
+      console.log(res, 'sunsfrrerereen');
+
+      if (res?.data?.status === 'success') {
+        setPlans(res.data.data);
+      }
+    } catch (e) {
+      console.log('Error fething plans', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredPlan = plans.filter(plan =>
+    selectedTab === 'monthly'
+      ? plan.period === 'Monthly'
+      : plan.period === 'Yearly',
+  );
+
+  const handleCreateOrder = async (plan: Plan) => {
+    try {
+      setLoading(true);
+
+      const body = {
+        userId: userId,
+        packageId: plan._id,
+        amount: plan.price,
+        email: user?.email || 'test@gmail.com',
+        name: `${user.firstName} ${user.lastName}` || 'User',
+        contact: user?.phone || '9999999999',
+      };
+
+      console.log('CREATE ORDER BODY:', body);
+
+      const res = await ApiManager.createOrder(body, token);
+
+      if (res?.data?.status === 'success') {
+        const paymentUrl = res.data.payment_url;
+
+        Alert.alert(
+          'Proceed to Payment',
+          'You will be redirected to payment page.',
+          [
+            {
+              text: 'Continue',
+              onPress: () => Linking.openURL(paymentUrl),
+            },
+          ],
+        );
+      }
+    } catch (error) {
+      console.log('❌ FULL ERROR:', error?.response?.data);
+      console.log('❌ STATUS:', error?.response?.status);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderCard = (plan: Plan) => {
     return (
-      <View key={plan.id} style={styles.card}>
+      <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.price}>{plan.price}</Text>
+          <Text style={styles.price}>₹{plan.price}</Text>
           <Text style={styles.planTitle}>{plan.title}</Text>
         </View>
 
-        <Text style={styles.subText}>Unlock premium access</Text>
-
-        <View style={{ marginTop: 10 }}>
-          {plan.features.map((item: string, index: number) => (
-            <View key={index} style={styles.featureRow}>
-              <Text style={styles.check}>✔</Text>
-              <Text style={styles.featureText}>{item}</Text>
-            </View>
-          ))}
-        </View>
+        <Text style={styles.subText}>{plan.description}</Text>
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => {
-            console.log('Selected Plan:', plan);
-            // later: createOrder(plan.id)
-          }}
+          onPress={() => handleCreateOrder(plan)}
         >
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
@@ -131,9 +173,13 @@ const SubscriptionScreen = () => {
       </View>
 
       {/* CARDS */}
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {plans.map(renderCard)}
-      </ScrollView>
+      {loading ? (
+        <Text style={{ textAlign: 'center' }}>Loading...</Text>
+      ) : (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {filteredPlan.map(renderCard)}
+        </ScrollView>
+      )}
     </View>
   );
 };
@@ -190,6 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderColor: '#F2F3F5',
     borderWidth: 2,
+    marginHorizontal: 14,
   },
 
   rowBetween: {
@@ -205,14 +252,13 @@ const styles = StyleSheet.create({
 
   planTitle: {
     fontSize: 14,
-    fontFamily: FONT.POPPINS_MEDIUM,
-    color: '#555',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   subText: {
     marginTop: 5,
-    color: '#888',
-    fontFamily: FONT.POPPINS_REGULAR,
+    color: '#747284',
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   featureRow: {

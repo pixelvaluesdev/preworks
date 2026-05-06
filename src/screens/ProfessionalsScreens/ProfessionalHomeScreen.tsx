@@ -43,6 +43,12 @@ const ProfessionalHomeScreen = () => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
+    if (!user?.isSubscribed) {
+      navigation.replace('Subscription');
+    }
+  }, []);
+
+  useEffect(() => {
     if (banners.length === 0) return;
 
     const interval = setInterval(() => {
