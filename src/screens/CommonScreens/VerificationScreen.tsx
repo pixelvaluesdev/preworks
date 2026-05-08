@@ -23,6 +23,7 @@ import { setUser, setUserToken } from '../../redux/slices/authSlice';
 import { useSelector } from 'react-redux';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import { useSnackbar } from '../../hooks/SnackbarProvider';
+import { getFCMToken } from '../../utils/firebaseNotifications';
 
 const VerificationScreen = () => {
   const [otp, setOtp] = useState('');
@@ -72,6 +73,26 @@ const VerificationScreen = () => {
         console.log('User in verification', user);
         console.log('Token in verification', token);
         dispatch(setUserToken(token));
+
+        try {
+          const fcmToken = await getFCMToken();
+
+          if (fcmToken) {
+            const fcmBody = {
+              userId: user._id,
+              fcmToken: fcmToken,
+            };
+
+            const fcmResponse = await ApiManager.registerFcmToken(
+              fcmBody,
+              token,
+            );
+
+            console.log('FCM REGISTER RESPONSE:', fcmResponse.data);
+          }
+        } catch (error) {
+          console.log('FCM REGISTER ERROR:', error);
+        }
 
         if (!user.firstName || !user.lastName) {
           navigation.replace('ShortProfile');

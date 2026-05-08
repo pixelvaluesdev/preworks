@@ -79,6 +79,7 @@ const requestPath = {
   updateWork: '/professional/update-Work',
 
   helpRequest: '/customer/helpUs',
+  registerFcmToken: '/auth/register-fcm-token',
 };
 
 const ApiManager = {
@@ -163,6 +164,10 @@ const ApiManager = {
 
   createOrder: (data: any, token?: string) => {
     return requests.post('/professional/create-order', data, token);
+  },
+
+  registerFcmToken: (data: any, token?: string) => {
+    return requests.post(requestPath.registerFcmToken, data, token);
   },
 };
 

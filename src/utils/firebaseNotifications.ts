@@ -33,8 +33,16 @@ export function notificationClickListener(navigation: any) {
 
 // Token
 export async function getFCMToken() {
-  const token = await getToken(messaging);
-  console.log('FCM Token:', token);
+  try {
+    const token = await getToken(messaging);
+
+    console.log('FCM Token:', token);
+
+    return token;
+  } catch (error) {
+    console.log('FCM TOKEN ERROR:', error);
+    return null;
+  }
 }
 
 // Foreground notification
