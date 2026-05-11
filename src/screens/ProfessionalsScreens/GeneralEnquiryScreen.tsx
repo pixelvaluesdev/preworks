@@ -27,6 +27,7 @@ import { useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
@@ -62,6 +63,7 @@ const GeneralEnquiryScreen = () => {
     }
 
     Linking.openURL(`tel:${phone}`);
+    triggerHaptic('impactHeavy');
   };
 
   const fetchProjectDetails = async () => {

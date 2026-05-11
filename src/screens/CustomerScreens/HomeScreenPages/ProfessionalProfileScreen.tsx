@@ -32,6 +32,7 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Redirect from '../../../assets/svgs/RedirectIcon.svg';
 import Copy from '../../../assets/svgs/CopyIcon.svg';
+import { triggerHaptic } from '../../../utils/hapticks';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
@@ -108,6 +109,7 @@ const ProfessionalProfileScreen = () => {
     }
 
     Linking.openURL(`tel:${phone}`);
+    triggerHaptic('impactHeavy');
   };
   const handleLinks = () => {
     const links = profile?.user?.links;

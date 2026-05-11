@@ -5,6 +5,7 @@ import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
   const [imgError, setImgError] = React.useState(false);
@@ -42,22 +43,24 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
         {selectedTab == 'project' ? (
           <TouchableOpacity
             style={styles.button}
-            onPress={() =>
+            onPress={() => {
               navigation.navigate('CommonProjectDetails', {
                 projectId: item._id,
-              })
-            }
+              });
+              triggerHaptic('impactHeavy');
+            }}
           >
             <Text style={styles.buttonText}>View Full Details</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.button}
-            onPress={() =>
+            onPress={() => {
               navigation.navigate('GeneralEnquiry', {
                 projectId: item._id,
-              })
-            }
+              });
+              triggerHaptic('impactHeavy');
+            }}
           >
             <Text style={styles.buttonText}>View Full Enquiry</Text>
           </TouchableOpacity>

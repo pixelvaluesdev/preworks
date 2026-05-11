@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH, HEIGHT } from '../../utils/responsive';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const ToggleTabs = ({ selectedTab, setSelectedTab }) => {
   return (
@@ -12,7 +13,10 @@ const ToggleTabs = ({ selectedTab, setSelectedTab }) => {
           styles.tabButton,
           selectedTab === 'project' && styles.activeTab,
         ]}
-        onPress={() => setSelectedTab('project')}
+        onPress={() => {
+          setSelectedTab('project');
+          triggerHaptic('impactHeavy');
+        }}
       >
         <Text
           style={[
@@ -29,7 +33,10 @@ const ToggleTabs = ({ selectedTab, setSelectedTab }) => {
           styles.tabButton,
           selectedTab === 'enquiry' && styles.activeTab,
         ]}
-        onPress={() => setSelectedTab('enquiry')}
+        onPress={() => {
+          setSelectedTab('enquiry');
+          triggerHaptic('impactHeavy');
+        }}
       >
         <Text
           style={[

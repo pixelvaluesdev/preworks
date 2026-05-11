@@ -37,6 +37,7 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
+import { triggerHaptic } from '../../../utils/hapticks';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, fromProjectsScreen } = route.params || {};
@@ -78,6 +79,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
     if (!phone) return;
 
     Linking.openURL(`tel:${phone}`);
+    triggerHaptic('impactHeavy');
   };
 
   const allImages = [

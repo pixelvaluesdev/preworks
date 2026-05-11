@@ -20,6 +20,7 @@ import { IMG_URL } from '../../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
+import { triggerHaptic } from '../../../utils/hapticks';
 
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
@@ -66,6 +67,8 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
     } else {
       Alert.alert('No phone number available');
     }
+
+    triggerHaptic('impactHeavy');
   };
 
   return (

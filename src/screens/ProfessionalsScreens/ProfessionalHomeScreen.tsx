@@ -13,6 +13,7 @@ import {
   FlatList,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
@@ -39,6 +40,9 @@ const ProfessionalHomeScreen = () => {
   const [projects, setProjects] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filteredResults, setFilteredResults] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const flatListRef = useRef(null);
 
@@ -85,6 +89,67 @@ const ProfessionalHomeScreen = () => {
     } catch (error) {
       console.log('Banner error', error);
     }
+  };
+
+  const handleSearch = text => {
+    setSearchText(text);
+
+    if (text.trim() === '') {
+      setFilteredResults([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const lowerText = text.toLowerCase();
+
+    const projectResults = projects
+      .filter(item => {
+        return (
+          item?.projectName?.toLowerCase()?.includes(lowerText) ||
+          item?.plotAddress?.toLowerCase()?.includes(lowerText)
+        );
+      })
+      .map(item => ({
+        ...item,
+        type: 'project',
+      }));
+
+    const enquiryResults = enquiries
+      .filter(item => {
+        return (
+          item?.projectName?.toLowerCase()?.includes(lowerText) ||
+          item?.plotAddress?.toLowerCase()?.includes(lowerText)
+        );
+      })
+      .map(item => ({
+        ...item,
+        type: 'enquiry',
+      }));
+
+    const finalResults =
+      selectedTab === 'project' ? projectResults : enquiryResults;
+
+    setFilteredResults(finalResults);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionPress = item => {
+    console.log('Pressed item', item);
+
+    setShowSuggestions(false);
+    setSearchText('');
+
+    setTimeout(() => {
+      if (item.type === 'project') {
+        navigation.navigate('CommonProjectDetails', {
+          projectId: item._id,
+        });
+      } else {
+        navigation.navigate('GeneralEnquiry', {
+          projectId: item._id,
+        });
+      }
+    }, 100);
   };
 
   const listData = selectedTab === 'project' ? projects : enquiries;
@@ -169,9 +234,38 @@ const ProfessionalHomeScreen = () => {
           )}
         />
 
+        {showSuggestions && searchText.length > 0 && (
+          <View style={styles.suggestionContainer}>
+            <View>
+              {filteredResults.length > 0 ? (
+                filteredResults.slice(0, 5).map(item => (
+                  <TouchableOpacity
+                    key={item._id}
+                    style={styles.suggestionCard}
+                    onPress={() => handleSuggestionPress(item)}
+                  >
+                    <Text style={styles.suggestionTitle}>
+                      {item.projectName}
+                    </Text>
+
+                    <Text style={styles.suggestionLocation}>
+                      {item.plotAddress}
+                    </Text>
+                  </TouchableOpacity>
+                ))
+              ) : (
+                <Text style={styles.noResultText}>No Results Found</Text>
+              )}
+            </View>
+          </View>
+        )}
+
         {/* Search Bar (keep if already exists) */}
         <SearchHeader
+          value={searchText}
+          onChangeText={handleSearch}
           containerStyle={styles.searchHeader}
+          onFocus={() => setShowSuggestions(true)}
           onProfilePress={() =>
             navigation.navigate('ProfessionalProfile', { userId: userId })
           }
@@ -275,5 +369,64 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
+  },
+  suggestionContainer: {
+    position: 'absolute',
+    top: 110,
+    left: 15,
+    right: 15,
+
+    backgroundColor: 'rgba(255,255,255,0.96)',
+
+    borderRadius: 14,
+    zIndex: 999,
+
+    maxHeight: 250,
+
+    elevation: 8,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+
+    overflow: 'hidden',
+  },
+
+  suggestionItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+    fontSize: FONTSIZE(14),
+    color: 'black',
+  },
+
+  noResultText: {
+    textAlign: 'center',
+    fontSize: 14,
+    padding: 15,
+    color: 'grey',
+  },
+  suggestionCard: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EEE',
+  },
+
+  suggestionTitle: {
+    fontFamily: FONT.POPPINS_MEDIUM,
+    fontSize: 14,
+    color: 'black',
+  },
+
+  suggestionLocation: {
+    marginTop: 1,
+    fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 12,
+    color: 'grey',
   },
 });

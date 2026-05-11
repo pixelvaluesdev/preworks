@@ -24,6 +24,7 @@ interface Props {
   style?: ViewStyle;
   containerStyle?: ViewStyle;
   onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const SearchHeader: React.FC<Props> = ({
@@ -35,6 +36,7 @@ const SearchHeader: React.FC<Props> = ({
   style,
   containerStyle,
   onFocus,
+  onBlur,
 }) => {
   const user = useSelector(state => state.auth.user);
   const profileImage = user?.image;
@@ -57,6 +59,7 @@ const SearchHeader: React.FC<Props> = ({
           style={styles.input}
           onFocus={onFocus}
           placeholderTextColor="#757575"
+          onBlur={onBlur}
         />
       </View>
 
