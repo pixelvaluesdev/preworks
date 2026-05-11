@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: HEIGHT(2),
-    paddingBottom: HEIGHT(3),
+    paddingTop: HEIGHT(1),
+    paddingBottom: HEIGHT(12),
   },
 
   title: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: WIDTH(88),
-    marginTop: 25,
+    marginTop: 12,
   },
 
   skipBtn: {

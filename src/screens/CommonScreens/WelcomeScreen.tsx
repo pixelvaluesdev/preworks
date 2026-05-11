@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import Customer from '../../assets/svgs/Customer.svg';
@@ -31,7 +31,11 @@ const WelcomeScreen = () => {
       resizeMode="cover"
     >
       <View style={styles.overlay}>
-        <Logo width={200} />
+        <Image
+          source={require('../../assets/pngs/PWLogo.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
 
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Please Select Your User Type</Text>
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     color: '#fff',
-    marginTop: 20,
+
     marginBottom: 10,
     fontFamily: FONT.POPPINS_BOLD,
   },
@@ -112,5 +116,10 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  logoImage: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
   },
 });
