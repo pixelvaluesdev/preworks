@@ -217,7 +217,9 @@ const CustomerHomeScreen = () => {
             data={professionals?.slice(0, 5) || []}
             horizontal
             showsHorizontalScrollIndicator={false}
-            keyExtractor={(item, index) => item._id || index.toString()}
+            keyExtractor={(item, index) =>
+              item?._id ? `${item._id}-${index}` : `professional-${index}`
+            }
             renderItem={({ item }) => {
               const hasValidImage =
                 item.image &&
@@ -233,11 +235,16 @@ const CustomerHomeScreen = () => {
               return (
                 <TouchableOpacity
                   style={styles.proCard}
-                  onPress={() =>
+                  onPress={() => {
+                    if (!item?._id) {
+                      console.log('Invalid professional item:', item);
+                      return;
+                    }
+
                     navigation.navigate('ProfessionalProfile', {
                       userId: item._id,
-                    })
-                  }
+                    });
+                  }}
                 >
                   <Image
                     source={

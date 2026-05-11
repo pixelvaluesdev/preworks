@@ -19,6 +19,7 @@ import ActNotifi from '../assets/svgs/ActNotifiIcon.svg';
 import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 
 import Colors from '../constants/colors';
+import { triggerHaptic } from '../utils/hapticks';
 
 const Tab = createBottomTabNavigator();
 
@@ -77,6 +78,7 @@ const AnimatedTabButton = (
     ]).start();
 
     onPress && onPress();
+    triggerHaptic('impactHeavy');
   };
 
   const IconComponent = focused ? ActiveIcon : InactiveIcon;

@@ -12,6 +12,7 @@ import {
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE } from '../../utils/responsive';
+import { triggerHaptic } from '../../utils/hapticks';
 
 interface SecondaryButtonProps {
   title: string;
@@ -33,7 +34,10 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
   return (
     <TouchableOpacity
       style={[styles.button, style, disabled && styles.disabled]}
-      onPress={onPress}
+      onPress={event => {
+        triggerHaptic('impactHeavy');
+        onPress(event);
+      }}
       disabled={disabled}
       activeOpacity={0.8}
     >

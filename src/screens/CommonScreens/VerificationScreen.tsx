@@ -238,10 +238,6 @@ const VerificationScreen = () => {
               )}
             </Text>
           </TouchableOpacity>
-          <SecondaryButton
-            title="Go to Subscription (Dummy)"
-            onPress={() => navigation.navigate('Subscription')}
-          />
         </View>
 
         <CustomPopup

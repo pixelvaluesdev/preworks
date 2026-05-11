@@ -33,7 +33,7 @@ const ProfessionalWelcomeScreen = () => {
           width={WIDTH(65)}
           Icon={Architect}
           onPress={() => {
-            triggerHaptic('impactLight');
+            triggerHaptic('impactHeavy');
             dispatch(setUserType('contractor'));
             if (!hasSeenProfessionalOnboarding) {
               navigation.navigate('ProfOnboarding');

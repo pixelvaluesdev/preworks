@@ -25,6 +25,7 @@ import ApiManager from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import Colors from '../../../constants/colors';
+import { triggerHaptic } from '../../../utils/hapticks';
 
 const TOTAL_STEPS = 4;
 
@@ -167,6 +168,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     } else {
       submitProjectApi();
     }
+    triggerHaptic('impactHeavy');
   };
 
   const handleBack = () => {
@@ -175,6 +177,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     } else {
       setStep(prev => prev - 1);
     }
+    triggerHaptic('impactHeavy');
   };
 
   const mapFloors = val => {

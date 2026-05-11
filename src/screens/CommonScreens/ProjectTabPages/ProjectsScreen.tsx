@@ -24,6 +24,7 @@ import OptionsIcon from '../../../assets/svgs/ThreeDotsIcon.svg';
 import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import DeleteICon from '../../../assets/svgs/BlackDeleteIcon.svg';
 import EditIcon from '../../../assets/svgs/BlackEditIcon.svg';
+import { triggerHaptic } from '../../../utils/hapticks';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -156,11 +157,13 @@ const ProjectsScreen = ({ route }: any) => {
             //  Interested project → go to General Enquiry
             navigation.navigate('GeneralEnquiry', {
               projectId: item.projectId?._id,
+              fromProjectsScreen: true,
             });
           } else {
             // Default (customer + quoted projects)
             navigation.navigate('CommonProjectDetails', {
               projectId: isCustomer ? item._id : item.projectId?._id,
+              fromProjectsScreen: true,
             });
           }
         }}
@@ -171,7 +174,7 @@ const ProjectsScreen = ({ route }: any) => {
             style={[styles.projectImage, !item.status && styles.closedImage]}
           />
 
-          {/* ❌ Only show menu for customer */}
+          {/*  Only show menu for customer */}
           {isCustomer && (
             <TouchableOpacity
               style={styles.deleteIcon}
@@ -293,7 +296,9 @@ const ProjectsScreen = ({ route }: any) => {
       {isCustomer && (
         <FlatList
           data={projects}
-          keyExtractor={item => item._id}
+          keyExtractor={(item, index) =>
+            item?._id?.toString() || index.toString()
+          }
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           refreshing={refreshing}
@@ -311,7 +316,9 @@ const ProjectsScreen = ({ route }: any) => {
             quotedProjects.length > 0 ? (
               <FlatList
                 data={quotedProjects}
-                keyExtractor={item => item.id}
+                keyExtractor={(item, index) =>
+                  item?._id?.toString() || index.toString()
+                }
                 renderItem={renderItem}
                 refreshing={refreshing}
                 onRefresh={onRefresh}
@@ -334,7 +341,9 @@ const ProjectsScreen = ({ route }: any) => {
           ) : interestedProjects.length > 0 ? (
             <FlatList
               data={interestedProjects}
-              keyExtractor={item => item.id}
+              keyExtractor={(item, index) =>
+                item?._id?.toString() || index.toString()
+              }
               renderItem={renderItem}
               refreshing={refreshing}
               onRefresh={onRefresh}
@@ -402,7 +411,10 @@ const ProjectsScreen = ({ route }: any) => {
       {isCustomer && (
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate('AddProjectInformation')}
+          onPress={() => {
+            navigation.navigate('AddProjectInformation');
+            triggerHaptic('impactHeavy');
+          }}
         >
           <PlusIcon width={24} height={24} />
         </TouchableOpacity>

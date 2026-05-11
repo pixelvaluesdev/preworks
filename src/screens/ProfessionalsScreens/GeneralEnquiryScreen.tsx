@@ -30,7 +30,7 @@ import ImageViewing from 'react-native-image-viewing';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
-  const { projectId } = route.params;
+  const { projectId, fromProjectsScreen } = route.params;
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
@@ -213,12 +213,14 @@ const GeneralEnquiryScreen = () => {
       <View style={styles.dashedDivider} />
 
       {/* Interested Button */}
-      <TouchableOpacity
-        style={styles.interestedBtn}
-        onPress={() => setShowPopup(true)}
-      >
-        <Text style={styles.interestedText}>I'm Interested</Text>
-      </TouchableOpacity>
+      {!fromProjectsScreen && (
+        <TouchableOpacity
+          style={styles.interestedBtn}
+          onPress={() => setShowPopup(true)}
+        >
+          <Text style={styles.interestedText}>I'm Interested</Text>
+        </TouchableOpacity>
+      )}
 
       <Popup
         title={'Show Your Interest'}
@@ -246,6 +248,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'white',
+    paddingBottom: 20,
   },
 
   image: {

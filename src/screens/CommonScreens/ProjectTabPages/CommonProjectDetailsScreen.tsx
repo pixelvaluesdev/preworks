@@ -39,7 +39,7 @@ import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
-  const { projectId } = route.params || {};
+  const { projectId, fromProjectsScreen } = route.params || {};
   const flatListRef = React.useRef(null);
 
   const userTypeRed = useSelector(state => state.auth.userType);
@@ -504,7 +504,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
             </>
           )}
 
-          {!isCustomer && (
+          {!isCustomer && !fromProjectsScreen && (
             <>
               <View style={{ marginTop: 15 }}>
                 {/* <TouchableOpacity>
