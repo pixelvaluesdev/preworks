@@ -11,6 +11,7 @@ import InteriorIcon from '../../assets/svgs/InteriorIcon.svg';
 import { WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE } from '../../utils/responsive';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const services = [
   {
@@ -51,7 +52,10 @@ const WhatWeDoSection = () => {
             title={item.title}
             subtitle={item.subtitle}
             Icon={item.Icon}
-            onPress={() => handlePress(item.type)}
+            onPress={() => {
+              handlePress(item.type);
+              triggerHaptic('impactMedium');
+            }}
           />
         ))}
       </ScrollView>

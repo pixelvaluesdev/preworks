@@ -10,8 +10,15 @@ import {
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
+import { triggerHaptic } from '../../utils/hapticks';
 
-const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
+const CustomPopup = ({
+  visible,
+  message,
+  buttons = [],
+  onClose,
+  disableOutsideClick = false,
+}) => {
   const isObject = typeof message === 'object';
 
   const title = isObject ? message?.title : message;
@@ -23,7 +30,13 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (!disableOutsideClick) {
+            onClose?.();
+          }
+        }}
+      >
         <View style={styles.overlay}>
           <View style={styles.popupContainer}>
             <Text style={styles.title}>{title}</Text>
@@ -41,7 +54,10 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
                         styles.button,
                         btn.type === 'primary' && styles.primaryBtn,
                       ]}
-                      onPress={btn.onPress}
+                      onPress={() => {
+                        triggerHaptic('impactHeavy');
+                        btn.onPress?.();
+                      }}
                     >
                       <Text
                         style={[
@@ -59,7 +75,10 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
                 <View style={styles.bottomButtonContainer}>
                   <TouchableOpacity
                     style={[styles.button, styles.singleButton]}
-                    onPress={buttons[2].onPress}
+                    onPress={() => {
+                      triggerHaptic('impactHeavy');
+                      buttons[2].onPress?.();
+                    }}
                   >
                     <Text style={styles.buttonText}>{buttons[2].label}</Text>
                   </TouchableOpacity>
@@ -80,7 +99,10 @@ const CustomPopup = ({ visible, message, buttons = [], onClose }) => {
                       buttons.length === 1 && styles.singleButton,
                       btn.type === 'primary' && styles.primaryBtn,
                     ]}
-                    onPress={btn.onPress}
+                    onPress={() => {
+                      triggerHaptic('impactHeavy');
+                      btn.onPress?.();
+                    }}
                   >
                     <Text
                       style={[

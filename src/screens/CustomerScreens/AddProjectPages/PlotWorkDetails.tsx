@@ -8,7 +8,7 @@ import { HEIGHT } from '../../../utils/responsive';
 const PlotWorkDetails = ({ data, handleChange }: any) => {
   return (
     <View style={styles.container}>
-      <View style={styles.infoBox}>
+      {/* <View style={styles.infoBox}>
         <View style={styles.row}>
           <Text style={styles.infoText}>For New Construction Select </Text>
           <TouchableOpacity>
@@ -24,7 +24,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
             <Text style={[styles.infoText, styles.linkText]}>Floor Area.</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </View> */}
 
       <BorderTextInput
         label="Floor Area"

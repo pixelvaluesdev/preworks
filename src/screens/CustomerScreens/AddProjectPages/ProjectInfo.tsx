@@ -22,7 +22,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         return;
       }
 
-      // 🔥 CACHE CHECK
+      //  CACHE CHECK
       if (cacheRef.current[text]) {
         setCitySuggestions(cacheRef.current[text]);
         setShowDropdown(true);

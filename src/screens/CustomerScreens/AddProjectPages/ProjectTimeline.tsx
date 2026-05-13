@@ -62,6 +62,13 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       sliderWidth - labelWidth,
     );
   };
+  const formatDisplayDate = (dateString: string) => {
+    if (!dateString) return '';
+
+    const [year, month, day] = dateString.split('-');
+
+    return `${day}-${month}-${year}`;
+  };
 
   return (
     <View style={styles.container}>
@@ -70,7 +77,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         label="Last Date of Receiving Quotation"
         placeholder="Enter your Last Date"
         editable={false}
-        value={data.lastDate}
+        value={formatDisplayDate(data.lastDate)}
         onChangeText={() => {}}
         height={HEIGHT(7)}
         rightComponent={
@@ -89,7 +96,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       <BorderTextInput
         label="Plan to start your construction"
         placeholder="Enter your start date"
-        value={data.startDate}
+        value={formatDisplayDate(data.startDate)}
         onChangeText={() => {}}
         editable={false}
         height={HEIGHT(7)}
@@ -113,9 +120,9 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         onChangeText={text => handleChange('description', text)}
         multiline
         height={HEIGHT(10)}
-        maxLength={200}
+        maxLength={2500}
       />
-      <Text style={styles.charCount}>{data.description?.length || 0}/200</Text>
+      <Text style={styles.charCount}>{data.description?.length || 0}/2500</Text>
 
       {/* PRICE RANGE */}
       <View style={styles.sliderContainer}>

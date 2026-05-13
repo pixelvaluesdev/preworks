@@ -29,6 +29,7 @@ import RightIcon from '../../assets/svgs/whiteBackIcon.svg';
 import ForwardIcon from '../../assets/svgs/ForwardArrow.svg';
 import YesIcon from '../../assets/svgs/YesIcon.svg';
 import { IMG_URL } from '../../apis/ApiManager';
+import { triggerHaptic } from '../../utils/hapticks';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -197,7 +198,10 @@ const SettingsScreen = () => {
           {/* Logout */}
           <TouchableOpacity
             style={styles.logoutRow}
-            onPress={() => setShowLogout(true)}
+            onPress={() => {
+              setShowLogout(true);
+              triggerHaptic('impactHeavy');
+            }}
           >
             <Logoutcon />
             <Text style={styles.logoutText}>Logout</Text>

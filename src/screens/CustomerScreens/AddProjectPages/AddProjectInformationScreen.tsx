@@ -255,9 +255,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       formData.append('pinCode', form.pinCode);
       formData.append('floorArea', form.floorArea);
 
-      if (form.plotSize) {
-        formData.append('plotSize', form.plotSize);
-      }
+      formData.append('plotSize', form.plotSize || '0');
+
       formData.append('noOfFloors', form.floors);
 
       formData.append(
@@ -449,6 +448,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
           title={isSuccess ? 'Success' : 'Error'}
           message={popupMessage}
           onClose={() => setPopupVisible(false)}
+          disableOutsideClick={true}
           buttons={[
             {
               label: 'OK',
