@@ -38,6 +38,7 @@ import ImageViewing from 'react-native-image-viewing';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import { triggerHaptic } from '../../../utils/hapticks';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, fromProjectsScreen } = route.params || {};
@@ -224,7 +225,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: HEIGHT(12) }}
@@ -568,7 +569,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         visible={viewerVisible}
         onRequestClose={() => setViewerVisible(false)}
       />
-    </View>
+    </ScreenWrapper>
   );
 };
 

@@ -26,6 +26,7 @@ import { useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
+import ScreenWrapper from '../../utils/screenWrapper';
 
 const ProfessionalHomeScreen = () => {
   const token = useSelector(state => state.auth.userToken);
@@ -201,107 +202,109 @@ const ProfessionalHomeScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Banner */}
-      <View style={styles.banner}>
-        <FlatList
-          ref={flatListRef}
-          data={banners}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item: any) => item._id}
-          onMomentumScrollEnd={e => {
-            const index = Math.round(
-              e.nativeEvent.contentOffset.x / WIDTH(100),
-            );
-            setCurrentIndex(index);
-          }}
-          renderItem={({ item }: any) => (
-            <>
-              <Image
-                source={{ uri: `${IMG_URL}${item?.image}` }}
-                style={styles.bannerImage}
-                resizeMode="cover"
-              />
+    <ScreenWrapper style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Banner */}
+        <View style={styles.banner}>
+          <FlatList
+            ref={flatListRef}
+            data={banners}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item: any) => item._id}
+            onMomentumScrollEnd={e => {
+              const index = Math.round(
+                e.nativeEvent.contentOffset.x / WIDTH(100),
+              );
+              setCurrentIndex(index);
+            }}
+            renderItem={({ item }: any) => (
+              <>
+                <Image
+                  source={{ uri: `${IMG_URL}${item?.image}` }}
+                  style={styles.bannerImage}
+                  resizeMode="cover"
+                />
 
-              <View style={styles.bannerTextContainer}>
-                <Text style={styles.bannerSmall}>Your Trusted</Text>
-                <Text style={styles.bannerTitle}>Construction</Text>
-                <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+                <View style={styles.bannerTextContainer}>
+                  <Text style={styles.bannerSmall}>Your Trusted</Text>
+                  <Text style={styles.bannerTitle}>Construction</Text>
+                  <Text style={styles.bannerSmall}>Make Your Dream House</Text>
+                </View>
+              </>
+            )}
+          />
+
+          {showSuggestions && searchText.length > 0 && (
+            <View style={styles.suggestionContainer}>
+              <View>
+                {filteredResults.length > 0 ? (
+                  filteredResults.slice(0, 5).map(item => (
+                    <TouchableOpacity
+                      key={item._id}
+                      style={styles.suggestionCard}
+                      onPress={() => handleSuggestionPress(item)}
+                    >
+                      <Text style={styles.suggestionTitle}>
+                        {item.projectName}
+                      </Text>
+
+                      <Text style={styles.suggestionLocation}>
+                        {item.plotAddress}
+                      </Text>
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Text style={styles.noResultText}>No Results Found</Text>
+                )}
               </View>
-            </>
-          )}
-        />
-
-        {showSuggestions && searchText.length > 0 && (
-          <View style={styles.suggestionContainer}>
-            <View>
-              {filteredResults.length > 0 ? (
-                filteredResults.slice(0, 5).map(item => (
-                  <TouchableOpacity
-                    key={item._id}
-                    style={styles.suggestionCard}
-                    onPress={() => handleSuggestionPress(item)}
-                  >
-                    <Text style={styles.suggestionTitle}>
-                      {item.projectName}
-                    </Text>
-
-                    <Text style={styles.suggestionLocation}>
-                      {item.plotAddress}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noResultText}>No Results Found</Text>
-              )}
             </View>
+          )}
+
+          {/* Search Bar (keep if already exists) */}
+          <SearchHeader
+            value={searchText}
+            onChangeText={handleSearch}
+            containerStyle={styles.searchHeader}
+            onFocus={() => setShowSuggestions(true)}
+            onProfilePress={() =>
+              navigation.navigate('ProfessionalProfile', { userId: userId })
+            }
+          />
+
+          {/* Dots */}
+          <View style={styles.dotContainer}>
+            {banners.map((_, index) => (
+              <View
+                key={index}
+                style={[styles.dot, currentIndex === index && styles.activeDot]}
+              />
+            ))}
           </View>
-        )}
-
-        {/* Search Bar (keep if already exists) */}
-        <SearchHeader
-          value={searchText}
-          onChangeText={handleSearch}
-          containerStyle={styles.searchHeader}
-          onFocus={() => setShowSuggestions(true)}
-          onProfilePress={() =>
-            navigation.navigate('ProfessionalProfile', { userId: userId })
-          }
-        />
-
-        {/* Dots */}
-        <View style={styles.dotContainer}>
-          {banners.map((_, index) => (
-            <View
-              key={index}
-              style={[styles.dot, currentIndex === index && styles.activeDot]}
-            />
-          ))}
         </View>
-      </View>
 
-      {/* Tabs */}
-      <ToggleTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+        {/* Tabs */}
+        <ToggleTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
-      {/* List */}
-      {loading ? (
-        <ActivityIndicator size="large" color={Colors.primary} />
-      ) : (
-        <FlatList
-          data={listData}
-          keyExtractor={item => item._id}
-          scrollEnabled={false}
-          renderItem={renderProject}
-          ListEmptyComponent={
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>
-              No Data Found
-            </Text>
-          }
-        />
-      )}
-    </ScrollView>
+        {/* List */}
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary} />
+        ) : (
+          <FlatList
+            data={listData}
+            keyExtractor={item => item._id}
+            scrollEnabled={false}
+            renderItem={renderProject}
+            ListEmptyComponent={
+              <Text style={{ textAlign: 'center', marginTop: 20 }}>
+                No Data Found
+              </Text>
+            }
+          />
+        )}
+      </ScrollView>
+    </ScreenWrapper>
   );
 };
 

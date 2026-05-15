@@ -33,6 +33,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import Redirect from '../../../assets/svgs/RedirectIcon.svg';
 import Copy from '../../../assets/svgs/CopyIcon.svg';
 import { triggerHaptic } from '../../../utils/hapticks';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
@@ -152,178 +153,180 @@ const ProfessionalProfileScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Banner */}
-        <Image
-          source={
-            profile?.user?.userBanner
-              ? { uri: IMG_URL + profile.user.userBanner }
-              : require('../../../assets/pngs/Placeholder.png')
-          }
-          style={styles.banner}
-        />
-
-        <TouchableOpacity
-          style={styles.backBtn}
-          onPress={() => navigation.goBack()}
-        >
-          <BackArrow width={25} height={25} />
-        </TouchableOpacity>
-
-        {/* Profile Card */}
-        <View style={styles.card}>
-          {/* Profile Image */}
+    <ScreenWrapper style={styles.container}>
+      <View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {/* Banner */}
           <Image
             source={
-              profile?.user?.image
-                ? { uri: `${IMG_URL}${profile.user.image}` }
+              profile?.user?.userBanner
+                ? { uri: IMG_URL + profile.user.userBanner }
                 : require('../../../assets/pngs/Placeholder.png')
             }
-            style={styles.profileImage}
+            style={styles.banner}
           />
 
-          {isProffesional && (
-            <TouchableOpacity
-              style={styles.editBtn}
-              onPress={() =>
-                navigation.navigate('EditProfileScreen', {
-                  userId: profile?.user?._id,
-                })
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <BackArrow width={25} height={25} />
+          </TouchableOpacity>
+
+          {/* Profile Card */}
+          <View style={styles.card}>
+            {/* Profile Image */}
+            <Image
+              source={
+                profile?.user?.image
+                  ? { uri: `${IMG_URL}${profile.user.image}` }
+                  : require('../../../assets/pngs/Placeholder.png')
               }
-            >
-              <Text style={styles.editText}>Edit</Text>
-            </TouchableOpacity>
-          )}
+              style={styles.profileImage}
+            />
 
-          <Text style={styles.name}>
-            {profile?.user?.firstName} {profile?.user?.lastName}
-          </Text>
-          <Text style={styles.role}>
-            {profile?.user?.userType || 'Not specified'}
-          </Text>
-          <Text style={styles.phone}>
-            {profile?.user?.city && profile?.user?.pincode
-              ? `${profile.user.city}, ${profile.user.pincode}`
-              : 'Location not specified'}
-          </Text>
+            {isProffesional && (
+              <TouchableOpacity
+                style={styles.editBtn}
+                onPress={() =>
+                  navigation.navigate('EditProfileScreen', {
+                    userId: profile?.user?._id,
+                  })
+                }
+              >
+                <Text style={styles.editText}>Edit</Text>
+              </TouchableOpacity>
+            )}
 
-          <Text style={styles.description}>
-            {profile?.user?.bio || 'No description available'}
-          </Text>
+            <Text style={styles.name}>
+              {profile?.user?.firstName} {profile?.user?.lastName}
+            </Text>
+            <Text style={styles.role}>
+              {profile?.user?.userType || 'Not specified'}
+            </Text>
+            <Text style={styles.phone}>
+              {profile?.user?.city && profile?.user?.pincode
+                ? `${profile.user.city}, ${profile.user.pincode}`
+                : 'Location not specified'}
+            </Text>
 
-          {/* Action Buttons */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity style={styles.actionItem} onPress={handleCall}>
-              <View style={styles.iconCircle}>
-                <CallIcon width={40} height={40} />
-              </View>
-              <Text style={styles.actionText}>Enquire now</Text>
-            </TouchableOpacity>
+            <Text style={styles.description}>
+              {profile?.user?.bio || 'No description available'}
+            </Text>
 
-            <View style={styles.divider} />
-
-            <TouchableOpacity
-              style={styles.actionItem}
-              onPress={() => setShowComingSoon(true)}
-            >
-              <View style={styles.iconCircle}>
-                <ChatIcon width={40} height={40} />
-              </View>
-              <Text style={styles.actionText}>Chat now</Text>
-
-              {showComingSoon && (
-                <Animated.Text
-                  style={[styles.comingSoonText, { opacity: blinkAnim }]}
-                >
-                  Coming Soon
-                </Animated.Text>
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.divider} />
-
-            <TouchableOpacity style={styles.actionItem} onPress={handleLinks}>
-              <View style={styles.iconCircle}>
-                <LinkIcon width={40} height={40} />
-              </View>
-              <Text style={styles.actionText}>links</Text>
-            </TouchableOpacity>
-          </View>
-
-          {showLinks && (
-            <View style={styles.linksPopup}>
-              {profile?.user?.links.map((link: string, index: number) => (
-                <View key={index} style={styles.linkRow}>
-                  {/* White box (ONLY text) */}
-                  <View style={styles.linkBox}>
-                    <Text numberOfLines={1} style={styles.linkText}>
-                      {link}
-                    </Text>
-                  </View>
-
-                  {/* Icons OUTSIDE */}
-                  <View style={styles.iconRow}>
-                    <TouchableOpacity onPress={() => copyToClipboard(link)}>
-                      <Text style={styles.icon}>
-                        <Copy />
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => openLink(link)}>
-                      <Text style={styles.icon}>
-                        <Redirect />
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+            {/* Action Buttons */}
+            <View style={styles.actionRow}>
+              <TouchableOpacity style={styles.actionItem} onPress={handleCall}>
+                <View style={styles.iconCircle}>
+                  <CallIcon width={40} height={40} />
                 </View>
-              ))}
+                <Text style={styles.actionText}>Enquire now</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity
+                style={styles.actionItem}
+                onPress={() => setShowComingSoon(true)}
+              >
+                <View style={styles.iconCircle}>
+                  <ChatIcon width={40} height={40} />
+                </View>
+                <Text style={styles.actionText}>Chat now</Text>
+
+                {showComingSoon && (
+                  <Animated.Text
+                    style={[styles.comingSoonText, { opacity: blinkAnim }]}
+                  >
+                    Coming Soon
+                  </Animated.Text>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.divider} />
+
+              <TouchableOpacity style={styles.actionItem} onPress={handleLinks}>
+                <View style={styles.iconCircle}>
+                  <LinkIcon width={40} height={40} />
+                </View>
+                <Text style={styles.actionText}>links</Text>
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
 
-        {/* Portfolio */}
-        <View style={styles.portfolioContainer}>
-          <Text style={styles.portfolioTitle}>My Portfolio</Text>
+            {showLinks && (
+              <View style={styles.linksPopup}>
+                {profile?.user?.links.map((link: string, index: number) => (
+                  <View key={index} style={styles.linkRow}>
+                    {/* White box (ONLY text) */}
+                    <View style={styles.linkBox}>
+                      <Text numberOfLines={1} style={styles.linkText}>
+                        {link}
+                      </Text>
+                    </View>
 
-          <View style={styles.grid}>
-            {workList.length === 0 ? (
-              <View style={styles.noDataContainer}>
-                <Text style={styles.noDataText}>No Work Available</Text>
-              </View>
-            ) : (
-              workList.map((item: any, index: number) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.gridItem}
-                  onPress={() =>
-                    navigation.navigate('ProfessionalsProject', {
-                      project: item,
-                    })
-                  }
-                >
-                  <View>
-                    <Image
-                      source={{
-                        uri: IMG_URL + item.images[0],
-                      }}
-                      style={styles.gridImage}
-                    />
+                    {/* Icons OUTSIDE */}
+                    <View style={styles.iconRow}>
+                      <TouchableOpacity onPress={() => copyToClipboard(link)}>
+                        <Text style={styles.icon}>
+                          <Copy />
+                        </Text>
+                      </TouchableOpacity>
 
-                    {/* MULTI IMAGE ICON */}
-                    {item.images?.length > 1 && (
-                      <View style={styles.multiIcon}>
-                        <MultiImg width={14} height={14} />
-                      </View>
-                    )}
+                      <TouchableOpacity onPress={() => openLink(link)}>
+                        <Text style={styles.icon}>
+                          <Redirect />
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </TouchableOpacity>
-              ))
+                ))}
+              </View>
             )}
           </View>
-        </View>
-      </ScrollView>
-    </View>
+
+          {/* Portfolio */}
+          <View style={styles.portfolioContainer}>
+            <Text style={styles.portfolioTitle}>My Portfolio</Text>
+
+            <View style={styles.grid}>
+              {workList.length === 0 ? (
+                <View style={styles.noDataContainer}>
+                  <Text style={styles.noDataText}>No Work Available</Text>
+                </View>
+              ) : (
+                workList.map((item: any, index: number) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.gridItem}
+                    onPress={() =>
+                      navigation.navigate('ProfessionalsProject', {
+                        project: item,
+                      })
+                    }
+                  >
+                    <View>
+                      <Image
+                        source={{
+                          uri: IMG_URL + item.images[0],
+                        }}
+                        style={styles.gridImage}
+                      />
+
+                      {/* MULTI IMAGE ICON */}
+                      {item.images?.length > 1 && (
+                        <View style={styles.multiIcon}>
+                          <MultiImg width={14} height={14} />
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </ScreenWrapper>
   );
 };
 

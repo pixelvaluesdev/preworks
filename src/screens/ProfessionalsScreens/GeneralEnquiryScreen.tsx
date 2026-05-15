@@ -28,6 +28,7 @@ import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
 import { triggerHaptic } from '../../utils/hapticks';
+import ScreenWrapper from '../../utils/screenWrapper';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
@@ -102,145 +103,147 @@ const GeneralEnquiryScreen = () => {
     );
   }
   return (
-    <ScrollView style={styles.container}>
-      <ScreenHeader title="General Enquiry" showBack />
+    <ScreenWrapper>
+      <ScrollView style={styles.container}>
+        <ScreenHeader title="General Enquiry" showBack />
 
-      {/* Image */}
-      <TouchableOpacity
-        onPress={() => {
-          setCurrentIndex(0);
-          setViewerVisible(true);
-        }}
-      >
-        <Image
-          source={
-            project?.image && project.image.length > 0 && !imgError
-              ? { uri: `${IMG_URL}${project.image[0]}` }
-              : require('../../assets/pngs/NoImg.png')
-          }
-          style={styles.image}
-          onError={() => setImgError(true)}
-        />
-      </TouchableOpacity>
+        {/* Image */}
+        <TouchableOpacity
+          onPress={() => {
+            setCurrentIndex(0);
+            setViewerVisible(true);
+          }}
+        >
+          <Image
+            source={
+              project?.image && project.image.length > 0 && !imgError
+                ? { uri: `${IMG_URL}${project.image[0]}` }
+                : require('../../assets/pngs/NoImg.png')
+            }
+            style={styles.image}
+            onError={() => setImgError(true)}
+          />
+        </TouchableOpacity>
 
-      {/* Title */}
-      <Text style={styles.title}>{project?.projectName}</Text>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: WIDTH(4),
-          gap: 4,
-        }}
-      >
-        <Location width={20} height={17} />
-        <Text style={styles.location}>{project?.plotAddress}</Text>
-      </View>
-
-      {/* Services */}
-      <Text style={styles.sectionTitle}>services customer need</Text>
-      {/* from api services are not comming */}
-      <View style={styles.tagRow}>
-        {project?.services?.map((item, index) => (
-          <View key={index} style={styles.tag}>
-            <Text style={styles.tagText}>{item}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Details */}
-      <Text style={styles.sectionTitle}>Project Detail</Text>
-
-      <DetailRow
-        icon={<AreaIcon />}
-        label="Plot Size"
-        value={`${project?.floorArea} sq.ft`}
-      />
-      <View style={styles.dashedDivider} />
-      <DetailRow
-        icon={<StairsIcon />}
-        label="No Of Floors"
-        value={project?.noOfFloors}
-      />
-      <View style={styles.dashedDivider} />
-      <DetailRow
-        icon={<CalenderIcon />}
-        label="Quote Last Date"
-        value={
-          project?.quoteLastDate
-            ? new Date(project.quoteLastDate).toDateString()
-            : 'N/A'
-        }
-      />
-      <View style={styles.dashedDivider} />
-      <DetailRow
-        icon={<ConstructionIcon />}
-        label="Type Of Quote"
-        value={project?.typeOfQuote}
-      />
-      <View style={styles.dashedDivider} />
-
-      {/* Call */}
-      <View style={styles.callRow}>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <View style={{ justifyContent: 'center' }}>
-            <PhoneIcon />
-          </View>
-
-          <View>
-            <Text
-              style={{
-                fontSize: 14,
-                fontFamily: FONT.POPPINS_MEDIUM,
-                fontWeight: '400',
-              }}
-            >
-              Mobile Number
-            </Text>
-            <Text style={styles.mobile}>
-              {project?.userId?.phone || 'Hidden'}
-            </Text>
-          </View>
+        {/* Title */}
+        <Text style={styles.title}>{project?.projectName}</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: WIDTH(4),
+            gap: 4,
+          }}
+        >
+          <Location width={20} height={17} />
+          <Text style={styles.location}>{project?.plotAddress}</Text>
         </View>
 
-        <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
-          <View style={{ flexDirection: 'row', gap: 6 }}>
-            <Phone2Icon />
+        {/* Services */}
+        <Text style={styles.sectionTitle}>services customer need</Text>
+        {/* from api services are not comming */}
+        <View style={styles.tagRow}>
+          {project?.services?.map((item, index) => (
+            <View key={index} style={styles.tag}>
+              <Text style={styles.tagText}>{item}</Text>
+            </View>
+          ))}
+        </View>
 
-            <Text style={styles.callText}>Call</Text>
+        {/* Details */}
+        <Text style={styles.sectionTitle}>Project Detail</Text>
+
+        <DetailRow
+          icon={<AreaIcon />}
+          label="Plot Size"
+          value={`${project?.floorArea} sq.ft`}
+        />
+        <View style={styles.dashedDivider} />
+        <DetailRow
+          icon={<StairsIcon />}
+          label="No Of Floors"
+          value={project?.noOfFloors}
+        />
+        <View style={styles.dashedDivider} />
+        <DetailRow
+          icon={<CalenderIcon />}
+          label="Quote Last Date"
+          value={
+            project?.quoteLastDate
+              ? new Date(project.quoteLastDate).toDateString()
+              : 'N/A'
+          }
+        />
+        <View style={styles.dashedDivider} />
+        <DetailRow
+          icon={<ConstructionIcon />}
+          label="Type Of Quote"
+          value={project?.typeOfQuote}
+        />
+        <View style={styles.dashedDivider} />
+
+        {/* Call */}
+        <View style={styles.callRow}>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ justifyContent: 'center' }}>
+              <PhoneIcon />
+            </View>
+
+            <View>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontFamily: FONT.POPPINS_MEDIUM,
+                  fontWeight: '400',
+                }}
+              >
+                Mobile Number
+              </Text>
+              <Text style={styles.mobile}>
+                {project?.userId?.phone || 'Hidden'}
+              </Text>
+            </View>
           </View>
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.dashedDivider} />
+          <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              <Phone2Icon />
 
-      {/* Interested Button */}
-      {!fromProjectsScreen && (
-        <TouchableOpacity
-          style={styles.interestedBtn}
-          onPress={() => setShowPopup(true)}
-        >
-          <Text style={styles.interestedText}>I'm Interested</Text>
-        </TouchableOpacity>
-      )}
+              <Text style={styles.callText}>Call</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
 
-      <Popup
-        title={'Show Your Interest'}
-        visible={showPopup}
-        onClose={() => setShowPopup(false)}
-        showQuotation={false}
-        projectId={projectId}
-        token={token}
-        userId={userId}
-      />
+        <View style={styles.dashedDivider} />
 
-      <ImageViewing
-        images={imageUrls}
-        imageIndex={currentIndex}
-        visible={viewerVisible}
-        onRequestClose={() => setViewerVisible(false)}
-      />
-    </ScrollView>
+        {/* Interested Button */}
+        {!fromProjectsScreen && (
+          <TouchableOpacity
+            style={styles.interestedBtn}
+            onPress={() => setShowPopup(true)}
+          >
+            <Text style={styles.interestedText}>I'm Interested</Text>
+          </TouchableOpacity>
+        )}
+
+        <Popup
+          title={'Show Your Interest'}
+          visible={showPopup}
+          onClose={() => setShowPopup(false)}
+          showQuotation={false}
+          projectId={projectId}
+          token={token}
+          userId={userId}
+        />
+
+        <ImageViewing
+          images={imageUrls}
+          imageIndex={currentIndex}
+          visible={viewerVisible}
+          onRequestClose={() => setViewerVisible(false)}
+        />
+      </ScrollView>
+    </ScreenWrapper>
   );
 };
 

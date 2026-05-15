@@ -18,6 +18,7 @@ import BackIcon from '../../assets/svgs/Back.svg';
 import ScreenHeader from '../../components/ScreenHeader';
 import { useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
+import ScreenWrapper from '../../utils/screenWrapper';
 
 const NotificationScreen = () => {
   const navigation = useNavigation();
@@ -86,7 +87,7 @@ const NotificationScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <ScreenHeader title={'Notifications'} showBack />
 
       {loading ? (
@@ -114,7 +115,7 @@ const NotificationScreen = () => {
           onRefresh={() => getNotifications(true)}
         />
       )}
-    </View>
+    </ScreenWrapper>
   );
 };
 

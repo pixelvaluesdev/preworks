@@ -25,6 +25,7 @@ import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import DeleteICon from '../../../assets/svgs/BlackDeleteIcon.svg';
 import EditIcon from '../../../assets/svgs/BlackEditIcon.svg';
 import { triggerHaptic } from '../../../utils/hapticks';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
@@ -226,96 +227,124 @@ const ProjectsScreen = ({ route }: any) => {
   // EMPTY STATE SECOND
   if (isCustomer && apiFinished && projects.length === 0) {
     return (
-      <View style={styles.container}>
-        <ScreenHeader title="Projects" showBack />
+      <ScreenWrapper style={styles.container}>
+        <View>
+          <ScreenHeader title="Projects" showBack />
 
-        <View style={styles.content}>
-          <Image
-            source={require('../../../assets/pngs/NoProjectsImg.png')}
-            style={styles.image}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.message}>
-            {isCustomer
-              ? "You don’t have any projects yet. Hit 'Add Project' to get started."
-              : 'No projects uploaded yet from customers.'}
-          </Text>
-
-          {isCustomer && (
-            <SecondaryButton
-              title="Add Project Details"
-              style={styles.button}
-              onPress={() => navigation.navigate('AddProjectInformation')}
-              icon={<PlusIcon height={20} width={30} />}
+          <View style={styles.content}>
+            <Image
+              source={require('../../../assets/pngs/NoProjectsImg.png')}
+              style={styles.image}
+              resizeMode="contain"
             />
-          )}
+
+            <Text style={styles.message}>
+              {isCustomer
+                ? "You don’t have any projects yet. Hit 'Add Project' to get started."
+                : 'No projects uploaded yet from customers.'}
+            </Text>
+
+            {isCustomer && (
+              <SecondaryButton
+                title="Add Project Details"
+                style={styles.button}
+                onPress={() => navigation.navigate('AddProjectInformation')}
+                icon={<PlusIcon height={20} width={30} />}
+              />
+            )}
+          </View>
         </View>
-      </View>
+      </ScreenWrapper>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <ScreenHeader title="Projects" showBack />
+    <ScreenWrapper style={styles.container}>
+      <View>
+        <ScreenHeader title="Projects" showBack />
 
-      {!isCustomer && (
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, selectedTab === 'quoted' && styles.activeTab]}
-            onPress={() => setSelectedTab('quoted')}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === 'quoted' && styles.activeTabText,
-              ]}
+        {!isCustomer && (
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, selectedTab === 'quoted' && styles.activeTab]}
+              onPress={() => setSelectedTab('quoted')}
             >
-              Quoted Projects
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.tabText,
+                  selectedTab === 'quoted' && styles.activeTabText,
+                ]}
+              >
+                Quoted Projects
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.tab,
-              selectedTab === 'interested' && styles.activeTab,
-            ]}
-            onPress={() => setSelectedTab('interested')}
-          >
-            <Text
+            <TouchableOpacity
               style={[
-                styles.tabText,
-                selectedTab === 'interested' && styles.activeTabText,
+                styles.tab,
+                selectedTab === 'interested' && styles.activeTab,
               ]}
+              onPress={() => setSelectedTab('interested')}
             >
-              Interested Projects
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      {isCustomer && (
-        <FlatList
-          data={projects}
-          keyExtractor={(item, index) =>
-            item?._id?.toString() || index.toString()
-          }
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          contentContainerStyle={{
-            paddingHorizontal: WIDTH(4),
-            paddingBottom: HEIGHT(10),
-          }}
-        />
-      )}
+              <Text
+                style={[
+                  styles.tabText,
+                  selectedTab === 'interested' && styles.activeTabText,
+                ]}
+              >
+                Interested Projects
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {isCustomer && (
+          <FlatList
+            data={projects}
+            keyExtractor={(item, index) =>
+              item?._id?.toString() || index.toString()
+            }
+            renderItem={renderItem}
+            showsVerticalScrollIndicator={false}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            contentContainerStyle={{
+              paddingHorizontal: WIDTH(4),
+              paddingBottom: HEIGHT(10),
+            }}
+          />
+        )}
 
-      {!isCustomer && (
-        <>
-          {selectedTab === 'quoted' ? (
-            quotedProjects.length > 0 ? (
+        {!isCustomer && (
+          <>
+            {selectedTab === 'quoted' ? (
+              quotedProjects.length > 0 ? (
+                <FlatList
+                  data={quotedProjects}
+                  keyExtractor={(item, index) =>
+                    item?._id?.toString() || index.toString()
+                  }
+                  renderItem={renderItem}
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  contentContainerStyle={{
+                    paddingHorizontal: WIDTH(4),
+                    paddingBottom: HEIGHT(10),
+                  }}
+                />
+              ) : (
+                <View style={styles.content}>
+                  <Image
+                    source={require('../../../assets/pngs/NoProjectsImg.png')}
+                    style={styles.image}
+                  />
+                  <Text style={styles.message}>
+                    You haven’t quoted any projects yet.
+                  </Text>
+                </View>
+              )
+            ) : interestedProjects.length > 0 ? (
               <FlatList
-                data={quotedProjects}
+                data={interestedProjects}
                 keyExtractor={(item, index) =>
                   item?._id?.toString() || index.toString()
                 }
@@ -334,112 +363,88 @@ const ProjectsScreen = ({ route }: any) => {
                   style={styles.image}
                 />
                 <Text style={styles.message}>
-                  You haven’t quoted any projects yet.
+                  You haven’t shown interest in any project.
                 </Text>
               </View>
-            )
-          ) : interestedProjects.length > 0 ? (
-            <FlatList
-              data={interestedProjects}
-              keyExtractor={(item, index) =>
-                item?._id?.toString() || index.toString()
-              }
-              renderItem={renderItem}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              contentContainerStyle={{
-                paddingHorizontal: WIDTH(4),
-                paddingBottom: HEIGHT(10),
-              }}
-            />
-          ) : (
-            <View style={styles.content}>
-              <Image
-                source={require('../../../assets/pngs/NoProjectsImg.png')}
-                style={styles.image}
-              />
-              <Text style={styles.message}>
-                You haven’t shown interest in any project.
-              </Text>
-            </View>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
 
-      {menuVisible && (
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => setMenuVisible(false)}
-        >
-          <View
-            style={[
-              styles.menuContainer,
-              { top: menuPosition.y, left: menuPosition.x - 120 },
-            ]}
+        {menuVisible && (
+          <TouchableOpacity
+            style={styles.overlay}
+            activeOpacity={1}
+            onPress={() => setMenuVisible(false)}
           >
-            {/* Edit */}
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setMenuVisible(false);
-                navigation.navigate('AddProjectInformation', {
-                  isEdit: true,
-                  projectId: selectedProject._id,
-                });
-              }}
+            <View
+              style={[
+                styles.menuContainer,
+                { top: menuPosition.y, left: menuPosition.x - 120 },
+              ]}
             >
-              <EditIcon width={20} height={20} />
-              <Text style={styles.menuText}>Edit</Text>
-            </TouchableOpacity>
+              {/* Edit */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setMenuVisible(false);
+                  navigation.navigate('AddProjectInformation', {
+                    isEdit: true,
+                    projectId: selectedProject._id,
+                  });
+                }}
+              >
+                <EditIcon width={20} height={20} />
+                <Text style={styles.menuText}>Edit</Text>
+              </TouchableOpacity>
 
-            {/* Delete */}
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                setDeletePopupVisible(true);
-              }}
-            >
-              <DeleteICon width={20} height={20} />
-              <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      )}
+              {/* Delete */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setDeletePopupVisible(true);
+                }}
+              >
+                <DeleteICon width={20} height={20} />
+                <Text style={[styles.menuText, { color: 'red' }]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        )}
 
-      {/* Add Button only for customer */}
-      {isCustomer && (
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            navigation.navigate('AddProjectInformation');
-            triggerHaptic('impactHeavy');
-          }}
-        >
-          <PlusIcon width={24} height={24} />
-        </TouchableOpacity>
-      )}
+        {/* Add Button only for customer */}
+        {isCustomer && (
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => {
+              navigation.navigate('AddProjectInformation');
+              triggerHaptic('impactHeavy');
+            }}
+          >
+            <PlusIcon width={24} height={24} />
+          </TouchableOpacity>
+        )}
 
-      <CustomPopup
-        visible={deletePopupVisible}
-        message="Are you sure you want to delete the project?"
-        onClose={() => setDeletePopupVisible(false)}
-        buttons={[
-          {
-            label: 'No, Keep it',
-            onPress: () => setDeletePopupVisible(false),
-          },
-          {
-            label: 'Yes, Delete!',
-            type: 'primary',
-            onPress: () => {
-              setDeletePopupVisible(false);
-              handleDeleteProject();
+        <CustomPopup
+          visible={deletePopupVisible}
+          message="Are you sure you want to delete the project?"
+          onClose={() => setDeletePopupVisible(false)}
+          buttons={[
+            {
+              label: 'No, Keep it',
+              onPress: () => setDeletePopupVisible(false),
             },
-          },
-        ]}
-      />
-    </View>
+            {
+              label: 'Yes, Delete!',
+              type: 'primary',
+              onPress: () => {
+                setDeletePopupVisible(false);
+                handleDeleteProject();
+              },
+            },
+          ]}
+        />
+      </View>
+    </ScreenWrapper>
   );
 };
 
