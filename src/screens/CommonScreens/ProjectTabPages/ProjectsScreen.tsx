@@ -116,21 +116,30 @@ const ProjectsScreen = ({ route }: any) => {
   const handleDeleteProject = async () => {
     if (!selectedProject?._id) return;
 
+    const deletedId = selectedProject._id;
+
     try {
       setLoading(true);
 
-      const res = await ApiManager.deleteProject(selectedProject._id, token);
+      const res = await ApiManager.deleteProject(deletedId, token);
+
+      console.log('TOKEN =>', token);
+
+      console.log('Selected Project Full =>', selectedProject);
+      console.log('Logged User =>', userId);
 
       if (res?.data?.status === 'success') {
-        // Option 1 (best UX): remove from list instantly
-        setProjects(prev =>
-          prev.filter(item => item._id !== selectedProject._id),
-        );
-
         await fetchProjects();
+        // Remove instantly from UI
+        // setProjects(prev => prev.filter(item => item._id !== deletedId));
+
+        setDeletePopupVisible(false);
+        setMenuVisible(false);
       }
     } catch (error) {
-      console.log('Delete Error:', error);
+      console.log('Delete Error:', error?.response?.data);
+      console.log('Delete Status:', error?.response?.status);
+      console.log('Delete Headers:', error?.response?.headers);
     } finally {
       setLoading(false);
       setSelectedProject(null);

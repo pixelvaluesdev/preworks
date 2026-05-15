@@ -1,65 +1,72 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useRef, useState, useMemo } from 'react';
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
+import { City } from 'country-state-city';
 
 const ProjectInfo = ({ data, handleChange }: any) => {
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const cacheRef = useRef({});
+  const [pinSuggestions, setPinSuggestions] = useState([]);
+  const [showPinDropdown, setShowPinDropdown] = useState(false);
+  const [cityPincodes, setCityPincodes] = useState([]);
 
-  const timeoutRef = useRef(null);
+  const fetchPincodes = async cityName => {
+    try {
+      const response = await fetch(
+        `https://api.postalpincode.in/postoffice/${cityName}`,
+      );
 
-  const fetchCities = text => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+      const result = await response.json();
+
+      if (result[0].Status === 'Success') {
+        setCityPincodes(result[0].PostOffice || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const indianCities = useMemo(() => {
+    return City.getCitiesOfCountry('IN');
+  }, []);
+
+  const handleCitySearch = text => {
+    handleChange('city', text);
+
+    if (text.length < 2) {
+      setCitySuggestions([]);
+      setShowDropdown(false);
+      return;
     }
 
-    timeoutRef.current = setTimeout(async () => {
-      if (text.length < 3) {
-        setCitySuggestions([]);
-        setShowDropdown(false);
-        return;
-      }
+    const filteredCities = indianCities
+      .filter(city => city.name.toLowerCase().includes(text.toLowerCase()))
+      .slice(0, 10);
 
-      //  CACHE CHECK
-      if (cacheRef.current[text]) {
-        setCitySuggestions(cacheRef.current[text]);
-        setShowDropdown(true);
-        return;
-      }
+    setCitySuggestions(filteredCities);
+    setShowDropdown(true);
+  };
 
-      try {
-        const res = await fetch(
-          `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${text}&countryIds=IN&limit=10`,
-          {
-            method: 'GET',
-            headers: {
-              'X-RapidAPI-Key': 'YOUR_KEY',
-              'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com',
-            },
-          },
-        );
+  const handlePinSearch = text => {
+    handleChange('pinCode', text);
 
-        const data = await res.json();
+    if (text.length < 1) {
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
+      return;
+    }
 
-        if (data.message === 'Too many requests') {
-          console.log('Rate limit hit');
-          return;
-        }
+    const filteredPins = cityPincodes
+      .filter(item => item.Pincode.includes(text))
+      .slice(0, 10);
 
-        cacheRef.current[text] = data?.data || [];
-
-        setCitySuggestions(data?.data || []);
-        setShowDropdown(true);
-      } catch (err) {
-        console.log(err);
-      }
-    }, 800);
+    setPinSuggestions(filteredPins);
+    setShowPinDropdown(true);
   };
 
   return (
-    <View style={{ gap: 6, zIndex: 1 }}>
+    <View style={{ gap: 6, zIndex: 1, paddingBottom: HEIGHT(30) }}>
       <BorderTextInput
         label="Project Name"
         placeholder="Enter your project name"
@@ -79,38 +86,64 @@ const ProjectInfo = ({ data, handleChange }: any) => {
           label="City"
           placeholder="Enter city name"
           value={data.city}
-          onChangeText={text => {
-            handleChange('city', text);
-            fetchCities(text);
-          }}
+          onChangeText={handleCitySearch}
           height={HEIGHT(7)}
         />
 
         {showDropdown && citySuggestions.length > 0 && (
           <View style={styles.dropdown}>
-            {citySuggestions.map((item, index) => (
-              <Text
-                key={index}
-                style={styles.item}
-                onPress={() => {
-                  handleChange('city', item.city);
-                  setShowDropdown(false);
-                }}
-              >
-                {item.city}
-              </Text>
-            ))}
+            <ScrollView
+              nestedScrollEnabled
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {citySuggestions.map((item, index) => (
+                <Text
+                  key={index}
+                  style={styles.item}
+                  onPress={() => {
+                    handleChange('city', item.name);
+                    fetchPincodes(item.name);
+                    setShowDropdown(false);
+                  }}
+                >
+                  {item.name}
+                </Text>
+              ))}
+            </ScrollView>
           </View>
         )}
       </View>
-      <BorderTextInput
-        label="PIN Code"
-        placeholder="Enter the postal code"
-        value={data.pinCode}
-        onChangeText={text => handleChange('pinCode', text)}
-        height={HEIGHT(7)}
-        keyboardType="number-pad"
-      />
+      <View style={{ position: 'relative' }}>
+        <BorderTextInput
+          label="PIN Code"
+          placeholder="Enter postal code"
+          value={data.pinCode}
+          onChangeText={handlePinSearch}
+          height={HEIGHT(7)}
+          keyboardType="number-pad"
+        />
+
+        {showPinDropdown && pinSuggestions.length > 0 && (
+          <View style={styles.dropdown}>
+            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
+              {pinSuggestions.map((item, index) => (
+                <Text
+                  key={index}
+                  style={styles.item}
+                  onPress={() => {
+                    handleChange('pinCode', item.Pincode);
+                    setShowPinDropdown(false);
+                  }}
+                >
+                  {item.Pincode}{' '}
+                  <Text style={{ color: '#888' }}>- {item.Name}</Text>
+                </Text>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -127,7 +160,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     zIndex: 1000,
-    elevation: 5, // 🔥 IMPORTANT for Android
+    elevation: 5, //  IMPORTANT for Android
     maxHeight: 150,
   },
 

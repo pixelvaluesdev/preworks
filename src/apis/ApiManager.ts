@@ -48,8 +48,12 @@ const requests = {
   put: (path: string, params?: any, token?: string) =>
     Axios(constructApiRequest(path, 'put', params, token)),
 
-  delete: (path: string, params?: any, token?: string) =>
-    Axios(constructApiRequest(path, 'delete', params, token)),
+  delete: (path: string, token?: string) =>
+  Axios({
+    url: path,
+    method: 'delete',
+    headers: token ? getAuthHeader(token) : getHeader(),
+  }),
 };
 
 const requestPath = {
@@ -116,12 +120,15 @@ const ApiManager = {
     return requests.put(requestPath.updateProject, data, token);
   },
   deleteProject: (projectId: string, token?: string) => {
-    return requests.delete(
-      `${requestPath.deleteProject}/${projectId}`,
-      {},
-      token,
-    );
+    console.log('DELETE ID =>', projectId);
+    console.log('DELETE URL =>', requestPath.deleteProject + '/' + projectId);
+    console.log('TOKEN =>', token);
+   return requests.get(
+  `${requestPath.deleteProject}/${projectId}`,
+  token,
+);
   },
+
   getNotifications: (userId: string, token?: string) => {
     return requests.get(`${requestPath.getNotifications}/${userId}`, token);
   },
