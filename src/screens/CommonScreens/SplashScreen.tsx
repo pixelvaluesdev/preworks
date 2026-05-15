@@ -21,10 +21,6 @@ const SplashScreen = () => {
     (state: any) => state.auth.hasSeenProfessionalOnboarding,
   );
 
-  console.log('token:', token);
-  console.log('user:', user);
-  console.log('hasSeenOnboarding:', hasSeenOnboarding);
-
   useEffect(() => {
     if (!isRehydrated) return;
 

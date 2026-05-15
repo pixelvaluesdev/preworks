@@ -24,6 +24,7 @@ import CustomPopup from '../../../components/Popups/CustomPopup';
 import { useSelector } from 'react-redux';
 import { IMG_URL } from '../../../apis/ApiManager';
 import ApiManager from '../../../apis/ApiManager';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const ProjectDetailsScreen = () => {
   const route = useRoute();
@@ -76,7 +77,7 @@ const ProjectDetailsScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <ScreenWrapper style={{ flex: 1 }}>
       {loading && (
         <View style={styles.loaderOverlay}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -232,7 +233,7 @@ const ProjectDetailsScreen = () => {
           />
         </View>
       </ScrollView>
-    </View>
+    </ScreenWrapper>
   );
 };
 

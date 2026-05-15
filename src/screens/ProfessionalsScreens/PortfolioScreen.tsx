@@ -30,6 +30,7 @@ import CloseIcon from '../../assets/svgs/Delete.svg';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import CustomPopup from '../../components/Popups/CustomPopup';
+import ScreenWrapper from '../../utils/screenWrapper';
 
 const PortfolioScreen = () => {
   const navigation = useNavigation();
@@ -231,200 +232,202 @@ const PortfolioScreen = () => {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
-    >
-      <View style={styles.container}>
-        <ScreenHeader title={isEdit ? 'Edit Work' : 'Add Work'} showBack />
+    <ScreenWrapper style={styles.container}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <View style={styles.container}>
+          <ScreenHeader title={isEdit ? 'Edit Work' : 'Add Work'} showBack />
 
-        {/* Step Indicator */}
-        <View style={styles.stepContainer}>
-          <View
-            style={[
-              styles.step,
-              { borderColor: !isStepTwo ? Colors.primary : Colors.border },
-            ]}
-          />
-          <View
-            style={[
-              styles.step,
-              { borderColor: isStepTwo ? Colors.primary : Colors.border },
+          {/* Step Indicator */}
+          <View style={styles.stepContainer}>
+            <View
+              style={[
+                styles.step,
+                { borderColor: !isStepTwo ? Colors.primary : Colors.border },
+              ]}
+            />
+            <View
+              style={[
+                styles.step,
+                { borderColor: isStepTwo ? Colors.primary : Colors.border },
+              ]}
+            />
+          </View>
+
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="none"
+          >
+            {!isStepTwo ? (
+              <>
+                <UploadBox
+                  label="Add Photos"
+                  value={form.image}
+                  onPress={pickImage}
+                  onRemove={updated =>
+                    setForm(prev => ({ ...prev, image: updated }))
+                  }
+                  showPreview={false}
+                />
+
+                {form.image.length > 0 && (
+                  <View style={{ marginHorizontal: -WIDTH(4) }}>
+                    <ScrollView
+                      horizontal
+                      pagingEnabled={false}
+                      showsHorizontalScrollIndicator={false}
+                      onScroll={e => {
+                        const index = Math.round(
+                          e.nativeEvent.contentOffset.x / SCREEN_WIDTH,
+                        );
+                        setCurrentIndex(index);
+                      }}
+                      decelerationRate="fast"
+                      snapToInterval={SCREEN_WIDTH}
+                      snapToAlignment="center"
+                    >
+                      {form.image.map((item, index) => (
+                        <View
+                          key={index}
+                          style={{ width: SCREEN_WIDTH, alignItems: 'center' }}
+                        >
+                          <View style={{ width: '92%', marginBottom: 10 }}>
+                            <Image
+                              source={{ uri: item?.uri }}
+                              style={styles.image}
+                            />
+
+                            <TouchableOpacity
+                              style={styles.imageDelete}
+                              onPress={() => {
+                                const updated = form.image.filter(
+                                  (_, i) => i !== index,
+                                );
+                                setForm(prev => ({ ...prev, image: updated }));
+                                setCurrentIndex(0);
+                              }}
+                            >
+                              <CloseIcon width={16} height={16} />
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ))}
+                    </ScrollView>
+
+                    {/* Dots Indicator */}
+                    {form.image.length > 1 && (
+                      <View style={styles.dotsContainer}>
+                        {form.image.map((_, i) => (
+                          <View
+                            key={i}
+                            style={[
+                              styles.dot,
+                              currentIndex === i && styles.activeDot,
+                            ]}
+                          />
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                )}
+
+                <BorderTextInput
+                  label="Caption"
+                  placeholder="Type here"
+                  value={form.caption}
+                  onChangeText={text => handleChange('caption', text)}
+                />
+              </>
+            ) : (
+              <>
+                <BorderTextInput
+                  label="Project Name / Client Name"
+                  placeholder="Enter your Project Name"
+                  value={form.projectName}
+                  onChangeText={text => handleChange('projectName', text)}
+                />
+
+                <BorderTextInput
+                  label="Site Address"
+                  placeholder="Enter address of site"
+                  value={form.siteName}
+                  onChangeText={text => handleChange('siteName', text)}
+                />
+
+                <BorderTextInput
+                  label="Budget"
+                  placeholder="Enter amount (e.g. 50,00,000)"
+                  value={form.budget}
+                  onChangeText={text => handleChange('budget', text)}
+                  keyboardType="number-pad"
+                />
+              </>
+            )}
+          </ScrollView>
+          {/* Footer Buttons */}
+          {!isStepTwo ? (
+            <View style={styles.footer}>
+              <SecondaryButton
+                title="Continue"
+                onPress={toggleStep}
+                disabled={!validateStep()}
+                style={{
+                  opacity: validateStep() ? 1 : 0.5,
+                }}
+              />
+            </View>
+          ) : (
+            <View style={styles.row}>
+              <AppButton
+                title="Back"
+                type="outline"
+                onPress={toggleStep}
+                style={{ flex: 1 }}
+              />
+              <AppButton
+                title={
+                  loading ? 'Submitting...' : isEdit ? 'Update Work' : 'Submit'
+                }
+                onPress={submitPortfolio}
+                disabled={!validateStep() || loading}
+                style={{
+                  flex: 1,
+                  opacity: validateStep() && !loading ? 1 : 0.5,
+                }}
+              />
+            </View>
+          )}
+
+          <CustomPopup
+            visible={popupVisible}
+            title={isSuccess ? 'Success' : 'Error'}
+            message={popupMessage}
+            onClose={() => setPopupVisible(false)}
+            buttons={[
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setPopupVisible(false);
+
+                  if (isSuccess) {
+                    navigation.navigate('ProfessionalProfile', {
+                      userId: userId,
+                    });
+                  }
+                },
+              },
             ]}
           />
         </View>
-
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="none"
-        >
-          {!isStepTwo ? (
-            <>
-              <UploadBox
-                label="Add Photos"
-                value={form.image}
-                onPress={pickImage}
-                onRemove={updated =>
-                  setForm(prev => ({ ...prev, image: updated }))
-                }
-                showPreview={false}
-              />
-
-              {form.image.length > 0 && (
-                <View style={{ marginHorizontal: -WIDTH(4) }}>
-                  <ScrollView
-                    horizontal
-                    pagingEnabled={false}
-                    showsHorizontalScrollIndicator={false}
-                    onScroll={e => {
-                      const index = Math.round(
-                        e.nativeEvent.contentOffset.x / SCREEN_WIDTH,
-                      );
-                      setCurrentIndex(index);
-                    }}
-                    decelerationRate="fast"
-                    snapToInterval={SCREEN_WIDTH}
-                    snapToAlignment="center"
-                  >
-                    {form.image.map((item, index) => (
-                      <View
-                        key={index}
-                        style={{ width: SCREEN_WIDTH, alignItems: 'center' }}
-                      >
-                        <View style={{ width: '92%', marginBottom: 10 }}>
-                          <Image
-                            source={{ uri: item?.uri }}
-                            style={styles.image}
-                          />
-
-                          <TouchableOpacity
-                            style={styles.imageDelete}
-                            onPress={() => {
-                              const updated = form.image.filter(
-                                (_, i) => i !== index,
-                              );
-                              setForm(prev => ({ ...prev, image: updated }));
-                              setCurrentIndex(0);
-                            }}
-                          >
-                            <CloseIcon width={16} height={16} />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    ))}
-                  </ScrollView>
-
-                  {/* Dots Indicator */}
-                  {form.image.length > 1 && (
-                    <View style={styles.dotsContainer}>
-                      {form.image.map((_, i) => (
-                        <View
-                          key={i}
-                          style={[
-                            styles.dot,
-                            currentIndex === i && styles.activeDot,
-                          ]}
-                        />
-                      ))}
-                    </View>
-                  )}
-                </View>
-              )}
-
-              <BorderTextInput
-                label="Caption"
-                placeholder="Type here"
-                value={form.caption}
-                onChangeText={text => handleChange('caption', text)}
-              />
-            </>
-          ) : (
-            <>
-              <BorderTextInput
-                label="Project Name / Client Name"
-                placeholder="Enter your Project Name"
-                value={form.projectName}
-                onChangeText={text => handleChange('projectName', text)}
-              />
-
-              <BorderTextInput
-                label="Site Address"
-                placeholder="Enter address of site"
-                value={form.siteName}
-                onChangeText={text => handleChange('siteName', text)}
-              />
-
-              <BorderTextInput
-                label="Budget"
-                placeholder="Enter amount (e.g. 50,00,000)"
-                value={form.budget}
-                onChangeText={text => handleChange('budget', text)}
-                keyboardType="number-pad"
-              />
-            </>
-          )}
-        </ScrollView>
-        {/* Footer Buttons */}
-        {!isStepTwo ? (
-          <View style={styles.footer}>
-            <SecondaryButton
-              title="Continue"
-              onPress={toggleStep}
-              disabled={!validateStep()}
-              style={{
-                opacity: validateStep() ? 1 : 0.5,
-              }}
-            />
-          </View>
-        ) : (
-          <View style={styles.row}>
-            <AppButton
-              title="Back"
-              type="outline"
-              onPress={toggleStep}
-              style={{ flex: 1 }}
-            />
-            <AppButton
-              title={
-                loading ? 'Submitting...' : isEdit ? 'Update Work' : 'Submit'
-              }
-              onPress={submitPortfolio}
-              disabled={!validateStep() || loading}
-              style={{
-                flex: 1,
-                opacity: validateStep() && !loading ? 1 : 0.5,
-              }}
-            />
-          </View>
-        )}
-
-        <CustomPopup
-          visible={popupVisible}
-          title={isSuccess ? 'Success' : 'Error'}
-          message={popupMessage}
-          onClose={() => setPopupVisible(false)}
-          buttons={[
-            {
-              label: 'OK',
-              type: 'primary',
-              onPress: () => {
-                setPopupVisible(false);
-
-                if (isSuccess) {
-                  navigation.navigate('ProfessionalProfile', {
-                    userId: userId,
-                  });
-                }
-              },
-            },
-          ]}
-        />
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </ScreenWrapper>
   );
 };
 
