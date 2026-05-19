@@ -31,6 +31,8 @@ const ProjectDetailsScreen = () => {
   const { project } = route.params;
   const token = useSelector(state => state.auth.userToken);
   console.log('Received project data:', project);
+  console.log('Tokennnnnn123', token);
+
   const images = project?.images || [];
 
   const navigation = useNavigation();
@@ -58,6 +60,8 @@ const ProjectDetailsScreen = () => {
       setLoading(true); // show loader
 
       const response = await ApiManager.deleteWork(project?._id, token);
+
+      console.log('Tokennnnnn123', token);
 
       if (response?.data?.status === 'success') {
         setMessage('Work deleted successfully');

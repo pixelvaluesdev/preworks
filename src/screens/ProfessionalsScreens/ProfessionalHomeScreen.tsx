@@ -48,8 +48,8 @@ const ProfessionalHomeScreen = () => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    if (!user?.isSubscribed) {
-      navigation.replace('Subscription');
+    if (!user?.image) {
+      navigation.replace('EditProfileScreen', { userId: user._id });
     }
   }, []);
 

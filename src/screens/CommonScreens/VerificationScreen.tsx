@@ -94,21 +94,27 @@ const VerificationScreen = () => {
           console.log('FCM REGISTER ERROR:', error);
         }
 
+        const isProfessional =
+          userType === 'contractor' ||
+          userType === 'architect' ||
+          userType === 'designer';
+
+        // STEP 1 → Name check
         if (!user.firstName || !user.lastName) {
           navigation.replace('ShortProfile');
           return;
         }
 
-        if (
-          userType === 'contractor' ||
-          userType === 'architect' ||
-          userType === 'designer'
-        ) {
-          if (user.isSubscribed) {
-            navigation.replace('ProfTabNav');
-          } else {
-            navigation.replace('Subscription');
-          }
+        // STEP 2 → Professional image check
+        if (isProfessional && !user.image) {
+          navigation.replace('EditProfileScreen', { userId: user._id });
+
+          return;
+        }
+
+        // STEP 3 → Final navigation
+        if (isProfessional) {
+          navigation.replace('ProfTabNav');
         } else {
           navigation.replace('CustmTabNav');
         }

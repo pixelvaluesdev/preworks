@@ -92,6 +92,7 @@ const EditProfileScreen = ({ navigation }: any) => {
       setLoading(true);
 
       const response = await ApiManager.getProfile(userId, token);
+      console.log('Profile response hehehehehhe:', response.data.data);
 
       if (response?.data?.status === 'success') {
         let data = response.data.data;
@@ -282,6 +283,9 @@ const EditProfileScreen = ({ navigation }: any) => {
 
       const hasValidLink = links.some(link => link.trim() !== '');
       if (!hasValidLink) return false;
+
+      // IMAGE REQUIRED
+      if (!profileImage && !profile?.image) return false;
     }
 
     return true;
@@ -300,6 +304,11 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
 
     setErrors({ email: '' });
+
+    if (isProfessional && !profileImage && !profile?.image) {
+      Alert.alert('Please upload profile image');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -591,7 +600,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                   type: 'primary',
                   onPress: () => {
                     setShowPopup(false);
-                    navigation.goBack(); // optional
+                    navigation.replace('ProfTabNav');
                   },
                 },
               ]}

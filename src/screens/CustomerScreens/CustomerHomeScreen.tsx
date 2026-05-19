@@ -281,7 +281,7 @@ const CustomerHomeScreen = () => {
           icon={<PlusIcon height={20} width={20} />}
           onPress={() => {
             navigation.navigate('AddProjectInformation');
-            triggerHaptic('notificationSuccess');
+            triggerHaptic('Heavy');
           }}
         />
 

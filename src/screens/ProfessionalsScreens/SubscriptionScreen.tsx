@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,11 @@ import {
 } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
+import {
+  useNavigation,
+  NavigationProp,
+  useFocusEffect,
+} from '@react-navigation/native';
 import ApiManager from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 
@@ -35,7 +39,7 @@ const SubscriptionScreen = () => {
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
   const token = useSelector((state: any) => state.auth.userToken);
-  console.log(token, 'tokennn in sinnnn');
+  console.log(user, 'user in sinnnn');
 
   const [selectedTab, setSelectedTab] = useState<'monthly' | 'yearly'>(
     'monthly',
@@ -43,6 +47,35 @@ const SubscriptionScreen = () => {
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, []),
+  );
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getProfile(userId, token);
+
+      if (res?.data?.status === 'success') {
+        setProfile(res.data.data);
+
+        console.log('Profile data 12232424:', res.data.data);
+
+        if (res.data.data.user?.isSubscribed) {
+          navigation.replace('ProfTabNav');
+        }
+      }
+    } catch (error) {
+      console.log('Profile Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchPlans();

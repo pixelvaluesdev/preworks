@@ -35,7 +35,6 @@ const ShortProfileScreen = () => {
   const [loading, setLoading] = useState(false);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
-  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const handleNext = async () => {
     const fName = firstName.trim();
@@ -44,7 +43,7 @@ const ShortProfileScreen = () => {
     if (!fName || !lName) {
       setPopupMessage('Please enter both first and last name');
       setPopupVisible(true);
-      setShouldNavigate(false);
+
       return;
     }
 
@@ -61,7 +60,6 @@ const ShortProfileScreen = () => {
       if (response.data?.status === 'success') {
         setPopupMessage(response.data.message || 'Profile added successfully');
         setPopupVisible(true);
-        setShouldNavigate(true);
 
         const updatedUser = {
           ...user,
@@ -70,14 +68,25 @@ const ShortProfileScreen = () => {
         };
 
         dispatch(setUser(updatedUser));
+
+        const isProfessional =
+          userType === 'contractor' ||
+          userType === 'architect' ||
+          userType === 'designer';
+
+        if (isCustomer) {
+          navigation.replace('CustmTabNav');
+        } else if (isProfessional && !updatedUser.image) {
+          navigation.replace('EditProfileScreen', { userId: user._id });
+        } else {
+          navigation.replace('ProfTabNav');
+        }
       } else {
         setPopupMessage(response.data?.message || 'Something went wrong');
         setPopupVisible(true);
-        setShouldNavigate(false);
       }
     } catch (error) {
       const serverMessage = error?.response?.data?.message;
-      setShouldNavigate(false);
 
       setPopupMessage(serverMessage || 'Network error');
       setPopupVisible(true);
@@ -127,9 +136,6 @@ const ShortProfileScreen = () => {
               type: 'primary',
               onPress: () => {
                 setPopupVisible(false);
-                if (shouldNavigate) {
-                  navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
-                }
               },
             },
           ]}

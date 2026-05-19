@@ -237,8 +237,12 @@ const ProjectsScreen = ({ route }: any) => {
   if (isCustomer && apiFinished && projects.length === 0) {
     return (
       <ScreenWrapper style={styles.container}>
-        <View>
-          <ScreenHeader title="Projects" showBack />
+        <View style={{ flex: 1 }}>
+          <ScreenHeader
+            title="Projects"
+            showBack
+            onBackPress={() => navigation.navigate('CustmTabNav')}
+          />
 
           <View style={styles.content}>
             <Image
@@ -269,8 +273,12 @@ const ProjectsScreen = ({ route }: any) => {
 
   return (
     <ScreenWrapper style={styles.container}>
-      <View>
-        <ScreenHeader title="Projects" showBack />
+      <View style={{ flex: 1 }}>
+        <ScreenHeader
+          title="Projects"
+          showBack
+          onBackPress={() => navigation.navigate('CustmTabNav')}
+        />
 
         {!isCustomer && (
           <View style={styles.tabContainer}>
@@ -528,7 +536,7 @@ const styles = StyleSheet.create({
   addButton: {
     position: 'absolute',
     right: 20,
-    bottom: 30,
+    bottom: 160,
     width: 55,
     height: 55,
     borderRadius: 12,

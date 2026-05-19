@@ -200,11 +200,12 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
     textAlign: 'center',
     color: '#777',
     marginTop: 6,
     lineHeight: 20,
+    marginBottom: 15,
   },
 });
