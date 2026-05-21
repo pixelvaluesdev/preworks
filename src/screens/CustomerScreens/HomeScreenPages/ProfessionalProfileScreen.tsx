@@ -34,6 +34,7 @@ import Redirect from '../../../assets/svgs/RedirectIcon.svg';
 import Copy from '../../../assets/svgs/CopyIcon.svg';
 import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
@@ -292,6 +293,14 @@ const ProfessionalProfileScreen = () => {
               {workList.length === 0 ? (
                 <View style={styles.noDataContainer}>
                   <Text style={styles.noDataText}>No Work Available</Text>
+
+                  <SecondaryButton
+                    title={'Add Work'}
+                    style={styles.submitBtn}
+                    onPress={() => {
+                      navigation.navigate('AddWork');
+                    }}
+                  />
                 </View>
               ) : (
                 workList.map((item: any, index: number) => (
@@ -561,5 +570,25 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 16,
     marginLeft: 10,
+  },
+
+  noDataContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+
+  noDataText: {
+    fontSize: 12,
+    color: '#777',
+    fontFamily: FONT.POPPINS_MEDIUM,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
+  submitBtn: {
+    width: WIDTH(40),
+    alignSelf: 'center',
   },
 });

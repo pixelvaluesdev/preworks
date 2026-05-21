@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +23,9 @@ import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 
 import Colors from '../constants/colors';
 import { triggerHaptic } from '../utils/hapticks';
+import { useSelector } from 'react-redux';
+import ApiManager from '../apis/ApiManager';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Tab = createBottomTabNavigator();
 
@@ -33,6 +36,7 @@ const AnimatedTabButton = (
   label,
   navigation,
   routeName,
+  showBadge = false,
 ) => {
   const { onPress } = props;
 
@@ -42,6 +46,38 @@ const AnimatedTabButton = (
 
   const scale = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(0)).current;
+
+  // BLINK ANIMATION
+  const blinkAnim = useRef(new Animated.Value(1)).current;
+
+  React.useEffect(() => {
+    let animation;
+
+    if (showBadge) {
+      animation = Animated.loop(
+        Animated.sequence([
+          Animated.timing(blinkAnim, {
+            toValue: 0.3,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+          Animated.timing(blinkAnim, {
+            toValue: 1,
+            duration: 700,
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+
+      animation.start();
+    } else {
+      blinkAnim.setValue(0);
+    }
+
+    return () => {
+      animation?.stop();
+    };
+  }, [showBadge]);
 
   const activeScale = focused ? 1.15 : 1;
   const activeLift = focused ? -4 : 0;
@@ -96,6 +132,26 @@ const AnimatedTabButton = (
           },
         ]}
       >
+        {/* BLINKING RED CIRCLE */}
+        {showBadge && (
+          <Animated.View
+            style={[
+              styles.glowRing,
+              {
+                opacity: blinkAnim,
+                transform: [
+                  {
+                    scale: blinkAnim.interpolate({
+                      inputRange: [0.3, 1],
+                      outputRange: [1, 1.15],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          />
+        )}
+
         <IconComponent height={24} />
 
         <Text
@@ -116,6 +172,33 @@ const AnimatedTabButton = (
 
 const ProfessionalTabNavigator = () => {
   const insets = useSafeAreaInsets();
+  const user = useSelector(state => state.auth.user);
+  const userId = user?._id;
+  const token = useSelector(state => state.auth.userToken);
+
+  console.log('Professspmdke', userId);
+
+  const [workList, setWorkList] = useState([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchProfile();
+    }, []),
+  );
+
+  const fetchProfile = async () => {
+    try {
+      const res = await ApiManager.getProfile(userId, token);
+
+      console.log('FULL RESPONSE =>', JSON.stringify(res, null, 2));
+
+      if (res?.data?.status === 'success') {
+        setWorkList(res?.data?.data?.workList || []);
+      }
+    } catch (error) {
+      console.log('Profile Error:', error);
+    }
+  };
 
   return (
     <Tab.Navigator
@@ -180,6 +263,7 @@ const ProfessionalTabNavigator = () => {
               'Add Work',
               navigation,
               route.name,
+              workList?.length === 0,
             ),
         })}
       />
@@ -233,5 +317,12 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     marginTop: 4,
+  },
+  glowRing: {
+    position: 'absolute',
+    width: 72,
+    height: 62,
+    borderRadius: 26,
+    backgroundColor: Colors.primary + '33',
   },
 });

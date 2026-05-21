@@ -28,6 +28,7 @@ import AppliedProjectsScreen from '../screens/ProfessionalsScreens/AppliedProjec
 import NoProjectScreen from '../screens/CustomerScreens/AddProjectPages/NoProjectsScreen';
 import ProfOnboardingScreen from '../screens/ProfessionalsScreens/ProfOnboardingScreen';
 import SubscriptionScreen from '../screens/ProfessionalsScreens/SubscriptionScreen';
+import PortfolioScreen from '../screens/ProfessionalsScreens/PortfolioScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -98,6 +99,7 @@ const AppNavigator = () => {
 
         <Stack.Screen name="NoProjects" component={NoProjectScreen} />
         <Stack.Screen name="Subscription" component={SubscriptionScreen} />
+        <Stack.Screen name="AddWork" component={PortfolioScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
