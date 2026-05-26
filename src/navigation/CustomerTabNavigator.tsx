@@ -155,7 +155,7 @@ const CustomerTabNavigator = () => {
               props,
               ActProject,
               ProjectIcon,
-              'Projects',
+              'My Projects',
               navigation,
               route.name,
             ),

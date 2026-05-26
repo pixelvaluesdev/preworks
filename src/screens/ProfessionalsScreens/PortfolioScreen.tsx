@@ -145,7 +145,7 @@ const PortfolioScreen = () => {
 
       if (res?.data?.status === 'success') {
         setIsSuccess(true);
-        setPopupMessage(res?.data?.message || 'Work added successfully');
+        setPopupMessage(res?.data?.message || 'Portfolio added successfully');
       }
     } catch (error) {
       setIsSuccess(false);
@@ -338,7 +338,7 @@ const PortfolioScreen = () => {
                 )}
 
                 <BorderTextInput
-                  label="Caption"
+                  label="Project Details"
                   placeholder="Type here"
                   value={form.caption}
                   onChangeText={text => handleChange('caption', text)}

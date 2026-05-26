@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: '#000',
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     justifyContent: 'center',
     paddingVertical: 0,

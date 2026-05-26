@@ -32,6 +32,7 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
           style={{
             color: value ? '#474747' : '#a6a6a6',
             fontFamily: FONT.POPPINS_REGULAR,
+            fontSize: 16,
           }}
         >
           {value || 'Select'}

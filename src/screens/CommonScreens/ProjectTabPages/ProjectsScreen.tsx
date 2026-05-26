@@ -155,7 +155,7 @@ const ProjectsScreen = ({ route }: any) => {
         ? { uri: `${IMG_URL}/${item.files[0]}` }
         : project?.image?.length > 0
         ? { uri: `${IMG_URL}/${project.image[0]}` }
-        : require('../../../assets/pngs/DummyImg.png');
+        : require('../../../assets/images/NoImg1.jpeg');
 
     const statusText = project?.status ? 'Active' : 'Closed';
 
@@ -259,7 +259,7 @@ const ProjectsScreen = ({ route }: any) => {
 
             {isCustomer && (
               <SecondaryButton
-                title="Add Project Details"
+                title="Post Your Projects"
                 style={styles.button}
                 onPress={() => navigation.navigate('AddProjectInformation')}
                 icon={<PlusIcon height={20} width={30} />}

@@ -294,13 +294,15 @@ const ProfessionalProfileScreen = () => {
                 <View style={styles.noDataContainer}>
                   <Text style={styles.noDataText}>No Work Available</Text>
 
-                  <SecondaryButton
-                    title={'Add Work'}
-                    style={styles.submitBtn}
-                    onPress={() => {
-                      navigation.navigate('AddWork');
-                    }}
-                  />
+                  {isProffesional && (
+                    <SecondaryButton
+                      title={'Add Work'}
+                      style={styles.submitBtn}
+                      onPress={() => {
+                        navigation.navigate('AddWork');
+                      }}
+                    />
+                  )}
                 </View>
               ) : (
                 workList.map((item: any, index: number) => (

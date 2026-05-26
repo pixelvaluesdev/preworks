@@ -6,7 +6,7 @@ import { PersistConfig } from 'redux-persist';
 const persistConfig: PersistConfig<any> = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth'],
+  whitelist: ['auth', 'projectDraft'],
 };
 
 export default persistConfig;

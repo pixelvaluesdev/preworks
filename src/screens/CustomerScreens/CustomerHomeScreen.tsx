@@ -138,6 +138,7 @@ const CustomerHomeScreen = () => {
         onProfilePress={() =>
           navigation.navigate('ProfileScreen', { userId: user?._id })
         }
+        placeholder="What are you looking for ?"
       />
 
       <TouchableOpacity
@@ -150,7 +151,7 @@ const CustomerHomeScreen = () => {
         <View style={styles.helpIconCircle}>
           <HelpIcon />
         </View>
-        <Text style={styles.helpText}>Help Us</Text>
+        <Text style={styles.helpText}>Need help?</Text>
       </TouchableOpacity>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -201,7 +202,7 @@ const CustomerHomeScreen = () => {
         {/* Professionals */}
         <View style={styles.section}>
           <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>Professionals List</Text>
+            <Text style={styles.sectionTitle}>All Professionals</Text>
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate('ProfessionalList', {
@@ -222,10 +223,7 @@ const CustomerHomeScreen = () => {
             }
             renderItem={({ item }) => {
               const hasValidImage =
-                item.image &&
-                item.image.length > 0 &&
-                typeof item.image[0] === 'string' &&
-                item.image[0].trim() !== '';
+                item?.image && typeof item.image === 'string';
 
               const fullName =
                 item.name ||
@@ -249,7 +247,7 @@ const CustomerHomeScreen = () => {
                   <Image
                     source={
                       hasValidImage
-                        ? { uri: `${IMG_URL}${item.image[0]}` }
+                        ? { uri: `${IMG_URL}${item.image}` }
                         : require('../../assets/pngs/Placeholder.png')
                     }
                     style={styles.proImage}
@@ -275,7 +273,7 @@ const CustomerHomeScreen = () => {
 
         {/* Add Project Button */}
         <SecondaryButton
-          title="Add Project Details"
+          title="Post Your Project"
           style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
           textStyle={{ fontSize: 18 }}
           icon={<PlusIcon height={20} width={20} />}

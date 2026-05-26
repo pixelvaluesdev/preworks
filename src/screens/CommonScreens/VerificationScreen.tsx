@@ -8,6 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -191,69 +193,71 @@ const VerificationScreen = () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/pngs/BGImg2.png')}
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={require('../../assets/pngs/BGImg2.png')}
+        style={styles.container}
+        resizeMode="cover"
       >
-        <View style={styles.overlay}>
-          <Text style={styles.title}>Verification OTP</Text>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.title}>Verification OTP</Text>
 
-          <Text style={styles.subtitle}>
-            Enter the OTP sent to your mobile number
-          </Text>
-          <View style={{ marginTop: 5 }}>
-            <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
-          </View>
+            <Text style={styles.subtitle}>
+              Enter the OTP sent to your mobile number
+            </Text>
+            <View style={{ marginTop: 5 }}>
+              <OTPInput length={5} onChangeOTP={value => setOtp(value)} />
+            </View>
 
-          <SecondaryButton
-            title={loading ? <ActivityIndicator color="#fff" /> : 'Verify'}
-            onPress={handleVerifyOtp}
-            disabled={loading}
-          />
-          <View
-            style={{
-              marginTop: 20,
-              alignItems: 'center',
-            }}
-          >
-            <Text
+            <SecondaryButton
+              title={loading ? <ActivityIndicator color="#fff" /> : 'Verify'}
+              onPress={handleVerifyOtp}
+              disabled={loading}
+            />
+            <View
               style={{
-                color: 'white',
-                fontFamily: FONT.POPPINS_REGULAR,
-                fontSize: 16,
+                marginTop: 20,
+                alignItems: 'center',
               }}
             >
-              Didn't receive the OTP?
-            </Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontFamily: FONT.POPPINS_REGULAR,
+                  fontSize: 16,
+                }}
+              >
+                Didn't receive the OTP?
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.resendContainer}
+              onPress={handleGetOtp}
+            >
+              <Text style={styles.resendText}>
+                {loading2 ? (
+                  <ActivityIndicator color={Colors.primary} />
+                ) : (
+                  'Resend OTP'
+                )}
+              </Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.resendContainer}
-            onPress={handleGetOtp}
-          >
-            <Text style={styles.resendText}>
-              {loading2 ? (
-                <ActivityIndicator color={Colors.primary} />
-              ) : (
-                'Resend OTP'
-              )}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <CustomPopup
-          visible={popupVisible}
-          message={popupConfig.message}
-          buttons={popupConfig.buttons}
-          onClose={() => setPopupVisible(false)}
-        />
-      </KeyboardAvoidingView>
-    </ImageBackground>
+          <CustomPopup
+            visible={popupVisible}
+            message={popupConfig.message}
+            buttons={popupConfig.buttons}
+            onClose={() => setPopupVisible(false)}
+          />
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 };
 

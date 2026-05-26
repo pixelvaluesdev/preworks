@@ -125,6 +125,7 @@ const styles = StyleSheet.create({
   placeholder: {
     color: '#a6a6a6',
     fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 16,
   },
   asterisk: {
     color: 'red',

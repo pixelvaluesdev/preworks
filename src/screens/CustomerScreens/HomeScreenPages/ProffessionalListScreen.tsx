@@ -93,7 +93,7 @@ const ProfessionalListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title={search ? 'Search' : 'Professionals List'} showBack />
+      <ScreenHeader title={search ? 'Search' : 'All Professionals'} showBack />
 
       <SearchHeader
         value={search}

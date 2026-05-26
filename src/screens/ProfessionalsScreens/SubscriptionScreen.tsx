@@ -136,8 +136,8 @@ const SubscriptionScreen = () => {
         );
       }
     } catch (error) {
-      console.log('❌ FULL ERROR:', error?.response?.data);
-      console.log('❌ STATUS:', error?.response?.status);
+      console.log(' FULL ERROR:', error?.response?.data);
+      console.log(' STATUS:', error?.response?.status);
     } finally {
       setLoading(false);
     }

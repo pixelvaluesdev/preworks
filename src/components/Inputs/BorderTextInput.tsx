@@ -19,6 +19,7 @@ interface BorderTextInputProps {
   keyboardType?: any;
   maxLength?: number;
   mandotory?: boolean;
+  leftComponent?: React.ReactNode;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -34,8 +35,10 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   keyboardType = 'default',
   maxLength,
   mandotory = true,
+  leftComponent,
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
+  const [isFocused, setIsFocused] = useState(false);
   return (
     <View style={[styles.inputWrapper, containerStyle]}>
       <Text style={styles.floatingLabel}>
@@ -43,7 +46,12 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
         {mandotory ? <Text style={styles.asterisk}> *</Text> : null}
       </Text>
 
-      <View style={styles.inputContainer}>
+      <View
+        style={[styles.inputContainer, isFocused && styles.focusedContainer]}
+      >
+        {leftComponent && (
+          <View style={styles.leftComponent}>{leftComponent}</View>
+        )}
         <TextInput
           mode="outlined"
           value={value}
@@ -56,6 +64,12 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           activeOutlineColor={Colors.primary}
           textColor={'#474747'}
           editable={editable}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          contentStyle={{
+            fontSize: 16,
+            fontFamily: FONT.POPPINS_REGULAR,
+          }}
           onContentSizeChange={e => {
             if (multiline) {
               setInputHeight(e.nativeEvent.contentSize.height);
@@ -68,7 +82,8 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
               height: multiline
                 ? Math.max(height || HEIGHT(6), inputHeight)
                 : height || HEIGHT(6),
-              paddingRight: 0,
+              paddingLeft: leftComponent ? 90 : 0,
+              paddingRight: rightComponent ? 40 : 0,
               fontSize: 14,
               fontFamily: FONT.POPPINS_REGULAR,
               textAlignVertical: multiline ? 'top' : 'center',
@@ -122,12 +137,28 @@ const styles = StyleSheet.create({
   },
 
   outline: {
-    borderRadius: 10,
-    borderWidth: 0.75,
+    borderRadius: 12,
+    borderWidth: 0,
   },
   inputContainer: {
     position: 'relative',
     justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: 'white',
+
+    borderColor: '#E2E2E2',
+    borderWidth: 1.2,
+
+    // soft base shadow
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+
+    elevation: 2,
   },
 
   rightComponent: {
@@ -140,5 +171,31 @@ const styles = StyleSheet.create({
   asterisk: {
     color: 'red',
     fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  focusedContainer: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+
+    // 3D Shadow
+    shadowColor: Colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+
+    elevation: 10,
+
+    // subtle raised look
+    backgroundColor: '#FFFFFF',
+  },
+  leftComponent: {
+    position: 'absolute',
+    left: 16,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

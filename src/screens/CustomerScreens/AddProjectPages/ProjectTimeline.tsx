@@ -114,7 +114,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
       {/* DESCRIPTION */}
       <BorderTextInput
-        label="Scope of work description"
+        label="Scope of work details"
         placeholder="Write here..."
         value={data.description}
         onChangeText={text => handleChange('description', text)}
@@ -127,7 +127,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       {/* PRICE RANGE */}
       <View style={styles.sliderContainer}>
         <Text style={styles.sliderLabel}>
-          Select Price Range <Text style={styles.asterisk}> *</Text>
+          Estimated Project Budget <Text style={styles.asterisk}> *</Text>
         </Text>
 
         <View

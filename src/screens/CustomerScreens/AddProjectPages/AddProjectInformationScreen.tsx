@@ -22,10 +22,14 @@ import Projectfiles from './Projectfiles';
 import AppButton from '../../../components/Buttons/AppButton';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import ApiManager from '../../../apis/ApiManager';
-import { useSelector } from 'react-redux';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import Colors from '../../../constants/colors';
 import { triggerHaptic } from '../../../utils/hapticks';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  saveProjectDraft,
+  clearProjectDraft,
+} from '../../../redux/slices/projectDraftSlice';
 
 const TOTAL_STEPS = 4;
 
@@ -40,6 +44,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
+  const draftForm = useSelector(state => state.projectDraft.form);
+  const [initialForm, setInitialForm] = useState(null);
 
   useEffect(() => {
     if (isEdit && projectId) {
@@ -47,67 +53,43 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     }
   }, [isEdit, projectId]);
 
-  const [form, setForm] = useState({
-    projectName: '',
-    address: '',
-    city: '',
-    pinCode: '',
-    floorArea: '',
-    plotSize: '',
-    floors: '',
-    quoteType: '',
-    startDate: '',
-    lastDate: '',
-    description: '',
-    budget: '',
-    siteImage: [], // new images
-    archDrawing: [], // new drawings
+  const [form, setForm] = useState(draftForm);
 
-    existingImages: [], //  API images
-    existingDrawings: [], // API drawings
-  });
+  const dispatch = useDispatch();
 
-  const handleChange = (key: string, value: string) => {
+  const handleChange = (key: string, value: any) => {
+    let updatedValue = value;
+
     if (key === 'pinCode') {
-      // Allow only numbers
       let cleaned = value.replace(/[^0-9]/g, '');
 
-      // Prevent first digit as 0
       if (cleaned.length === 1 && cleaned === '0') {
         return;
       }
 
-      // Limit to 6 digits
       if (cleaned.length > 6) {
         return;
       }
 
-      setForm(prev => ({
-        ...prev,
-        pinCode: cleaned,
-      }));
-      return;
+      updatedValue = cleaned;
     }
 
-    //  For area field (numbers only)
     if (key === 'floorArea' || key === 'plotSize') {
-      let cleaned = value.replace(/[^0-9.]/g, '');
-      setForm(prev => ({ ...prev, [key]: cleaned }));
-      return;
+      updatedValue = value.replace(/[^0-9.]/g, '');
     }
 
-    //  City: only alphabets + spaces
     if (key === 'city') {
-      let cleaned = value.replace(/[^a-zA-Z ]/g, '');
-
-      setForm(prev => ({ ...prev, city: cleaned }));
-      return;
+      updatedValue = value.replace(/[^a-zA-Z ]/g, '');
     }
 
-    setForm(prev => ({
-      ...prev,
-      [key]: value,
-    }));
+    const updatedForm = {
+      ...form,
+      [key]: updatedValue,
+    };
+
+    setForm(updatedForm);
+
+    dispatch(saveProjectDraft(updatedForm));
   };
 
   const validateStep = () => {
@@ -187,18 +169,25 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     return val;
   };
 
+  const hasChanges = () => {
+    if (!initialForm) return false;
+
+    return JSON.stringify(form) !== JSON.stringify(initialForm);
+  };
+
   const prefillForm = project => {
-    setForm({
+    const formattedData = {
       projectName: project?.projectName || '',
       address: project?.plotAddress || '',
       city: project?.city || '',
       pinCode: project?.pinCode || '',
 
-      // selectedType: 'floor', // default (or adjust later)
+      floors:
+        project?.noOfFloors?.replace('Ground + ', '')?.replace(' Floor', '') ||
+        '',
 
       floorArea: project?.floorArea?.toString() || '',
       plotSize: project?.plotSize?.toString() || '',
-      floors: project?.noOfFloors || '',
 
       quoteType:
         project?.typeOfQuote === 'labour' ? 'Labour Only' : 'Labour + Material',
@@ -217,7 +206,10 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       hasDrawing: project?.drawingStatus || false,
       services: project?.services || [],
       hideNumber: project?.hideNumber || false,
-    });
+    };
+
+    setForm(formattedData);
+    setInitialForm(formattedData);
   };
 
   const fetchProjectDetails = async () => {
@@ -257,7 +249,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       formData.append('plotSize', form.plotSize || '0');
 
-      formData.append('noOfFloors', form.floors);
+      formData.append('noOfFloors', `Ground + ${form.floors}`);
 
       formData.append(
         'typeOfQuote',
@@ -328,9 +320,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       setIsSuccess(true);
       setPopupMessage({
-        title: 'Project Created Successfully',
+        title: 'Project Posted Successfully',
         subtitle:
-          'You will start receiving quotations soon.\nYou can track your project in the Projects tab.',
+          'You will start receiving responses soon.\nYou can track your project in the Projects tab.',
       });
     } catch (error) {
       setIsSuccess(false);
@@ -433,10 +425,19 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                     : 'Continue'
                 }
                 onPress={handleNext}
-                disabled={!validateStep() || loading}
+                disabled={
+                  !validateStep() ||
+                  loading ||
+                  (isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
+                }
                 style={{
                   flex: 1,
-                  opacity: validateStep() && !loading ? 1 : 0.5,
+                  opacity:
+                    validateStep() &&
+                    !loading &&
+                    !(isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
+                      ? 1
+                      : 0.5,
                 }}
               />
             </View>
@@ -457,6 +458,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                 setPopupVisible(false);
 
                 if (isSuccess) {
+                  dispatch(clearProjectDraft());
                   navigation.navigate('ProjectDetails');
                 }
               },

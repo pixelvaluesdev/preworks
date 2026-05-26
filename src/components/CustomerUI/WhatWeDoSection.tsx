@@ -18,19 +18,19 @@ const services = [
     title: 'Contractor',
     Icon: ContractorIcon,
     type: 'contractor',
-    subtitle: 'Hire Professional',
+    subtitle: 'For Construction Work',
   },
   {
     title: 'Architect',
     Icon: ArchitectIcon,
     type: 'architect',
-    subtitle: 'Plan your Project',
+    subtitle: 'Planning & Designing',
   },
   {
     title: 'Interior Designer',
     Icon: InteriorIcon,
     type: 'designer',
-    subtitle: 'Design Your Space',
+    subtitle: 'For Designing Your Space',
   },
 ];
 
@@ -43,7 +43,7 @@ const WhatWeDoSection = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>What We Do</Text>
+      <Text style={styles.title}>What do you need?</Text>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {services.map((item, index) => (

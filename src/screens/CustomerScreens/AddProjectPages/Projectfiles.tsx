@@ -189,7 +189,7 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
   return (
     <View style={styles.container}>
       <UploadBox
-        label="Upload Site images (Required)"
+        label="Site Images & Elevation"
         value={[...(data.existingImages || []), ...(data.siteImage || [])]}
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
@@ -254,6 +254,7 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
               'Construction',
               'Interior Design',
               'Renovation',
+              'On-Site Consultation',
             ].map(item => {
               const isSelected = services.includes(item);
 
@@ -275,8 +276,8 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
       {/* ALWAYS VISIBLE */}
       <View style={styles.toggleContainer}>
         <Text style={styles.questionText}>
-          Do you want to hide your number?{' '}
-          <Text style={styles.asterisk}> *</Text>
+          Display your number to receive calls.{' '}
+          {/* <Text style={styles.asterisk}> *</Text> */}
         </Text>
         <Switch
           value={data?.hideNumber || false}
@@ -288,7 +289,8 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
 
       <Text style={styles.note}>
         <Text style={styles.noteLabel}>Note: </Text>
-        IF you choose to hide you will not receive any calls from professional.
+        Recommended for faster responses. You can hide your number anytime
+        later.
       </Text>
 
       <CustomPopup
@@ -438,10 +440,12 @@ const styles = StyleSheet.create({
   },
 
   questionText: {
+    flex: 1,
     fontSize: 14,
-    marginBottom: 10,
     color: '#757575',
     fontFamily: FONT.POPPINS_REGULAR,
+    marginBottom: 0,
+    marginRight: 10,
   },
 
   radioRow: {
@@ -557,6 +561,7 @@ const styles = StyleSheet.create({
   placeholder: {
     color: '#a6a6a6',
     fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 16,
   },
   pdfBox: {
     width: 80,

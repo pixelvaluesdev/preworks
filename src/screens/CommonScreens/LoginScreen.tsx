@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 
 import { FONT } from '../../theme/fonts';
@@ -31,6 +33,11 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
 
   const userType = useSelector((state: any) => state.auth.userType);
+
+  const capitalizeFirstLetter = (text: string) => {
+    if (!text) return '';
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
 
   const handleGetOtp = async () => {
     const trimmedMobile = mobile.trim();
@@ -68,48 +75,52 @@ const LoginScreen = () => {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/pngs/BGImg2.png')}
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground
+        source={require('../../assets/pngs/BGImg2.png')}
+        style={styles.container}
+        resizeMode="cover"
       >
-        <View style={styles.overlay}>
-          <Text style={styles.title}>Log In</Text>
-          <Text style={styles.subtitle}>
-            Please enter your details to sign in
-          </Text>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.overlay}>
+            <Text style={styles.title}>
+              Log In as {capitalizeFirstLetter(userType)}
+            </Text>
+            <Text style={styles.subtitle}>
+              Please enter your details to sign in
+            </Text>
 
-          <CustomTextInput
-            label="Mobile number"
-            prefix="+91-"
-            placeholder="Mobile number"
-            keyboardType="number-pad"
-            maxLength={10}
-            value={mobile}
-            onChangeText={text => {
-              const numericText = text.replace(/[^0-9]/g, '');
-              setMobile(numericText);
-            }}
-          />
+            <CustomTextInput
+              label="Mobile number"
+              prefix="+91-"
+              placeholder="Mobile number"
+              keyboardType="number-pad"
+              maxLength={10}
+              value={mobile}
+              onChangeText={text => {
+                const numericText = text.replace(/[^0-9]/g, '');
+                setMobile(numericText);
+              }}
+            />
 
-          <SecondaryButton
-            title={loading ? <ActivityIndicator color="#fff" /> : 'Get OTP'}
-            onPress={handleGetOtp}
-            disabled={loading}
-            style={{ marginTop: 10 }}
-          />
+            <SecondaryButton
+              title={loading ? <ActivityIndicator color="#fff" /> : 'Get OTP'}
+              onPress={handleGetOtp}
+              disabled={loading}
+              style={{ marginTop: 10 }}
+            />
 
-          {/* <SecondaryButton
+            {/* <SecondaryButton
           title="Dummy Home"
           onPress={() => navigation.navigate('CustmTabNav')}
         /> */}
-        </View>
-      </KeyboardAvoidingView>
-    </ImageBackground>
+          </View>
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 };
 

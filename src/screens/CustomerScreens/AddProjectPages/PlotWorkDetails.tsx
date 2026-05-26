@@ -34,6 +34,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         onChangeText={text => handleChange('floorArea', text)}
         height={HEIGHT(7)}
         rightComponent={<Text style={{ fontSize: 16 }}>sq.ft</Text>}
+        maxLength={6}
       />
 
       <BorderTextInput
@@ -45,6 +46,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         height={HEIGHT(7)}
         rightComponent={<Text style={{ fontSize: 16 }}>sq.ft</Text>}
         mandotory={false}
+        maxLength={6}
       />
 
       {/* <BorderTextInput
@@ -68,38 +70,28 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         }
       /> */}
 
-      <BorderDropdown
+      <BorderTextInput
         label="No of Floors"
-        value={data.floors}
-        options={[
-          'Only Ground Floor',
-          'Ground + 1 Floor',
-          'Ground + 2 Floor',
-          'Ground + 3 Floor',
-          'Custom',
-        ]}
-        onSelect={val => {
-          handleChange('floors', val);
-
-          if (val !== 'Custom') {
-            handleChange('customFloors', '');
-          }
+        placeholder="Enter number of floors"
+        value={data.floors || ''}
+        onChangeText={text => {
+          const cleaned = text.replace(/[^0-9]/g, '');
+          handleChange('floors', cleaned);
         }}
+        height={HEIGHT(7)}
+        keyboardType="number-pad"
+        maxLength={2}
+        leftComponent={
+          <Text
+            style={{
+              fontSize: 16,
+              fontFamily: FONT.POPPINS_REGULAR,
+            }}
+          >
+            Ground +
+          </Text>
+        }
       />
-      {data.floors === 'Custom' && (
-        <BorderTextInput
-          label="Enter Custom Floors"
-          placeholder="e.g. 5"
-          value={data.customFloors ? `Ground + ${data.customFloors} Floor` : ''}
-          onChangeText={text => {
-            // Extract only number from user input
-            const number = text.replace(/[^0-9]/g, '');
-            handleChange('customFloors', number);
-          }}
-          height={HEIGHT(7)}
-          keyboardType="number-pad"
-        />
-      )}
 
       <BorderDropdown
         label="Type Of Quote"

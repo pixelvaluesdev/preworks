@@ -44,6 +44,8 @@ const ProfessionalHomeScreen = () => {
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const scrollRef = useRef(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const flatListRef = useRef(null);
 
@@ -160,7 +162,7 @@ const ProfessionalHomeScreen = () => {
       return (
         <ProjectCard
           title={item.projectName}
-          location={item.plotAddress}
+          location={`${item.plotAddress}, ${item.city}`}
           image={
             item.image && item.image.length > 0
               ? `${IMG_URL}${item.image[0]}`
@@ -203,7 +205,20 @@ const ProfessionalHomeScreen = () => {
 
   return (
     <ScreenWrapper style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        onScroll={event => {
+          const offsetY = event.nativeEvent.contentOffset.y;
+
+          if (offsetY > 400) {
+            setShowScrollTop(true);
+          } else {
+            setShowScrollTop(false);
+          }
+        }}
+        scrollEventThrottle={16}
+      >
         {/* Banner */}
         <View style={styles.banner}>
           <FlatList
@@ -304,6 +319,21 @@ const ProfessionalHomeScreen = () => {
           />
         )}
       </ScrollView>
+
+      {showScrollTop && (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.scrollTopButton}
+          onPress={() => {
+            scrollRef.current?.scrollTo({
+              y: 0,
+              animated: true,
+            });
+          }}
+        >
+          <Text style={styles.scrollTopText}>Scroll to Top</Text>
+        </TouchableOpacity>
+      )}
     </ScreenWrapper>
   );
 };
@@ -431,5 +461,36 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 12,
     color: 'grey',
+  },
+
+  scrollTopButton: {
+    position: 'absolute',
+    bottom: 25,
+    alignSelf: 'center',
+
+    backgroundColor: 'rgba(78, 77, 77, 0.78)',
+
+    paddingHorizontal: 18,
+    height: 42,
+    borderRadius: 25,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    elevation: 8,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+  },
+
+  scrollTopText: {
+    color: '#fff',
+    fontSize: 13,
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 });

@@ -32,6 +32,8 @@ import { IMG_URL } from '../../../apis/ApiManager';
 import { setUser } from '../../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import { City } from 'country-state-city';
+import { useMemo } from 'react';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
@@ -65,6 +67,18 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const [profileImage, setProfileImage] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
+
+  const [citySuggestions, setCitySuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const [pinSuggestions, setPinSuggestions] = useState([]);
+  const [showPinDropdown, setShowPinDropdown] = useState(false);
+
+  const [cityPincodes, setCityPincodes] = useState([]);
+
+  const indianCities = useMemo(() => {
+    return City.getCitiesOfCountry('IN');
+  }, []);
 
   useEffect(() => {
     if (userId) {
@@ -373,6 +387,56 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
   };
 
+  const fetchPincodes = async cityName => {
+    try {
+      const response = await fetch(
+        `https://api.postalpincode.in/postoffice/${cityName}`,
+      );
+
+      const result = await response.json();
+
+      if (result[0].Status === 'Success') {
+        setCityPincodes(result[0].PostOffice || []);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleCitySearch = text => {
+    setCity(text);
+
+    if (text.length < 2) {
+      setCitySuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const filteredCities = indianCities
+      .filter(city => city.name.toLowerCase().includes(text.toLowerCase()))
+      .slice(0, 10);
+
+    setCitySuggestions(filteredCities);
+    setShowDropdown(true);
+  };
+
+  const handlePinSearch = text => {
+    handleInputChange('pin', text, setPin);
+
+    if (text.length < 1) {
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
+      return;
+    }
+
+    const filteredPins = cityPincodes
+      .filter(item => item.Pincode.includes(text))
+      .slice(0, 10);
+
+    setPinSuggestions(filteredPins);
+    setShowPinDropdown(true);
+  };
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -489,27 +553,80 @@ const EditProfileScreen = ({ navigation }: any) => {
 
                 {/* ROW */}
                 <View style={styles.row}>
-                  <View style={styles.col}>
-                    <BorderTextInput
-                      label="City"
-                      value={city}
-                      onChangeText={text =>
-                        handleInputChange('city', text, setCity)
-                      }
-                      placeholder="City"
-                    />
+                  {/* CITY */}
+                  <View style={[styles.col, { zIndex: 1000 }]}>
+                    <View style={{ position: 'relative' }}>
+                      <BorderTextInput
+                        label="City"
+                        value={city}
+                        onChangeText={handleCitySearch}
+                        placeholder="City"
+                      />
+
+                      {showDropdown && citySuggestions.length > 0 && (
+                        <View style={styles.dropdown}>
+                          <ScrollView
+                            nestedScrollEnabled
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                          >
+                            {citySuggestions.map((item, index) => (
+                              <Text
+                                key={index}
+                                style={styles.item}
+                                onPress={() => {
+                                  setCity(item.name);
+                                  fetchPincodes(item.name);
+                                  setShowDropdown(false);
+                                }}
+                              >
+                                {item.name}
+                              </Text>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
                   </View>
 
-                  <View style={styles.col}>
-                    <BorderTextInput
-                      label="Pin code"
-                      value={pin}
-                      onChangeText={text =>
-                        handleInputChange('pin', text, setPin)
-                      }
-                      placeholder="Pincode"
-                      keyboardType="number-pad"
-                    />
+                  {/* PINCODE */}
+                  <View style={[styles.col, { zIndex: 999 }]}>
+                    <View style={{ position: 'relative' }}>
+                      <BorderTextInput
+                        label="Pin code"
+                        value={pin}
+                        onChangeText={handlePinSearch}
+                        placeholder="Pincode"
+                        keyboardType="number-pad"
+                      />
+
+                      {showPinDropdown && pinSuggestions.length > 0 && (
+                        <View style={styles.dropdown}>
+                          <ScrollView
+                            nestedScrollEnabled
+                            keyboardShouldPersistTaps="handled"
+                          >
+                            {pinSuggestions.map((item, index) => (
+                              <Text
+                                key={index}
+                                style={styles.item}
+                                onPress={() => {
+                                  setPin(item.Pincode);
+                                  setState(item.State || '');
+                                  setShowPinDropdown(false);
+                                }}
+                              >
+                                {item.Pincode}
+                                <Text style={{ color: '#888' }}>
+                                  {' '}
+                                  - {item.Name}
+                                </Text>
+                              </Text>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
                   </View>
                 </View>
 
@@ -546,7 +663,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                           label={`Link ${index + 1}`}
                           value={item}
                           onChangeText={text => handleLinkChange(text, index)}
-                          placeholder="Enter link"
+                          placeholder="https://linkedin.com/in/username"
                         />
 
                         {links.length > 1 && (
@@ -717,5 +834,24 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_MEDIUM,
     fontSize: 14,
     textAlignVertical: 'center',
+  },
+
+  dropdown: {
+    position: 'absolute',
+    top: HEIGHT(8),
+    width: '100%',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    zIndex: 1000,
+    elevation: 5,
+    maxHeight: 150,
+  },
+
+  item: {
+    padding: 10,
+    borderBottomWidth: 0.5,
+    borderColor: '#ccc',
   },
 });

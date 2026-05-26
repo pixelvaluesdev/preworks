@@ -197,11 +197,11 @@ const Popup = ({
 
               {/* Message Input */}
               <BorderTextInput
-                label="Any Message"
+                label="Why choose you?"
                 value={message}
                 onChangeText={setMessage}
                 multiline
-                placeholder="Type here..."
+                placeholder="Mention your expertise, team  & nearby sites"
               />
 
               <SecondaryButton

@@ -1,15 +1,49 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
+import { useSelector } from 'react-redux';
+import ApiManager from '../../apis/ApiManager';
 
 const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
+  const user = useSelector(state => state.auth.user);
+
+  const userId = user?._id;
+  const token = useSelector((state: any) => state.auth.userToken);
   const [imgError, setImgError] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [profile, setProfile] = React.useState(null);
+
   const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, []),
+  );
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+
+      const res = await ApiManager.getProfile(userId, token);
+
+      if (res?.data?.status === 'success') {
+        setProfile(res.data.data);
+
+        console.log('Profile data 12232424:', res.data.data);
+      }
+    } catch (error) {
+      console.log('Profile Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.card}>
       <View style={styles.imageWrapper}>
@@ -17,12 +51,13 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
           source={
             image && !imgError
               ? { uri: image }
-              : require('../../assets/pngs/NoImg.png')
+              : require('../../assets/images/NoImg1.jpeg')
           }
           style={styles.image}
+          resizeMode="cover"
           onError={() => setImgError(true)}
         />
-        {/* 🔥 TIME BADGE */}
+        {/* TIME BADGE */}
         {time && (
           <View style={styles.timeBadge}>
             <Text style={styles.timeText}>{time}</Text>
@@ -44,9 +79,11 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigation.navigate('CommonProjectDetails', {
-                projectId: item._id,
-              });
+              profile?.user?.isSubscribed
+                ? navigation.navigate('CommonProjectDetails', {
+                    projectId: item._id,
+                  })
+                : navigation.navigate('Subscription');
               triggerHaptic('impactHeavy');
             }}
           >
@@ -56,9 +93,11 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              navigation.navigate('GeneralEnquiry', {
-                projectId: item._id,
-              });
+              profile?.user?.isSubscribed
+                ? navigation.navigate('GeneralEnquiry', {
+                    projectId: item._id,
+                  })
+                : navigation.navigate('Subscription');
               triggerHaptic('impactHeavy');
             }}
           >
@@ -82,10 +121,10 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#757575',
   },
-
   image: {
-    width: '100%',
+    width: '102%',
     height: 130,
+    marginLeft: -2,
   },
 
   content: {
@@ -128,6 +167,8 @@ const styles = StyleSheet.create({
   },
   imageWrapper: {
     position: 'relative',
+    width: '100%',
+    overflow: 'hidden',
   },
 
   timeBadge: {
