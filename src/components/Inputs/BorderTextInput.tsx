@@ -59,7 +59,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           placeholder={placeholder}
           placeholderTextColor="#a6a6a6"
           multiline={multiline}
-          numberOfLines={multiline ? 3 : 1}
+          numberOfLines={multiline ? 4 : 1}
           outlineColor="#757575"
           activeOutlineColor={Colors.primary}
           textColor={'#474747'}
@@ -69,37 +69,26 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           contentStyle={{
             fontSize: 16,
             fontFamily: FONT.POPPINS_REGULAR,
-          }}
-          onContentSizeChange={e => {
-            if (multiline) {
-              setInputHeight(e.nativeEvent.contentSize.height);
-            }
+            paddingTop: multiline ? 14 : 0,
+            paddingBottom: multiline ? 14 : 0,
+            textAlignVertical: multiline ? 'top' : 'center',
           }}
           style={[
             styles.input,
-
             {
-              height: multiline
-                ? Math.max(height || HEIGHT(6), inputHeight)
-                : height || HEIGHT(6),
+              minHeight: multiline ? HEIGHT(14) : HEIGHT(6),
+
               paddingLeft: leftComponent ? 90 : 0,
               paddingRight: rightComponent ? 40 : 0,
+
               fontSize: 14,
               fontFamily: FONT.POPPINS_REGULAR,
+
               textAlignVertical: multiline ? 'top' : 'center',
             },
           ]}
           outlineStyle={styles.outline}
           keyboardType={keyboardType}
-          theme={{
-            fonts: {
-              bodyLarge: {
-                fontFamily: FONT.POPPINS_REGULAR,
-                fontSize: 5,
-                color: 'red',
-              },
-            },
-          }}
           maxLength={maxLength}
         />
 

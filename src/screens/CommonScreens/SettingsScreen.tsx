@@ -31,6 +31,8 @@ import YesIcon from '../../assets/svgs/YesIcon.svg';
 import { IMG_URL } from '../../apis/ApiManager';
 import { triggerHaptic } from '../../utils/hapticks';
 import ScreenWrapper from '../../utils/screenWrapper';
+import { clearProjectDraft } from '../../redux/slices/projectDraftSlice';
+import { Persistor } from '../../redux/store';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
@@ -56,9 +58,11 @@ const SettingsScreen = () => {
     try {
       setLoading(true);
 
-      await AsyncStorage.removeItem('persist:root');
-
+      // AsyncStorage.removeItem('persist:root');
+      dispatch(clearProjectDraft());
       dispatch(clearUser());
+
+      await Persistor.purge();
 
       navigation.reset({
         index: 0,

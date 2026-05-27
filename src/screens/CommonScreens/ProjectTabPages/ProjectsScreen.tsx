@@ -12,7 +12,6 @@ import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-
 import PlusIcon from '../../../assets/svgs/PlusIcon.svg';
 import DeleteIcon from '../../../assets/svgs/Delete.svg';
 import ScreenHeader from '../../../components/ScreenHeader';
@@ -241,7 +240,11 @@ const ProjectsScreen = ({ route }: any) => {
           <ScreenHeader
             title="Projects"
             showBack
-            onBackPress={() => navigation.navigate('CustmTabNav')}
+            onBackPress={() => {
+            navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+            triggerHaptic('impactHeavy');
+          }}
+          
           />
 
           <View style={styles.content}>
@@ -277,7 +280,10 @@ const ProjectsScreen = ({ route }: any) => {
         <ScreenHeader
           title="Projects"
           showBack
-          onBackPress={() => navigation.navigate('CustmTabNav')}
+          onBackPress={() => {
+            navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+            triggerHaptic('impactHeavy');
+          }}
         />
 
         {!isCustomer && (

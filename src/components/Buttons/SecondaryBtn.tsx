@@ -41,7 +41,7 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <View style={styles.icon}>{icon}</View>
+      {icon && <View style={styles.icon}>{icon}</View>}
       <Text style={[styles.text, textStyle]}>{title}</Text>
     </TouchableOpacity>
   );
