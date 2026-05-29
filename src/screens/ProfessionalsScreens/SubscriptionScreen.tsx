@@ -1,22 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react'; //sdk
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Linking,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { FONT } from '../../theme/fonts';
-import { WIDTH, HEIGHT } from '../../utils/responsive';
+
 import {
   useNavigation,
   NavigationProp,
   useFocusEffect,
 } from '@react-navigation/native';
-import ApiManager from '../../apis/ApiManager';
+
 import { useSelector } from 'react-redux';
+
+import RazorpayCheckout from 'react-native-razorpay';
+
+import { FONT } from '../../theme/fonts';
+import { WIDTH, HEIGHT } from '../../utils/responsive';
+import ApiManager from '../../apis/ApiManager';
 
 /* ---------------- TYPES ---------------- */
 
@@ -28,18 +33,18 @@ type Plan = {
   description: string;
 };
 
-// (optional) navigation type (you can adjust later)
 type RootStackParamList = {
   Subscription: undefined;
+  ProfTabNav: undefined;
 };
 
 const SubscriptionScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const user = useSelector(state => state.auth.user);
-  const userId = user?._id;
+  const user = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.userToken);
-  console.log(user, 'user in sinnnn');
+
+  const userId = user?._id;
 
   const [selectedTab, setSelectedTab] = useState<'monthly' | 'yearly'>(
     'monthly',
@@ -47,7 +52,8 @@ const SubscriptionScreen = () => {
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
-  const [profile, setProfile] = useState(null);
+
+  /* ---------------- PROFILE ---------------- */
 
   useFocusEffect(
     useCallback(() => {
@@ -61,21 +67,23 @@ const SubscriptionScreen = () => {
 
       const res = await ApiManager.getProfile(userId, token);
 
+      console.log('PROFILE RESPONSE =>', res?.data);
+
       if (res?.data?.status === 'success') {
-        setProfile(res.data.data);
+        const profileData = res?.data?.data;
 
-        console.log('Profile data 12232424:', res.data.data);
-
-        if (res.data.data.user?.isSubscribed) {
+        if (profileData?.user?.isSubscribed) {
           navigation.replace('ProfTabNav');
         }
       }
     } catch (error) {
-      console.log('Profile Error:', error);
+      console.log('PROFILE ERROR =>', error);
     } finally {
       setLoading(false);
     }
   };
+
+  /* ---------------- PLANS ---------------- */
 
   useEffect(() => {
     fetchPlans();
@@ -86,17 +94,45 @@ const SubscriptionScreen = () => {
       setLoading(true);
 
       const res = await ApiManager.getSubscriptions();
-      console.log(res, 'sunsfrrerereen');
+
+      console.log('SUBSCRIPTION RESPONSE =>', res?.data);
 
       if (res?.data?.status === 'success') {
-        setPlans(res.data.data);
+        setPlans(res?.data?.data || []);
       }
-    } catch (e) {
-      console.log('Error fething plans', e);
+    } catch (error) {
+      console.log('FETCH PLAN ERROR =>', error);
+
+      // DUMMY DATA IF API FAILS
+      setPlans([
+        {
+          _id: '1',
+          title: 'Starter Plan',
+          price: '499',
+          period: 'Monthly',
+          description: 'Access for one month',
+        },
+        {
+          _id: '2',
+          title: 'Premium Plan',
+          price: '999',
+          period: 'Monthly',
+          description: 'Premium monthly subscription',
+        },
+        {
+          _id: '3',
+          title: 'Yearly Plan',
+          price: '4999',
+          period: 'Yearly',
+          description: 'Save more with yearly plan',
+        },
+      ]);
     } finally {
       setLoading(false);
     }
   };
+
+  /* ---------------- FILTER PLAN ---------------- */
 
   const filteredPlan = plans.filter(plan =>
     selectedTab === 'monthly'
@@ -104,50 +140,109 @@ const SubscriptionScreen = () => {
       : plan.period === 'Yearly',
   );
 
+  /* ---------------- PAYMENT ---------------- */
+
   const handleCreateOrder = async (plan: Plan) => {
     try {
       setLoading(true);
 
+      // OPTIONAL BODY
       const body = {
-        userId: userId,
+        userId: userId || 'dummy_user_id',
         packageId: plan._id,
         amount: plan.price,
         email: user?.email || 'test@gmail.com',
-        name: `${user.firstName} ${user.lastName}` || 'User',
+        name: `${user?.firstName || 'Test'} ${user?.lastName || 'User'}`,
         contact: user?.phone || '9999999999',
       };
 
-      console.log('CREATE ORDER BODY:', body);
+      console.log('CREATE ORDER BODY =>', body);
 
-      const res = await ApiManager.createOrder(body, token);
+      /*
+        REAL API CALL
+        Uncomment later when backend is ready
+      */
 
-      if (res?.data?.status === 'success') {
-        const paymentUrl = res.data.payment_url;
+      // const res = await ApiManager.createOrder(body, token);
 
-        Alert.alert(
-          'Proceed to Payment',
-          'You will be redirected to payment page.',
-          [
-            {
-              text: 'Continue',
-              onPress: () => Linking.openURL(paymentUrl),
-            },
-          ],
-        );
+      /*
+        DUMMY RESPONSE
+      */
+
+      const dummyResponse = {
+        data: {
+          status: 'success',
+          data: {
+            currency: 'INR',
+            amount: Number(plan.price) * 100,
+            orderId: 'order_Qwerty123456789',
+          },
+        },
+      };
+
+      console.log('DUMMY ORDER RESPONSE =>', dummyResponse);
+
+      if (dummyResponse?.data?.status === 'success') {
+        const options = {
+          description: plan.description || 'Subscription Payment',
+
+          image: 'https://i.imgur.com/3g7nmJC.jpg',
+
+          currency: dummyResponse.data.data.currency,
+
+          key: 'rzp_test_SukuuBUdHEG643',
+
+          amount: dummyResponse.data.data.amount,
+
+          name: 'PreWorks',
+
+          order_id: dummyResponse.data.data.orderId,
+
+          prefill: {
+            email: user?.email || 'test@gmail.com',
+
+            contact: user?.phone || '9999999999',
+
+            name: `${user?.firstName || 'Test'} ${user?.lastName || 'User'}`,
+          },
+
+          theme: {
+            color: '#3AA171',
+          },
+        };
+
+        console.log('RAZORPAY OPTIONS =>', options);
+
+        RazorpayCheckout.open(options)
+          .then((data: any) => {
+            console.log('PAYMENT SUCCESS =>', data);
+
+            Alert.alert('Success', `Payment ID: ${data.razorpay_payment_id}`);
+          })
+          .catch((error: any) => {
+            console.log('PAYMENT FAILED =>', error);
+
+            Alert.alert(
+              'Payment Failed',
+              error?.description || 'Something went wrong',
+            );
+          });
       }
-    } catch (error) {
-      console.log(' FULL ERROR:', error?.response?.data);
-      console.log(' STATUS:', error?.response?.status);
+    } catch (error: any) {
+      console.log('PAYMENT ERROR =>', error);
     } finally {
       setLoading(false);
     }
   };
+
+  /* ---------------- CARD ---------------- */
 
   const renderCard = (plan: Plan) => {
     return (
       <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
           <Text style={styles.price}>₹{plan.price}</Text>
+
           <Text style={styles.planTitle}>{plan.title}</Text>
         </View>
 
@@ -163,12 +258,14 @@ const SubscriptionScreen = () => {
     );
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
     <View style={styles.container}>
-      {/* HEADER */}
       <Text style={styles.header}>Subscription</Text>
 
       {/* TOGGLE */}
+
       <View style={styles.toggleContainer}>
         <TouchableOpacity
           style={[
@@ -205,9 +302,10 @@ const SubscriptionScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* CARDS */}
+      {/* LOADER */}
+
       {loading ? (
-        <Text style={{ textAlign: 'center' }}>Loading...</Text>
+        <ActivityIndicator size="large" color="#3AA171" />
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           {filteredPlan.map(renderCard)}
@@ -219,19 +317,22 @@ const SubscriptionScreen = () => {
 
 export default SubscriptionScreen;
 
+/* ---------------- STYLES ---------------- */
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: WIDTH(5),
     paddingTop: HEIGHT(5),
   },
 
   header: {
-    fontSize: 20,
+    fontSize: 22,
     textAlign: 'center',
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    marginBottom: 20,
+    marginBottom: HEIGHT(3),
+    color: '#000',
   },
 
   toggleContainer: {
@@ -239,18 +340,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#EDEDED',
     borderRadius: 30,
     padding: 4,
-    marginBottom: 20,
+    marginBottom: HEIGHT(3),
     alignSelf: 'center',
   },
 
   toggleBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingVertical: HEIGHT(1),
+    paddingHorizontal: WIDTH(6),
     borderRadius: 30,
   },
 
   activeToggle: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
 
   toggleText: {
@@ -263,13 +364,12 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
+    padding: WIDTH(5),
+    marginBottom: HEIGHT(2),
     borderColor: '#F2F3F5',
     borderWidth: 2,
-    marginHorizontal: 14,
   },
 
   rowBetween: {
@@ -279,47 +379,35 @@ const styles = StyleSheet.create({
   },
 
   price: {
-    fontSize: 22,
+    fontSize: 24,
     fontFamily: FONT.POPPINS_SEMIBOLD,
+    color: '#000',
   },
 
   planTitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: FONT.POPPINS_SEMIBOLD,
+    color: '#3AA171',
   },
 
   subText: {
-    marginTop: 5,
+    marginTop: HEIGHT(1),
     color: '#747284',
     fontFamily: FONT.POPPINS_MEDIUM,
-  },
-
-  featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-
-  check: {
-    color: '#3AA171',
-    marginRight: 8,
-  },
-
-  featureText: {
-    fontFamily: FONT.POPPINS_REGULAR,
-    color: '#333',
+    lineHeight: 22,
   },
 
   button: {
     backgroundColor: '#3AA171',
-    marginTop: 15,
-    paddingVertical: 12,
-    borderRadius: 10,
+    marginTop: HEIGHT(2),
+    paddingVertical: HEIGHT(1.5),
+    borderRadius: 12,
     alignItems: 'center',
   },
 
   buttonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontFamily: FONT.POPPINS_SEMIBOLD,
+    fontSize: 14,
   },
 });
