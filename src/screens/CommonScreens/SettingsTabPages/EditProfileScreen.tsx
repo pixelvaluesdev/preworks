@@ -13,6 +13,8 @@ import {
   Alert,
   PermissionsAndroid,
   ActivityIndicator,
+  BackHandler,
+  FlatList,
 } from 'react-native';
 
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
@@ -85,6 +87,30 @@ const EditProfileScreen = ({ navigation }: any) => {
       fetchProfile();
     }
   }, [userId]);
+
+  useEffect(() => {
+    const backAction = () => {
+      Alert.alert('Exit App', 'Do you want to close the app?', [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => BackHandler.exitApp(),
+        },
+      ]);
+
+      return true; // prevent default back action
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
 
   const handleLinkChange = (text, index) => {
     const updatedLinks = [...links];
@@ -395,8 +421,14 @@ const EditProfileScreen = ({ navigation }: any) => {
 
       const result = await response.json();
 
-      if (result[0].Status === 'Success') {
-        setCityPincodes(result[0].PostOffice || []);
+      if (result[0]?.Status === 'Success') {
+        const pins = result[0]?.PostOffice || [];
+
+        setCityPincodes(pins);
+        setPinSuggestions(pins);
+      } else {
+        setCityPincodes([]);
+        setPinSuggestions([]);
       }
     } catch (error) {
       console.log(error);
@@ -422,12 +454,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const handlePinSearch = text => {
     handleInputChange('pin', text, setPin);
-
-    if (text.length < 1) {
-      setPinSuggestions([]);
-      setShowPinDropdown(false);
-      return;
-    }
 
     const filteredPins = cityPincodes
       .filter(item => item.Pincode.includes(text))
@@ -475,7 +501,26 @@ const EditProfileScreen = ({ navigation }: any) => {
                 />
                 <TouchableOpacity
                   style={styles.backBtn}
-                  onPress={() => navigation.goBack()}
+                  onPress={() => {
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    } else {
+                      Alert.alert('Exit App', 'Do you want to close the app?', [
+                        {
+                          text: 'Cancel',
+                          style: 'cancel',
+                        },
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            setTimeout(() => {
+                              BackHandler.exitApp();
+                            }, 300);
+                          },
+                        },
+                      ]);
+                    }
+                  }}
                 >
                   <Back />
                 </TouchableOpacity>
@@ -577,7 +622,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 onPress={() => {
                                   setCity(item.name);
                                   fetchPincodes(item.name);
+
                                   setShowDropdown(false);
+                                  setShowPinDropdown(true);
                                 }}
                               >
                                 {item.name}
@@ -598,30 +645,36 @@ const EditProfileScreen = ({ navigation }: any) => {
                         onChangeText={handlePinSearch}
                         placeholder="Pincode"
                         keyboardType="number-pad"
+                        onFocus={() => {
+                          setPinSuggestions(cityPincodes);
+                          setShowPinDropdown(true);
+                        }}
                       />
 
                       {showPinDropdown && pinSuggestions.length > 0 && (
                         <View style={styles.dropdown}>
                           <ScrollView
-                            nestedScrollEnabled
+                            nestedScrollEnabled={true}
                             keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={true}
                           >
                             {pinSuggestions.map((item, index) => (
-                              <Text
+                              <TouchableOpacity
                                 key={index}
-                                style={styles.item}
                                 onPress={() => {
                                   setPin(item.Pincode);
                                   setState(item.State || '');
                                   setShowPinDropdown(false);
                                 }}
                               >
-                                {item.Pincode}
-                                <Text style={{ color: '#888' }}>
-                                  {' '}
-                                  - {item.Name}
+                                <Text style={styles.item}>
+                                  {item.Pincode}
+                                  <Text style={{ color: '#888' }}>
+                                    {' '}
+                                    - {item.Name}
+                                  </Text>
                                 </Text>
-                              </Text>
+                              </TouchableOpacity>
                             ))}
                           </ScrollView>
                         </View>
@@ -844,9 +897,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    zIndex: 1000,
-    elevation: 5,
-    maxHeight: 150,
+    zIndex: 9999,
+    elevation: 20,
+    maxHeight: HEIGHT(25), // increase
   },
 
   item: {

@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
 
   fileText: {
     fontSize: 12,
-    flex: 1,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
   cross: {

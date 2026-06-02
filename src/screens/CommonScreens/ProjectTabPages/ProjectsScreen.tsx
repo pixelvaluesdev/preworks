@@ -241,10 +241,9 @@ const ProjectsScreen = ({ route }: any) => {
             title="Projects"
             showBack
             onBackPress={() => {
-            navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
-            triggerHaptic('impactHeavy');
-          }}
-          
+              navigation.replace(isCustomer ? 'CustmTabNav' : 'ProfTabNav');
+              triggerHaptic('impactHeavy');
+            }}
           />
 
           <View style={styles.content}>

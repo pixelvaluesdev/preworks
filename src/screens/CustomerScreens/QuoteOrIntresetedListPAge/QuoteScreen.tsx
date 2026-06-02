@@ -9,7 +9,6 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
 import ScreenHeader from '../../../components/ScreenHeader';
@@ -17,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { ActivityIndicator } from 'react-native-paper';
+import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
 
 const QuoteListScreen = ({ route }: any) => {
   const token = useSelector(state => state.auth.userToken);
@@ -113,6 +113,10 @@ const QuoteListScreen = ({ route }: any) => {
 
           return (
             <View style={styles.emptyContainer}>
+              <Image
+                source={require('../../../assets/pngs/EmptyBox.png')}
+                style={styles.emptyImage}
+              />
               <Text style={styles.emptyText}>
                 {isQuote ? 'No quotes yet' : 'No one has shown interest yet'}
               </Text>
@@ -184,5 +188,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyImage: {
+    marginTop: -80,
+    width: WIDTH(80),
+    height: HEIGHT(50),
   },
 });

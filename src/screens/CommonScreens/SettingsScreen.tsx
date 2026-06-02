@@ -241,10 +241,14 @@ const SettingsScreen = () => {
 
           <CustomPopup
             visible={showDeletePopup}
-            message="Are you sure you want to delete your account?"
+            message={{
+              title: 'Are you sure you want to delete your account?',
+              subtitle:
+                'Your account deletion request will be sent to the admin and reviewed within 3 working days.',
+            }}
             buttons={[
               {
-                label: 'Delete',
+                label: 'Send Request',
                 type: 'primary',
                 onPress: () => {
                   console.log('Delete API call here');

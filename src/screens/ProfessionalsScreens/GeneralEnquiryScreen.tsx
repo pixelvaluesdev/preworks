@@ -217,14 +217,14 @@ const GeneralEnquiryScreen = () => {
         <View style={styles.dashedDivider} />
 
         {/* Interested Button */}
-        {!fromProjectsScreen && (
-          <TouchableOpacity
-            style={styles.interestedBtn}
-            onPress={() => setShowPopup(true)}
-          >
-            <Text style={styles.interestedText}>I'm Interested</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.interestedBtn}
+          onPress={() => setShowPopup(true)}
+        >
+          <Text style={styles.interestedText}>
+            {fromProjectsScreen ? 'Show Interest Again' : "I'm Interested"}
+          </Text>
+        </TouchableOpacity>
 
         <Popup
           title={'Show Your Interest'}

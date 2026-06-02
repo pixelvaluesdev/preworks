@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigator from './src/navigation/AppNavigator';
 import { Persistor, Store } from './src/redux/store';
@@ -6,24 +7,32 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { SnackbarProvider } from './src/hooks/SnackbarProvider';
 import { PersistGate } from 'redux-persist/integration/react';
 import { InternetProvider } from './src/context/InternetContext';
+
 import { requestUserPermission } from './src/utils/requestUserPermission';
+
 import {
   getFCMToken,
-  notificationClickListener,
   notificationListener,
 } from './src/utils/firebaseNotifications';
-import { useEffect } from 'react';
-import { useNavigation } from './react-navigation';
 
 function App() {
   useEffect(() => {
-    requestUserPermission();
-    getFCMToken();
-    notificationListener();
-  }, []);
+    const initializeNotifications = async () => {
+      try {
+        // Delay fixes activity attach issue
+        setTimeout(async () => {
+          await requestUserPermission();
+          await getFCMToken();
 
-  const navigation = useEffect(() => {
-    notificationClickListener(navigation);
+          // Register foreground listener
+          notificationListener();
+        }, 2000);
+      } catch (e) {
+        console.log('Notification Init Error:', e);
+      }
+    };
+
+    initializeNotifications();
   }, []);
 
   return (

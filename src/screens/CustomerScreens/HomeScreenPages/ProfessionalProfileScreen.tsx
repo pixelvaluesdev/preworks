@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import {
   useFocusEffect,
@@ -102,7 +103,7 @@ const ProfessionalProfileScreen = () => {
     }
   };
 
-  const handleCall = () => {
+  const handleCall = async () => {
     const phone = profile?.user?.phone;
 
     if (!phone) {
@@ -110,8 +111,31 @@ const ProfessionalProfileScreen = () => {
       return;
     }
 
-    Linking.openURL(`tel:${phone}`);
-    triggerHaptic('impactHeavy');
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+          {
+            title: 'Phone Call Permission',
+            message: 'App needs permission to make phone calls',
+            buttonPositive: 'Allow',
+            buttonNegative: 'Deny',
+          },
+        );
+
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          Linking.openURL(`tel:${phone}`);
+          triggerHaptic('impactHeavy');
+        } else {
+          Alert.alert('Permission Denied');
+        }
+      } else {
+        Linking.openURL(`tel:${phone}`);
+        triggerHaptic('impactHeavy');
+      }
+    } catch (error) {
+      console.log('Call Error:', error);
+    }
   };
   const handleLinks = () => {
     const links = profile?.user?.links;
@@ -299,7 +323,9 @@ const ProfessionalProfileScreen = () => {
                       title={'Add Work'}
                       style={styles.submitBtn}
                       onPress={() => {
-                        navigation.navigate('AddWork');
+                        navigation.navigate('AddWork', {
+                          userId: profile?.user?._id,
+                        });
                       }}
                     />
                   )}

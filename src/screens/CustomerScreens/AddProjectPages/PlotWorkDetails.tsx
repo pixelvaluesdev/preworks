@@ -4,6 +4,7 @@ import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import BorderDropdown from '../../../components/Inputs/BorderDropdown';
 import { FONT } from '../../../theme/fonts';
 import { HEIGHT } from '../../../utils/responsive';
+import Colors from '../../../constants/colors';
 
 const PlotWorkDetails = ({ data, handleChange }: any) => {
   return (
@@ -93,6 +94,8 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
         }
       />
 
+      <Text style={styles.noteText}>Note: Enter 0 for only ground floor.</Text>
+
       <BorderDropdown
         label="Type Of Quote"
         value={data.quoteType}
@@ -159,5 +162,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
+  },
+  noteText: {
+    fontSize: 12,
+    color: Colors.primary,
+    fontFamily: FONT.POPPINS_REGULAR,
+    marginTop: -20,
+    marginBottom: 5,
   },
 });

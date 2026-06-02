@@ -320,7 +320,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       setIsSuccess(true);
       setPopupMessage({
-        title: 'Project Posted Successfully',
+        title: isEdit
+          ? 'Project Updated Successfully'
+          : 'Project Posted Successfully',
         subtitle:
           'You will start receiving responses soon.\nYou can track your project in the Projects tab.',
       });
@@ -459,7 +461,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
                 if (isSuccess) {
                   dispatch(clearProjectDraft());
-                  navigation.navigate('ProjectDetails');
+                  navigation.replace('ProjectDetails');
                 }
               },
             },

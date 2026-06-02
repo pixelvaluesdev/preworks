@@ -259,14 +259,20 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
               const isSelected = services.includes(item);
 
               return (
-                <View key={item} style={styles.checkboxRow}>
+                <TouchableOpacity
+                  key={item}
+                  style={styles.checkboxRow}
+                  activeOpacity={0.7}
+                  onPress={() => toggleService(item)}
+                >
                   <CheckBox
                     value={isSelected}
                     onValueChange={() => toggleService(item)}
                     tintColors={{ true: Colors.primary, false: '#999' }}
                   />
+
                   <Text style={styles.checkboxLabel}>{item}</Text>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>

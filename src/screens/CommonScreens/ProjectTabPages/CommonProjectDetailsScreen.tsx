@@ -507,33 +507,17 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
             </>
           )}
 
-          {!isCustomer && !fromProjectsScreen && (
-            <>
-              <View style={{ marginTop: 15 }}>
-                {/* <TouchableOpacity>
-                  <BorderTextInput
-                    label="Architectural Drawing"
-                    placeholder="Architectural Drawing.PDF"
-                    editable={false}
-                    // value={data.lastDate}
-                    // onChangeText={text => handleChange('lastDate', text)}
-                    height={HEIGHT(7)}
-                    rightComponent={
-                      <>
-                        <TouchableOpacity>
-                          <DownloadIcon />
-                        </TouchableOpacity>
-                      </>
-                    }
-                  />
-                </TouchableOpacity> */}
-
-                <SecondaryButton
-                  title="Send Your Quotation"
-                  onPress={() => setShowPopup(true)}
-                />
-              </View>
-            </>
+          {!isCustomer && (
+            <View style={{ marginTop: 15 }}>
+              <SecondaryButton
+                title={
+                  fromProjectsScreen
+                    ? 'Send Quotation Again'
+                    : 'Send Your Quotation'
+                }
+                onPress={() => setShowPopup(true)}
+              />
+            </View>
           )}
         </View>
       </ScrollView>
