@@ -69,7 +69,7 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
     const options = {
       mediaType: 'photo',
       quality: 0.7,
-      selectionLimit: MAX_FILES - existingCount, // ✅ limit remaining
+      selectionLimit: MAX_FILES - existingCount, //  remaining
     };
 
     launchImageLibrary(options, async response => {
@@ -199,7 +199,7 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>
           Do you already have architectural drawings?
-          <Text style={styles.asterisk}> *</Text>
+          <Text style={styles.asterisk}>*</Text>
         </Text>
 
         <View style={styles.radioRow}>
@@ -340,13 +340,29 @@ const UploadBox = ({
   textStyle,
   onRemove,
 }: any) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const handlePress = () => {
+    setIsFocused(true);
+
+    onPress?.();
+
+    // remove focus after picker opens
+    setTimeout(() => {
+      setIsFocused(false);
+    }, 1000);
+  };
   return (
     <View style={styles.inputWrapper}>
       <Text style={[styles.label, textStyle]}>
         {label} <Text style={styles.asterisk}> *</Text>
       </Text>
 
-      <TouchableOpacity style={styles.uploadBox} onPress={onPress}>
+      <TouchableOpacity
+        style={[styles.uploadBox, value?.length > 0 && styles.focusedUploadBox]}
+        onPress={handlePress}
+        activeOpacity={0.8}
+      >
         {rightComponent && (
           <View style={styles.uploadIcon}>{rightComponent}</View>
         )}
@@ -432,13 +448,42 @@ const styles = StyleSheet.create({
   },
 
   uploadBox: {
-    borderWidth: 0.75,
-    borderColor: '#757575',
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 16,
     justifyContent: 'center',
     paddingTop: 22,
+
+    backgroundColor: '#fff',
+
+    borderColor: '#E2E2E2',
+    borderWidth: 1.2,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+
+    elevation: 2,
+  },
+  focusedUploadBox: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+
+    shadowColor: Colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+
+    elevation: 10,
+
+    backgroundColor: '#FFFFFF',
   },
 
   questionContainer: {

@@ -39,6 +39,7 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   const [isFocused, setIsFocused] = useState(false);
+
   return (
     <View style={[styles.inputWrapper, containerStyle]}>
       <Text style={styles.floatingLabel}>

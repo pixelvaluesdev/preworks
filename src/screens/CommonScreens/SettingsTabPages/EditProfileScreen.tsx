@@ -770,7 +770,11 @@ const EditProfileScreen = ({ navigation }: any) => {
                   type: 'primary',
                   onPress: () => {
                     setShowPopup(false);
-                    navigation.replace('ProfTabNav');
+                    if (isProfessional) {
+                      navigation.replace('ProfTabNav');
+                    } else {
+                      navigation.replace('CustmTabNav');
+                    }
                   },
                 },
               ]}

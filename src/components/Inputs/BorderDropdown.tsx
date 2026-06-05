@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import DownArrow from '../../assets/svgs/downArrow.svg';
+import Colors from '../../constants/colors';
 
 interface BorderDropdownProps {
   label: string;
@@ -18,6 +19,8 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
 
+  const isFocused = open;
+
   return (
     <View style={styles.wrapper}>
       {/* FLOATING LABEL */}
@@ -27,7 +30,10 @@ const BorderDropdown: React.FC<BorderDropdownProps> = ({
       </Text>
 
       {/* DROPDOWN BOX */}
-      <TouchableOpacity style={styles.dropdown} onPress={() => setOpen(!open)}>
+      <TouchableOpacity
+        style={[styles.dropdown, isFocused && styles.focusedDropdown]}
+        onPress={() => setOpen(!open)}
+      >
         <Text
           style={{
             color: value ? '#474747' : '#a6a6a6',
@@ -82,16 +88,26 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    borderWidth: 0.75,
-    borderColor: '#757575',
-    borderRadius: 10,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
     alignItems: 'center',
-    textAlignVertical: 'center',
+    backgroundColor: '#fff',
+
+    borderColor: '#E2E2E2',
+    borderWidth: 1.2,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+
+    elevation: 2,
   },
 
   arrow: {
@@ -120,5 +136,21 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 14,
     color: '#474747',
+  },
+  focusedDropdown: {
+    borderColor: Colors.primary,
+    borderWidth: 1,
+
+    shadowColor: Colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+
+    elevation: 10,
+
+    backgroundColor: '#FFFFFF',
   },
 });

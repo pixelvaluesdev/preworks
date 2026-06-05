@@ -195,7 +195,10 @@ const SettingsScreen = () => {
             </TouchableOpacity>
 
             {/* FAQ's */}
-            <TouchableOpacity style={styles.row}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => navigation.navigate('FAQ')}
+            >
               <View style={styles.rowLeft}>
                 <PolicyIcon />
                 <Text style={styles.rowText}>FAQ's</Text>

@@ -84,6 +84,7 @@ const requestPath = {
 
   helpRequest: '/customer/helpUs',
   registerFcmToken: '/auth/register-fcm-token',
+  getFAQ: '/admin/getFaqs',
 };
 
 const ApiManager = {
@@ -172,6 +173,9 @@ const ApiManager = {
 
   registerFcmToken: (data: any, token?: string) => {
     return requests.post(requestPath.registerFcmToken, data, token);
+  },
+  getFAQ: (token?: string) => {
+    return requests.get(requestPath.getFAQ, token);
   },
 };
 
