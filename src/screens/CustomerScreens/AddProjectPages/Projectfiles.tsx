@@ -24,7 +24,7 @@ import { Image as Compressor } from 'react-native-compressor';
 const Projectfile = ({ data, handleChange, loading }: any) => {
   const token = useSelector(state => state.auth.userToken);
 
-  const hasDrawing = data?.hasDrawing ?? false;
+  const hasDrawing = data?.hasDrawing ?? true;
   const services = data?.services || [];
 
   const [popupVisible, setPopupVisible] = useState(false);
@@ -194,6 +194,7 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
         onRemove={(file, index) => handleRemove(file, index, 'image')}
+        required={false}
       />
 
       <View style={styles.questionContainer}>
@@ -339,6 +340,7 @@ const UploadBox = ({
   rightComponent,
   textStyle,
   onRemove,
+  required,
 }: any) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -355,7 +357,8 @@ const UploadBox = ({
   return (
     <View style={styles.inputWrapper}>
       <Text style={[styles.label, textStyle]}>
-        {label} <Text style={styles.asterisk}> *</Text>
+        {label}
+        {required ? <Text style={styles.asterisk}> *</Text> : null}
       </Text>
 
       <TouchableOpacity

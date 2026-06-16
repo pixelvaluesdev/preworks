@@ -253,8 +253,13 @@ const CustomerHomeScreen = () => {
                     style={styles.proImage}
                   />
 
-                  <Text style={styles.proName}>{fullName}</Text>
-
+                  <Text
+                    style={styles.proName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {fullName}
+                  </Text>
                   <Text style={styles.proExp}>
                     {item.userType?.toUpperCase()}
                   </Text>

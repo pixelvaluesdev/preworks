@@ -93,8 +93,20 @@ const ProfessionalListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title={search ? 'Search' : 'All Professionals'} showBack />
-
+      <ScreenHeader
+        title={
+          search
+            ? 'Search'
+            : type
+            ? `All ${
+                type.toLowerCase() === 'all'
+                  ? 'Professionals'
+                  : type.charAt(0).toUpperCase() + type.slice(1)
+              }`
+            : 'All Professionals'
+        }
+        showBack
+      />
       <SearchHeader
         value={search}
         onChangeText={setSearch}
@@ -164,7 +176,11 @@ const ProfessionalListScreen = () => {
                     paddingHorizontal: 10,
                   }}
                 >
-                  <Text style={styles.name}>
+                  <Text
+                    style={styles.name}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
                     {item.firstName} {item.lastName}
                   </Text>
 

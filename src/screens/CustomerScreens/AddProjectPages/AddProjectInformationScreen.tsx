@@ -47,14 +47,20 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   const draftForm = useSelector(state => state.projectDraft.form);
   const [initialForm, setInitialForm] = useState(null);
 
+  console.log('Redux draft:', draftForm.hasDrawing);
+
   useEffect(() => {
     if (isEdit && projectId) {
       fetchProjectDetails();
     }
   }, [isEdit, projectId]);
 
-  const [form, setForm] = useState(draftForm);
+  const [form, setForm] = useState({
+    ...draftForm,
+    hasDrawing: isEdit ? draftForm?.hasDrawing : draftForm?.hasDrawing ?? true,
+  });
 
+  console.log('Form state:', form.hasDrawing);
   const dispatch = useDispatch();
 
   const handleChange = (key: string, value: any) => {
@@ -118,10 +124,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
     // STEP 3 validation (Files)
     if (step === 3) {
-      const totalImages =
-        (form.siteImage?.length || 0) + (form.existingImages?.length || 0);
-
-      if (totalImages === 0) return false;
+      // REMOVE mandatory image check
 
       if (form.hasDrawing) {
         const totalDrawings =
@@ -131,7 +134,6 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
         if (totalDrawings === 0) return false;
       } else {
         if (!form.services || form.services.length === 0) return false;
-        // hideNumber is NOT mandatory → no need to validate
       }
     }
 

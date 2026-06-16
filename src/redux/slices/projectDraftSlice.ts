@@ -18,7 +18,7 @@ const initialState = {
     archDrawing: [],
     existingImages: [],
     existingDrawings: [],
-    hasDrawing: false,
+    hasDrawing: true,
     services: [],
     hideNumber: false,
   },

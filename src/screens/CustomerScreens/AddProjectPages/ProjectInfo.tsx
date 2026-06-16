@@ -10,27 +10,27 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   const [pinSuggestions, setPinSuggestions] = useState([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
   const [cityPincodes, setCityPincodes] = useState([]);
-
   const fetchPincodes = async cityName => {
     try {
-      console.log('City Selected:', cityName);
-
       const response = await fetch(
         `https://api.postalpincode.in/postoffice/${cityName}`,
       );
 
       const result = await response.json();
 
-      console.log('API Result:', JSON.stringify(result, null, 2));
-
       if (result[0]?.Status === 'Success') {
         const pins = result[0]?.PostOffice || [];
 
         setCityPincodes(pins);
         setPinSuggestions(pins);
+
+        // ADD THESE LINES
+        setShowPinDropdown(true);
+        handleChange('pinCode', '');
       } else {
         setCityPincodes([]);
         setPinSuggestions([]);
+        setShowPinDropdown(false);
       }
     } catch (error) {
       console.log('PIN API Error:', error);
@@ -61,9 +61,10 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   const handlePinSearch = text => {
     handleChange('pinCode', text);
 
-    if (text.length < 1) {
-      setPinSuggestions([]);
-      setShowPinDropdown(false);
+    if (text.length === 0) {
+      // Show all pincodes again
+      setPinSuggestions(cityPincodes);
+      setShowPinDropdown(cityPincodes.length > 0);
       return;
     }
 
@@ -72,7 +73,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       .slice(0, 10);
 
     setPinSuggestions(filteredPins);
-    setShowPinDropdown(true);
+    setShowPinDropdown(filteredPins.length > 0);
   };
 
   return (

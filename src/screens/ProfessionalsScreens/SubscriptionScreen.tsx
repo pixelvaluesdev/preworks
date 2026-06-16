@@ -8,15 +8,24 @@ import {
   Linking,
   Alert,
 } from 'react-native';
+
+// import Ionicons from 'react-native-vector-icons/Ionicons';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import { FONT } from '../../theme/fonts';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
+import Building from '../../assets/svgs/Buildings.svg';
+
 import {
   useNavigation,
   NavigationProp,
   useFocusEffect,
 } from '@react-navigation/native';
+
 import ApiManager from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
+import ScreenHeader from '../../components/ScreenHeader';
+import ScreenWrapper from '../../utils/screenWrapper';
 
 /* ---------------- TYPES ---------------- */
 
@@ -162,58 +171,149 @@ const SubscriptionScreen = () => {
       </View>
     );
   };
-
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       {/* HEADER */}
-      <Text style={styles.header}>Subscription</Text>
 
-      {/* TOGGLE */}
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[
-            styles.toggleBtn,
-            selectedTab === 'monthly' && styles.activeToggle,
-          ]}
-          onPress={() => setSelectedTab('monthly')}
-        >
-          <Text
-            style={[
-              styles.toggleText,
-              selectedTab === 'monthly' && styles.activeText,
-            ]}
-          >
-            Monthly
-          </Text>
-        </TouchableOpacity>
+      <ScreenHeader title={'Subsciption'} showBack />
 
-        <TouchableOpacity
-          style={[
-            styles.toggleBtn,
-            selectedTab === 'yearly' && styles.activeToggle,
-          ]}
-          onPress={() => setSelectedTab('yearly')}
-        >
-          <Text
-            style={[
-              styles.toggleText,
-              selectedTab === 'yearly' && styles.activeText,
-            ]}
-          >
-            Yearly
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        {/* TOP BANNER */}
 
-      {/* CARDS */}
-      {loading ? (
-        <Text style={{ textAlign: 'center' }}>Loading...</Text>
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {filteredPlan.map(renderCard)}
-        </ScrollView>
-      )}
-    </View>
+        <View style={styles.banner}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bannerTitle}>
+              Everything you need to win more projects
+            </Text>
+
+            <Text style={styles.bannerSubtitle}>
+              Unlock full access and grow your business with premium.
+            </Text>
+          </View>
+
+          {/* <MaterialCommunityIcons
+            name="office-building"
+            size={70}
+            color="#C6C6C6"
+          /> */}
+
+          <Building />
+        </View>
+
+        {/* FEATURES */}
+
+        <View style={styles.featureContainer}>
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              {/* <Ionicons name="document-text" size={18} color="#3AA171" /> */}
+            </View>
+
+            <Text style={styles.featureText}>Full access to live projects</Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              {/* <Ionicons name="eye" size={18} color="#3AA171" /> */}
+            </View>
+
+            <Text style={styles.featureText}>
+              View Complete enquiry details
+            </Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              {/* <Ionicons name="call" size={18} color="#3AA171" /> */}
+            </View>
+
+            <Text style={styles.featureText}>
+              Contact project owner directly
+            </Text>
+          </View>
+
+          <View style={styles.featureItem}>
+            <View style={styles.featureIcon}>
+              {/* <Ionicons name="paper-plane" size={18} color="#3AA171" /> */}
+            </View>
+
+            <Text style={styles.featureText}>Submit Quotations</Text>
+          </View>
+        </View>
+
+        {/* PLANS */}
+
+        {loading ? (
+          <Text style={{ textAlign: 'center', marginTop: 40 }}>Loading...</Text>
+        ) : (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {filteredPlan.map((plan, index) => {
+              const yearly = plan.period?.toLowerCase() === 'yearly';
+
+              return (
+                <View key={plan._id} style={styles.planCard}>
+                  {yearly && (
+                    <View style={styles.popularBadge}>
+                      <Text style={styles.popularText}>MOST POPULAR</Text>
+                    </View>
+                  )}
+
+                  <Text style={styles.planTitleCenter}>{plan.title}</Text>
+
+                  <Text style={styles.planSub}>
+                    Best value for serious professionals
+                  </Text>
+
+                  <View style={styles.priceRow}>
+                    <Text style={styles.bigPrice}>₹{plan.price}</Text>
+
+                    <Text style={styles.yearText}>/{plan.period}</Text>
+                  </View>
+
+                  {yearly && (
+                    <View style={styles.saveRow}>
+                      <Text style={styles.oldPrice}>₹17,988</Text>
+
+                      <View style={styles.saveBadge}>
+                        <Text style={styles.saveText}>Save 17%</Text>
+                      </View>
+                    </View>
+                  )}
+
+                  <View style={styles.divider} />
+
+                  {[
+                    'Unlimited Projects Access',
+                    'Contact Project Owners',
+                    'Submit Quotations',
+                    'Priority Visibility',
+                  ].map(item => (
+                    <View style={styles.featureRow} key={item}>
+                      {/* <Ionicons
+                        name="checkmark-circle"
+                        size={18}
+                        color="#16A34A"
+                      /> */}
+
+                      <Text style={styles.cardFeature}>{item}</Text>
+                    </View>
+                  ))}
+
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => handleCreateOrder(plan)}
+                  >
+                    <Text style={styles.buttonText}>Choose {plan.title}</Text>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </ScrollView>
+        )}
+      </ScrollView>
+    </ScreenWrapper>
   );
 };
 
@@ -222,104 +322,198 @@ export default SubscriptionScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: WIDTH(5),
-    paddingTop: HEIGHT(5),
+    backgroundColor: 'white',
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 18,
   },
 
   header: {
-    fontSize: 20,
-    textAlign: 'center',
+    fontSize: 22,
     fontFamily: FONT.POPPINS_SEMIBOLD,
-    marginBottom: 20,
+    color: '#111',
   },
 
-  toggleContainer: {
+  banner: {
+    backgroundColor: '#EEF4EF',
+
+    padding: 16,
     flexDirection: 'row',
-    backgroundColor: '#EDEDED',
-    borderRadius: 30,
-    padding: 4,
-    marginBottom: 20,
-    alignSelf: 'center',
+    alignItems: 'center',
+    marginBottom: 18,
   },
 
-  toggleBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 30,
+  bannerTitle: {
+    fontSize: 18,
+    color: '#111',
+    fontFamily: FONT.POPPINS_BOLD,
+    lineHeight: 28,
   },
 
-  activeToggle: {
-    backgroundColor: '#fff',
+  bannerSubtitle: {
+    marginTop: 6,
+    color: '#666',
+    fontSize: 12,
+    fontFamily: FONT.POPPINS_REGULAR,
   },
 
-  toggleText: {
-    fontFamily: FONT.POPPINS_MEDIUM,
-    color: '#777',
-  },
-
-  activeText: {
-    color: '#3AA171',
-  },
-
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 20,
-    borderColor: '#F2F3F5',
-    borderWidth: 2,
-    marginHorizontal: 14,
-  },
-
-  rowBetween: {
+  featureContainer: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#EAEAEA',
+    paddingVertical: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 22,
+    marginHorizontal: 20,
+  },
+
+  featureItem: {
+    width: '23%',
     alignItems: 'center',
   },
 
-  price: {
-    fontSize: 22,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
+  featureIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#EAF8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
 
-  planTitle: {
-    fontSize: 14,
-    fontFamily: FONT.POPPINS_SEMIBOLD,
-  },
-
-  subText: {
-    marginTop: 5,
-    color: '#747284',
+  featureText: {
+    fontSize: 11,
+    textAlign: 'center',
+    color: '#444',
     fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  planCard: {
+    width: WIDTH(72),
+    backgroundColor: '#FFF',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: '#4CAF7D',
+    padding: 16,
+    marginRight: 15,
+    marginTop: 18,
+  },
+
+  popularBadge: {
+    position: 'absolute',
+    top: -15,
+    alignSelf: 'center',
+    backgroundColor: '#3AA171',
+    paddingHorizontal: 18,
+    paddingVertical: 7,
+    borderRadius: 20,
+    zIndex: 10,
+  },
+
+  popularText: {
+    color: '#FFF',
+    fontSize: 11,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+
+  planTitleCenter: {
+    textAlign: 'center',
+    marginTop: 10,
+    fontSize: 22,
+    color: '#111',
+    fontFamily: FONT.POPPINS_BOLD,
+  },
+
+  planSub: {
+    textAlign: 'center',
+    color: '#777',
+    marginTop: 5,
+    marginBottom: 15,
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+  },
+
+  bigPrice: {
+    fontSize: 38,
+    color: '#111',
+    fontFamily: FONT.POPPINS_BOLD,
+  },
+
+  yearText: {
+    marginBottom: 8,
+    fontSize: 16,
+    color: '#666',
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  saveRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
+  oldPrice: {
+    textDecorationLine: 'line-through',
+    color: '#888',
+    marginRight: 8,
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  saveBadge: {
+    backgroundColor: '#DDF7E7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+
+  saveText: {
+    color: '#3AA171',
+    fontSize: 11,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#E8E8E8',
+    marginVertical: 18,
   },
 
   featureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginBottom: 12,
   },
 
-  check: {
-    color: '#3AA171',
-    marginRight: 8,
-  },
-
-  featureText: {
-    fontFamily: FONT.POPPINS_REGULAR,
+  cardFeature: {
+    marginLeft: 10,
     color: '#333',
+    fontFamily: FONT.POPPINS_MEDIUM,
   },
 
   button: {
     backgroundColor: '#3AA171',
-    marginTop: 15,
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 18,
   },
 
   buttonText: {
-    color: '#fff',
+    textAlign: 'center',
+    color: '#FFF',
+    fontSize: 15,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

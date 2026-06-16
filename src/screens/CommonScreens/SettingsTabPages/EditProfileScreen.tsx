@@ -77,6 +77,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   const [showPinDropdown, setShowPinDropdown] = useState(false);
 
   const [cityPincodes, setCityPincodes] = useState([]);
+  const [linkErrors, setLinkErrors] = useState([]);
 
   const indianCities = useMemo(() => {
     return City.getCitiesOfCountry('IN');
@@ -116,15 +117,22 @@ const EditProfileScreen = ({ navigation }: any) => {
     const updatedLinks = [...links];
     updatedLinks[index] = text;
     setLinks(updatedLinks);
-  };
 
+    const updatedErrors = [...linkErrors];
+    updatedErrors[index] = validateLink(text);
+    setLinkErrors(updatedErrors);
+  };
   const addMoreLinks = () => {
     setLinks([...links, '']);
+    setLinkErrors([...linkErrors, '']);
   };
 
   const removeLink = index => {
     const updatedLinks = links.filter((_, i) => i !== index);
+    const updatedErrors = linkErrors.filter((_, i) => i !== index);
+
     setLinks(updatedLinks.length ? updatedLinks : ['']);
+    setLinkErrors(updatedErrors.length ? updatedErrors : ['']);
   };
 
   const fetchProfile = async () => {
@@ -157,8 +165,10 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         if (data?.links?.length > 0) {
           setLinks(data.links);
+          setLinkErrors(data.links.map(() => ''));
         } else {
           setLinks(['']);
+          setLinkErrors(['']);
         }
       }
     } catch (error) {
@@ -250,6 +260,14 @@ const EditProfileScreen = ({ navigation }: any) => {
     });
   };
 
+  const validateLink = link => {
+    if (!link.trim()) return '';
+
+    const regex = /^https:\/\/.+/i;
+
+    return regex.test(link) ? '' : 'Link should start with https://';
+  };
+
   const handleInputChange = (key, value, setter) => {
     let cleaned = value;
 
@@ -321,9 +339,11 @@ const EditProfileScreen = ({ navigation }: any) => {
       if (!experience.trim()) return false;
       if (!bio.trim()) return false;
 
-      const hasValidLink = links.some(link => link.trim() !== '');
-      if (!hasValidLink) return false;
+      const hasInvalidLinks = links.some(
+        link => link.trim() !== '' && validateLink(link),
+      );
 
+      if (hasInvalidLinks) return false;
       // IMAGE REQUIRED
       if (!profileImage && !profile?.image) return false;
     }
@@ -347,6 +367,15 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     if (isProfessional && !profileImage && !profile?.image) {
       Alert.alert('Please upload profile image');
+      return;
+    }
+
+    const invalidLink = links.find(
+      link => link.trim() !== '' && validateLink(link),
+    );
+
+    if (invalidLink) {
+      Alert.alert('Invalid Link', 'Please enter links starting with https://');
       return;
     }
 
@@ -705,7 +734,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                     label="Experience"
                     value={experience}
                     onChangeText={setExperience}
-                    placeholder="Enter your experience"
+                    placeholder="Enter your experience in years"
                   />
                 )}
                 <View style={{}}>
@@ -713,11 +742,26 @@ const EditProfileScreen = ({ navigation }: any) => {
                     links.map((item, index) => (
                       <View key={index} style={{ marginBottom: 10 }}>
                         <BorderTextInput
-                          label={`Link ${index + 1}`}
+                          label={`Link ${index + 1} (Paste URL)`}
                           value={item}
                           onChangeText={text => handleLinkChange(text, index)}
-                          placeholder="https://linkedin.com/in/username"
+                          placeholder="e.g. Instagram / LinkedIn profile URL"
+                          mandotory={false}
                         />
+
+                        {linkErrors[index] ? (
+                          <Text
+                            style={{
+                              color: 'red',
+                              fontSize: 12,
+                              marginTop: -15,
+                              marginBottom: 5,
+                              marginLeft: 5,
+                            }}
+                          >
+                            {linkErrors[index]}
+                          </Text>
+                        ) : null}
 
                         {links.length > 1 && (
                           <TouchableOpacity onPress={() => removeLink(index)}>

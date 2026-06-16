@@ -354,17 +354,19 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               {/* LEFT SIDE */}
               <View style={styles.rowLeft}>
                 <GreyMobile width={25} height={25} />
-
+                {/* Important : we have reverse the logic of hidenumber on frontend  */}
                 <View style={{ marginLeft: 10, margin: 10 }}>
                   <Text style={styles.sectionTitle}>Mobile Number</Text>
                   <Text style={styles.valueText}>
-                    {project?.hideNumber ? 'Hidden' : project?.userId?.phone}
+                    {/* {project?.hideNumber ?  : project?.userId?.phone} */}
+                    {project?.hideNumber ? project?.userId?.phone : 'Hidden'}
                   </Text>
                 </View>
               </View>
 
               {/* RIGHT SIDE */}
-              {!isCustomer && (
+              {/* RIGHT SIDE */}
+              {!isCustomer && project?.hideNumber && (
                 <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
                   <CallIcon height={40} width={40} />
                   <Text style={styles.callText}>Call</Text>

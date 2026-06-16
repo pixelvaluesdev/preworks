@@ -418,7 +418,9 @@ const PortfolioScreen = () => {
 
                   if (isSuccess) {
                     setPopupVisible(false);
-                    navigation.goBack();
+                    navigation.navigate('ProfessionalProfile', {
+                      userId: userId,
+                    });
                   }
                 },
               },
