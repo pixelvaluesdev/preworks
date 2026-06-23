@@ -98,12 +98,12 @@ const ProfessionalListScreen = () => {
           search
             ? 'Search'
             : type
-            ? `All ${
+            ? `${
                 type.toLowerCase() === 'all'
                   ? 'Professionals'
-                  : type.charAt(0).toUpperCase() + type.slice(1)
+                  : type.charAt(0).toUpperCase() + type.slice(1) + 's'
               }`
-            : 'All Professionals'
+            : 'Professionals'
         }
         showBack
       />

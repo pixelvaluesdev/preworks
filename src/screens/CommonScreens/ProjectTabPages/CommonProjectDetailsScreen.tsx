@@ -239,9 +239,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                   images.length > 0 && !imgError
                     ? {
                         uri: `${IMG_URL}${
-                          images[0].startsWith('/')
+                          images?.[0]?.startsWith('/')
                             ? images[0]
-                            : '/' + images[0]
+                            : '/' + (images?.[0] || '')
                         }`,
                       }
                     : require('../../../assets/pngs/NoImg.png')
