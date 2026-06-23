@@ -21,19 +21,19 @@ const { width } = Dimensions.get('window');
 const slides = [
   {
     id: '1',
-    image: require('../../assets/pngs/PWalktrough1.png'),
+    image: require('../../assets/pngs/PWalkthrough1.png'),
     title: 'Send Instant Bids',
     subtitle: 'Quote Confidently and manage communication in one place.',
   },
   {
     id: '2',
-    image: require('../../assets/pngs/PWalktrough2.png'),
+    image: require('../../assets/pngs/PWalkthrough2.png'),
     title: 'Find Real Projects Daily',
     subtitle: 'Verified clients post new construction jobs every day.',
   },
   {
     id: '3',
-    image: require('../../assets/pngs/PWalktrough3.png'),
+    image: require('../../assets/pngs/PWalkthrough3.png'),
     title: 'Build Your Brand',
     subtitle: 'Deliver quality work, earn trust, and grow your client base.',
   },

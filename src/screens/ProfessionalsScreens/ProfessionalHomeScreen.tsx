@@ -162,7 +162,9 @@ const ProfessionalHomeScreen = () => {
       return (
         <ProjectCard
           title={item.projectName}
-          location={`${item.plotAddress}, ${item.city}`}
+          location={`${item?.plotAddress || ''}, ${item?.city || ''}, ${
+            item?.pinCode || ''
+          }`}
           image={
             item.image && item.image.length > 0
               ? `${IMG_URL}${item.image[0]}`
@@ -312,9 +314,13 @@ const ProfessionalHomeScreen = () => {
             scrollEnabled={false}
             renderItem={renderProject}
             ListEmptyComponent={
-              <Text style={{ textAlign: 'center', marginTop: 20 }}>
-                No Data Found
-              </Text>
+              <View style={styles.emptyContainer}>
+                <Image
+                  source={require('../../assets/pngs/no_data.jpeg')}
+                  style={styles.emptyImage}
+                  resizeMode="contain"
+                />
+              </View>
             }
           />
         )}
@@ -491,6 +497,23 @@ const styles = StyleSheet.create({
   scrollTopText: {
     color: '#fff',
     fontSize: 13,
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    //marginTop: 10,
+  },
+
+  emptyImage: {
+    width: 220,
+    height: 220,
+  },
+
+  emptyText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 });

@@ -143,7 +143,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                   key={index}
                   style={styles.item}
                   onPress={() => {
-                    handleChange('pinCode', item.Pincode);
+                    handleChange('pinCode', `${item.Pincode} - ${item.Name}`);
                     setShowPinDropdown(false);
                   }}
                 >

@@ -142,6 +142,7 @@ const PortfolioScreen = () => {
         : await ApiManager.addWork(formData, token);
 
       console.log(res?.data?.message, 'Thid id the msgh');
+      console.log(formData, 'Professsss formedara');
 
       if (res?.data?.status === 'success') {
         setIsSuccess(true);
@@ -156,21 +157,25 @@ const PortfolioScreen = () => {
     }
   };
 
-  const handleChange = useCallback((key: string, value: string) => {
+  const handleChange = useCallback((key, value) => {
     let cleaned = value;
+
     if (key === 'budget') {
-      // allow only numbers
       cleaned = value.replace(/[^0-9]/g, '');
 
-      // prevent starting with 0
       if (cleaned.length === 1 && cleaned === '0') return;
 
-      // limit length (optional, e.g. 10 digits)
       if (cleaned.length > 10) return;
 
-      // format with commas (optional but nice UX)
+      // If user cleared everything
+      if (cleaned === '') {
+        setForm(prev => ({ ...prev, [key]: '' }));
+        return;
+      }
+
       cleaned = Number(cleaned).toLocaleString('en-IN');
     }
+
     setForm(prev => ({ ...prev, [key]: cleaned }));
   }, []);
 
