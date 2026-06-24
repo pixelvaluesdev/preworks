@@ -11,6 +11,7 @@ import {
   Linking,
   Alert,
   PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import {
   useFocusEffect,
@@ -36,6 +37,7 @@ import Copy from '../../../assets/svgs/CopyIcon.svg';
 import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
 import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
@@ -103,40 +105,33 @@ const ProfessionalProfileScreen = () => {
     }
   };
 
-  const handleCall = async () => {
-    const phone = profile?.user?.phone;
+  const requestCallPermission = async () => {
+    if (Platform.OS !== 'android') return true;
 
-    if (!phone) {
-      Alert.alert('No Phone Number', 'Phone number not available');
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      {
+        title: 'Phone Call Permission',
+        message: 'App needs permission to make phone calls',
+        buttonPositive: 'Allow',
+        buttonNegative: 'Deny',
+      },
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  };
+
+  const handleCall = async () => {
+    const hasPermission = await requestCallPermission();
+
+    if (!hasPermission) {
+      Alert.alert('Permission Denied');
       return;
     }
 
-    try {
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CALL_PHONE,
-          {
-            title: 'Phone Call Permission',
-            message: 'App needs permission to make phone calls',
-            buttonPositive: 'Allow',
-            buttonNegative: 'Deny',
-          },
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          Linking.openURL(`tel:${phone}`);
-          triggerHaptic('impactHeavy');
-        } else {
-          Alert.alert('Permission Denied');
-        }
-      } else {
-        Linking.openURL(`tel:${phone}`);
-        triggerHaptic('impactHeavy');
-      }
-    } catch (error) {
-      console.log('Call Error:', error);
-    }
+    RNImmediatePhoneCall.immediatePhoneCall(profile?.user?.phone);
   };
+
   const handleLinks = () => {
     const links = profile?.user?.links;
 
