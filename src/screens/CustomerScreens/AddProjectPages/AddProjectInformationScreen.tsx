@@ -60,10 +60,15 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     hasDrawing: isEdit ? draftForm?.hasDrawing : draftForm?.hasDrawing ?? true,
   });
 
+  useEffect(() => {
+    dispatch(saveProjectDraft(form));
+  }, [form]);
+
   console.log('Form state:', form.hasDrawing);
   const dispatch = useDispatch();
 
   const handleChange = (key: string, value: any) => {
+    console.log('handleChange', key, value);
     let updatedValue = value;
 
     if (key === 'pinCode') {
@@ -88,14 +93,10 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       updatedValue = value.replace(/[^a-zA-Z ]/g, '');
     }
 
-    const updatedForm = {
-      ...form,
+    setForm(prev => ({
+      ...prev,
       [key]: updatedValue,
-    };
-
-    setForm(updatedForm);
-
-    dispatch(saveProjectDraft(updatedForm));
+    }));
   };
 
   const validateStep = () => {

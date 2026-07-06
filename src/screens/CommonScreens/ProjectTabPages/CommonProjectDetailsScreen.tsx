@@ -11,6 +11,9 @@ import {
   ActivityIndicator,
   Dimensions,
   Linking,
+  PermissionsAndroid,
+  Platform,
+  Alert,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -39,6 +42,7 @@ import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, fromProjectsScreen } = route.params || {};
@@ -74,15 +78,41 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
 
-  const handleCall = () => {
-    const phone = project?.userId?.phone;
+  const requestCallPermission = async () => {
+    if (Platform.OS !== 'android') return true;
 
-    if (!phone) return;
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      {
+        title: 'Phone Call Permission',
+        message: 'App needs permission to make phone calls',
+        buttonPositive: 'Allow',
+        buttonNegative: 'Deny',
+      },
+    );
 
-    Linking.openURL(`tel:${phone}`);
-    triggerHaptic('impactHeavy');
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
   };
 
+  const handleCall = async () => {
+    const phone = project?.userId?.phone;
+
+    if (!phone) {
+      Alert.alert('No Phone Number Available');
+      return;
+    }
+
+    const hasPermission = await requestCallPermission();
+
+    if (!hasPermission) {
+      Alert.alert('Permission Denied');
+      return;
+    }
+
+    triggerHaptic('impactHeavy');
+
+    RNImmediatePhoneCall.immediatePhoneCall(phone);
+  };
   const allImages = [
     ...(project?.image || []),
     ...drawings.filter(

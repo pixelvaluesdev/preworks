@@ -112,14 +112,69 @@ const QuoteListScreen = ({ route }: any) => {
           if (loading) return null;
 
           return (
-            <View style={styles.emptyContainer}>
+            <View style={styles.noResponseContainer}>
               <Image
                 source={require('../../../assets/pngs/EmptyBox.png')}
-                style={styles.emptyImage}
+                style={styles.noResponseImage}
+                resizeMode="contain"
               />
-              <Text style={styles.emptyText}>
-                {isQuote ? 'No quotes yet' : 'No one has shown interest yet'}
+
+              <Text style={styles.noResponseTitle}>
+                {isQuote ? 'No Quotes Yet' : 'No Interest Yet'}
               </Text>
+
+              <View style={styles.liveBadge}>
+                <View style={styles.liveDot} />
+                <Text style={styles.liveText}>Your project is live</Text>
+              </View>
+
+              <Text style={styles.description}>
+                {isQuote
+                  ? 'We’ve notified relevant professionals about your requirement.\nQuotes will start appearing soon.'
+                  : 'We’ve notified professionals in your area.\nInterested responses will start appearing soon.'}
+              </Text>
+
+              <View style={styles.infoSection}>
+                <View style={styles.infoRow}>
+                  <View
+                    style={[styles.iconCircle, { backgroundColor: '#EEF4FF' }]}
+                  >
+                    <Text style={styles.icon}>👁</Text>
+                  </View>
+
+                  <Text style={styles.infoText}>
+                    Your project is visible to relevant professionals
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.infoRow}>
+                  <View
+                    style={[styles.iconCircle, { backgroundColor: '#EDF8EF' }]}
+                  >
+                    <Text style={styles.icon}>🔔</Text>
+                  </View>
+
+                  <Text style={styles.infoText}>
+                    We’ve notified professionals in your area
+                  </Text>
+                </View>
+
+                <View style={styles.divider} />
+
+                <View style={styles.infoRow}>
+                  <View
+                    style={[styles.iconCircle, { backgroundColor: '#FFF4E8' }]}
+                  >
+                    <Text style={styles.icon}>⏰</Text>
+                  </View>
+
+                  <Text style={styles.infoText}>
+                    You’ll be notified as soon as someone responds
+                  </Text>
+                </View>
+              </View>
             </View>
           );
         }}
@@ -139,11 +194,12 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     backgroundColor: '#F4F4F4',
-    padding: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderRadius: 10,
     marginBottom: 12,
     alignItems: 'center',
+    marginHorizontal: 16,
   },
 
   avatar: {
@@ -154,29 +210,130 @@ const styles = StyleSheet.create({
 
   info: {
     marginLeft: 12,
+    flex: 1,
   },
 
   name: {
-    fontFamily: FONT.POPPINS_SEMIBOLD,
     fontSize: 15,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    color: '#111827',
   },
 
   exp: {
+    fontSize: 13,
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: 12,
-    color: '#000000',
+    color: '#6B7280',
+    marginTop: 2,
   },
 
   location: {
+    fontSize: 13,
     fontFamily: FONT.POPPINS_REGULAR,
-    fontSize: 14,
-    color: '#000000',
+    color: '#6B7280',
+    marginTop: 2,
   },
+
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  noResponseContainer: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 30,
+  },
+
+  noResponseImage: {
+    width: 380,
+    height: 240,
+  },
+
+  noResponseTitle: {
+    fontSize: 16,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    color: '#081A4B',
+  },
+
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF8EF',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 30,
+    marginTop: 12,
+  },
+
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#4CAF50',
+    marginRight: 8,
+  },
+
+  liveText: {
+    fontSize: 12,
+    color: '#4CAF50',
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  description: {
+    marginTop: 20,
+    textAlign: 'center',
+    fontSize: 12,
+    lineHeight: 26,
+    color: '#5E6475',
+    fontFamily: FONT.POPPINS_REGULAR,
+    paddingHorizontal: 10,
+  },
+
+  infoSection: {
+    width: '100%',
+    marginTop: 30,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+  },
+
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+
+  icon: {
+    fontSize: 16,
+  },
+
+  infoText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 15,
+    color: '#4B5563',
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginLeft: 62,
+  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    verticalAlign: 'middle',
   },
 
   emptyText: {
@@ -184,14 +341,10 @@ const styles = StyleSheet.create({
     color: '#777',
     fontFamily: FONT.POPPINS_REGULAR,
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   emptyImage: {
-    marginTop: -80,
-    width: WIDTH(80),
-    height: HEIGHT(50),
+    width: 220,
+    height: 220,
+    resizeMode: 'contain',
   },
 });

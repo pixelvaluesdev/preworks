@@ -76,6 +76,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
     setShowPinDropdown(filteredPins.length > 0);
   };
 
+  console.log('ProjectInfo city value:', data.city);
   return (
     <View style={{ gap: 6, zIndex: 1, paddingBottom: HEIGHT(30) }}>
       <BorderTextInput
@@ -113,6 +114,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                   key={index}
                   style={styles.item}
                   onPress={() => {
+                    console.log('Selected city:', item.name);
                     handleChange('city', item.name);
                     fetchPincodes(item.name);
                     setShowDropdown(false);
