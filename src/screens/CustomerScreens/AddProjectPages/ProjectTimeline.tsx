@@ -105,44 +105,58 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   return (
     <View style={styles.container}>
       {/* LAST DATE */}
-      <BorderTextInput
-        label="Last Date of Receiving Quotation"
-        placeholder="Enter your Last Date"
-        editable={false}
-        value={formatDisplayDate(data.lastDate)}
-        onChangeText={() => {}}
-        height={HEIGHT(7)}
-        rightComponent={
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedField('lastDate');
-              showDatePicker();
-            }}
-          >
-            <CalenderIcon />
-          </TouchableOpacity>
-        }
-      />
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedField('lastDate');
+          showDatePicker();
+        }}
+      >
+        <BorderTextInput
+          label="Last Date of Receiving Quotation"
+          placeholder="Enter your Last Date"
+          editable={false}
+          value={formatDisplayDate(data.lastDate)}
+          onChangeText={() => {}}
+          height={HEIGHT(7)}
+          rightComponent={
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedField('lastDate');
+                showDatePicker();
+              }}
+            >
+              <CalenderIcon />
+            </TouchableOpacity>
+          }
+        />
+      </TouchableOpacity>
 
       {/* START DATE */}
-      <BorderTextInput
-        label="Plan to start your construction"
-        placeholder="Enter your start date"
-        value={formatDisplayDate(data.startDate)}
-        onChangeText={() => {}}
-        editable={false}
-        height={HEIGHT(7)}
-        rightComponent={
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedField('startDate');
-              showDatePicker();
-            }}
-          >
-            <CalenderIcon />
-          </TouchableOpacity>
-        }
-      />
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedField('startDate');
+          showDatePicker();
+        }}
+      >
+        <BorderTextInput
+          label="Plan to start your construction"
+          placeholder="Enter your start date"
+          value={formatDisplayDate(data.startDate)}
+          onChangeText={() => {}}
+          editable={false}
+          height={HEIGHT(7)}
+          rightComponent={
+            <TouchableOpacity
+              onPress={() => {
+                setSelectedField('startDate');
+                showDatePicker();
+              }}
+            >
+              <CalenderIcon />
+            </TouchableOpacity>
+          }
+        />
+      </TouchableOpacity>
 
       {/* DESCRIPTION */}
       <BorderTextInput

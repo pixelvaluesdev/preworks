@@ -17,6 +17,7 @@ import ApiManager from '../apis/ApiManager';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { pick } from '@react-native-documents/picker';
 import { useNavigation } from '@react-navigation/native';
+import sendNotification from '../utils/sendNotifications';
 
 const Popup = ({
   title,
@@ -25,6 +26,8 @@ const Popup = ({
   showQuotation = true,
   projectId,
   userId,
+  customerId,
+  projectName,
   token,
 }) => {
   const [quotation, setQuotation] = useState('');
@@ -32,6 +35,16 @@ const Popup = ({
   const [quotationFiles, setQuotationFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+
+  console.log(
+    {
+      projectId,
+      userId,
+      customerId,
+      projectName,
+    },
+    'pOPUP pROPRS',
+  );
 
   const removeFile = index => {
     setQuotationFiles(prev => prev.filter((_, i) => i !== index));
@@ -71,6 +84,19 @@ const Popup = ({
       console.log('Enquiry Response:', res?.data);
 
       if (res?.data?.status === 'success') {
+        console.log('Notification Payload:', {
+          userId: customerId,
+          professionalId: userId,
+          notificationType: 'QUOTATION_SUBMITTED',
+          projectName,
+        });
+        await sendNotification({
+          userId: customerId,
+          professionalId: userId,
+          notificationType: 'QUOTATION_SUBMITTED',
+          projectName,
+          token,
+        });
         const selectedType = showQuotation ? 'quotation' : 'enquiry';
 
         setMessage('');

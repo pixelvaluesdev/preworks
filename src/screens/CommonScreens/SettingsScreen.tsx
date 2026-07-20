@@ -122,7 +122,7 @@ const SettingsScreen = () => {
               onPress={() =>
                 navigation.navigate(
                   isCustomer ? 'ProfileScreen' : 'ProfessionalProfile',
-                  { userId: userId },
+                  { userId: userId, isSelfProfile: true },
                 )
               }
             >

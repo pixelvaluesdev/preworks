@@ -188,14 +188,16 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
 
   return (
     <View style={styles.container}>
-      <UploadBox
-        label="Site Images & Elevation"
-        value={[...(data.existingImages || []), ...(data.siteImage || [])]}
-        onPress={() => pickImage('siteImage')}
-        rightComponent={<UploadIcon />}
-        onRemove={(file, index) => handleRemove(file, index, 'image')}
-        required={false}
-      />
+      <TouchableOpacity onPress={() => pickImage('siteImage')}>
+        <UploadBox
+          label="Site Images & Elevation"
+          value={[...(data.existingImages || []), ...(data.siteImage || [])]}
+          onPress={() => pickImage('siteImage')}
+          rightComponent={<UploadIcon />}
+          onRemove={(file, index) => handleRemove(file, index, 'image')}
+          required={false}
+        />
+      </TouchableOpacity>
 
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>
@@ -227,17 +229,19 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
       </View>
 
       {hasDrawing && (
-        <UploadBox
-          label="Upload architectural drawings (Preferred PDF)"
-          value={[
-            ...(data.existingDrawings || []),
-            ...(data.archDrawing || []),
-          ]}
-          onRemove={(file, index) => handleRemove(file, index, 'drawing')}
-          onPress={() => openPickerPopup('archDrawing')}
-          rightComponent={<UploadIcon />}
-          textStyle={{ fontSize: 12 }}
-        />
+        <TouchableOpacity onPress={() => openPickerPopup('archDrawing')}>
+          <UploadBox
+            label="Upload architectural drawings (Preferred PDF)"
+            value={[
+              ...(data.existingDrawings || []),
+              ...(data.archDrawing || []),
+            ]}
+            onRemove={(file, index) => handleRemove(file, index, 'drawing')}
+            onPress={() => openPickerPopup('archDrawing')}
+            rightComponent={<UploadIcon />}
+            textStyle={{ fontSize: 12 }}
+          />
+        </TouchableOpacity>
       )}
 
       {!hasDrawing && (

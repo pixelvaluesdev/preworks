@@ -274,7 +274,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                             : '/' + (images?.[0] || '')
                         }`,
                       }
-                    : require('../../../assets/pngs/NoImg.png')
+                    : require('../../../assets/images/NoImg1.jpeg')
                 }
                 style={styles.banner}
                 resizeMode="cover"
@@ -308,7 +308,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                               item.startsWith('/') ? item : '/' + item
                             }`,
                           }
-                        : require('../../../assets/pngs/NoImg.png')
+                        : require('../../../assets/images/NoImg1.jpeg')
                     }
                     style={styles.banner}
                     resizeMode="cover"
@@ -361,7 +361,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
                     source={
                       img
                         ? { uri: `${IMG_URL}/${img}` }
-                        : require('../../../assets/pngs/NoImg.png')
+                        : require('../../../assets/images/NoImg1.jpeg')
                     }
                     style={styles.thumbnail}
                   />
@@ -414,7 +414,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               <View style={{ marginLeft: 10, margin: 10 }}>
                 <Text style={styles.sectionTitle}>Full Plot Address</Text>
                 <Text style={styles.valueText}>
-                  {project?.plotAddress}, {project?.city}, {project?.pinCode}
+                  {project?.pinCode
+                    ? project.pinCode
+                    : `${project?.plotAddress}, ${project?.city}`}
                 </Text>
               </View>
             </View>
@@ -576,8 +578,10 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         onClose={() => setShowPopup(false)}
         projectId={projectId}
         token={token}
-        showQuotation={true}
         userId={userId}
+        customerId={project?.userId?._id}
+        projectName={project?.projectName || ''}
+        showQuotation={true}
       />
       <ImageViewing
         images={imageUrls}

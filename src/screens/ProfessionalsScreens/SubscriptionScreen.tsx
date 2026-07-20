@@ -26,15 +26,28 @@ import ApiManager from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import ScreenHeader from '../../components/ScreenHeader';
 import ScreenWrapper from '../../utils/screenWrapper';
+import RazorpayCheckout from 'react-native-razorpay';
+import Colors from '../../constants/colors';
+import MsgSvg from '../../assets/svgs/MsgSvg.svg';
+
+import CallSvg from '../../assets/svgs/CallSvg.svg';
+
+import FileSvg from '../../assets/svgs/FileSvg.svg';
+
+import EyeSvg from '../../assets/svgs/EyeSvg.svg';
 
 /* ---------------- TYPES ---------------- */
 
 type Plan = {
   _id: string;
-  title: string;
-  price: string;
-  period: 'Monthly' | 'Yearly';
+  name: string;
   description: string;
+  amount: number;
+  currency: string;
+  interval: 'monthly' | 'yearly';
+  period: number;
+  razorpayPlanId: string;
+  isActive: boolean;
 };
 
 // (optional) navigation type (you can adjust later)
@@ -73,7 +86,7 @@ const SubscriptionScreen = () => {
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
 
-        console.log('Profile data 12232424:', res.data.data);
+        // console.log('Profile data 12232424:', res.data.data);
 
         if (res.data.data.user?.isSubscribed) {
           navigation.replace('ProfTabNav');
@@ -94,10 +107,11 @@ const SubscriptionScreen = () => {
     try {
       setLoading(true);
 
-      const res = await ApiManager.getSubscriptions();
+      const res = await ApiManager.getPlans(token);
       console.log(res, 'sunsfrrerereen');
 
       if (res?.data?.status === 'success') {
+        console.log(res.data.data, 'Plansssssssss ddataaa');
         setPlans(res.data.data);
       }
     } catch (e) {
@@ -107,46 +121,102 @@ const SubscriptionScreen = () => {
     }
   };
 
-  const filteredPlan = plans.filter(plan =>
-    selectedTab === 'monthly'
-      ? plan.period === 'Monthly'
-      : plan.period === 'Yearly',
-  );
+  const filteredPlan = plans;
 
   const handleCreateOrder = async (plan: Plan) => {
     try {
       setLoading(true);
 
       const body = {
-        userId: userId,
-        packageId: plan._id,
-        amount: plan.price,
-        email: user?.email || 'test@gmail.com',
-        name: `${user.firstName} ${user.lastName}` || 'User',
-        contact: user?.phone || '9999999999',
+        userId,
+        planId: plan._id,
+        // temp payment type for testing 
+        paymentType : "subscription"
+
       };
 
-      console.log('CREATE ORDER BODY:', body);
+      console.log('CREATE SUBSCRIPTION BODY:', body);
+      console.log('TOKEN:', token);
 
-      const res = await ApiManager.createOrder(body, token);
+      const response = await ApiManager.createSubscription(body, token);
 
-      if (res?.data?.status === 'success') {
-        const paymentUrl = res.data.payment_url;
+      console.log('Create subscripyionn', response);
 
-        Alert.alert(
-          'Proceed to Payment',
-          'You will be redirected to payment page.',
-          [
-            {
-              text: 'Continue',
-              onPress: () => Linking.openURL(paymentUrl),
-            },
-          ],
-        );
+      if (!response?.data?.success) {
+        Alert.alert('Error', response?.data?.message || 'Something went wrong');
+        return;
       }
-    } catch (error) {
-      console.log(' FULL ERROR:', error?.response?.data);
-      console.log(' STATUS:', error?.response?.status);
+
+      const data = response.data.data;
+
+      console.log('SUBSCRIPTION DATA:', data);
+
+      const options = {
+        key: data.razorpayKey,
+
+        subscription_id: data.subscriptionId,
+
+        name: 'PreWorks',
+
+        description: data.planName,
+
+        currency: data.currency,
+
+        prefill: {
+          name: `${user?.firstName || ''} ${user?.lastName || ''}`,
+
+          email: user?.email,
+
+          contact: user?.phone,
+        },
+
+        theme: {
+          color: Colors.primary,
+        },
+      };
+
+      console.log('RAZORPAY OPTIONS:', options);
+
+      RazorpayCheckout.open(options)
+        .then(async payment => {
+          console.log('PAYMENT SUCCESS', payment);
+
+          const verifyBody = {
+            userId,
+            razorpay_payment_id: payment.razorpay_payment_id,
+            razorpay_subscription_id: payment.razorpay_subscription_id,
+
+            razorpay_signature: payment.razorpay_signature,
+          };
+
+          console.log('VERIFY BODY', verifyBody);
+          const verifyRes = await ApiManager.verifySubscription(
+            verifyBody,
+            token,
+          );
+
+          console.log('VERIFY RESPONSE', verifyRes.data);
+
+          if (verifyRes.data.success) {
+            Alert.alert('Success', 'Subscription activated successfully.');
+
+            fetchProfile();
+          } else {
+            Alert.alert('Verification Failed', verifyRes.data.message);
+          }
+        })
+        .catch(error => {
+          console.log('PAYMENT FAILED', error);
+
+          Alert.alert(
+            'Payment Cancelled',
+            error.description || 'Payment was not completed.',
+          );
+        });
+    } catch (error: any) {
+      console.log('STATUS:', error?.response?.status);
+      console.log('ERROR:', error?.response?.data);
+      console.log('REQUEST:', error?.config?.data);
     } finally {
       setLoading(false);
     }
@@ -156,8 +226,8 @@ const SubscriptionScreen = () => {
     return (
       <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.price}>₹{plan.price}</Text>
-          <Text style={styles.planTitle}>{plan.title}</Text>
+          <Text style={styles.bigPrice}>₹{plan.amount}</Text>
+          <Text style={styles.planTitle}>{plan.name}</Text>
         </View>
 
         <Text style={styles.subText}>{plan.description}</Text>
@@ -208,15 +278,14 @@ const SubscriptionScreen = () => {
         <View style={styles.featureContainer}>
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              {/* <Ionicons name="document-text" size={18} color="#3AA171" /> */}
+              <FileSvg />
             </View>
-
             <Text style={styles.featureText}>Full access to live projects</Text>
           </View>
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              {/* <Ionicons name="eye" size={18} color="#3AA171" /> */}
+              <EyeSvg />
             </View>
 
             <Text style={styles.featureText}>
@@ -226,7 +295,7 @@ const SubscriptionScreen = () => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              {/* <Ionicons name="call" size={18} color="#3AA171" /> */}
+              <MsgSvg />
             </View>
 
             <Text style={styles.featureText}>
@@ -236,7 +305,7 @@ const SubscriptionScreen = () => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              {/* <Ionicons name="paper-plane" size={18} color="#3AA171" /> */}
+              <EyeSvg />
             </View>
 
             <Text style={styles.featureText}>Submit Quotations</Text>
@@ -248,9 +317,15 @@ const SubscriptionScreen = () => {
         {loading ? (
           <Text style={{ textAlign: 'center', marginTop: 40 }}>Loading...</Text>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 10,
+            }}
+          >
             {filteredPlan.map((plan, index) => {
-              const yearly = plan.period?.toLowerCase() === 'yearly';
+              const yearly = plan.interval === 'yearly';
 
               return (
                 <View key={plan._id} style={styles.planCard}>
@@ -260,19 +335,21 @@ const SubscriptionScreen = () => {
                     </View>
                   )}
 
-                  <Text style={styles.planTitleCenter}>{plan.title}</Text>
+                  <Text style={styles.planTitleCenter}>{plan.name}</Text>
 
                   <Text style={styles.planSub}>
                     Best value for serious professionals
                   </Text>
 
                   <View style={styles.priceRow}>
-                    <Text style={styles.bigPrice}>₹{plan.price}</Text>
+                    <Text style={styles.bigPrice}>₹{plan.amount}</Text>
 
-                    <Text style={styles.yearText}>/{plan.period}</Text>
+                    <Text style={styles.yearText}>
+                      /{plan.interval === 'monthly' ? 'Month' : 'Year'}
+                    </Text>
                   </View>
 
-                  {yearly && (
+                  {/* {yearly && (
                     <View style={styles.saveRow}>
                       <Text style={styles.oldPrice}>₹17,988</Text>
 
@@ -280,7 +357,7 @@ const SubscriptionScreen = () => {
                         <Text style={styles.saveText}>Save 17%</Text>
                       </View>
                     </View>
-                  )}
+                  )} */}
 
                   <View style={styles.divider} />
 
@@ -305,7 +382,7 @@ const SubscriptionScreen = () => {
                     style={styles.button}
                     onPress={() => handleCreateOrder(plan)}
                   >
-                    <Text style={styles.buttonText}>Choose {plan.title}</Text>
+                    <Text style={styles.buttonText}>Choose {plan.name}</Text>
                   </TouchableOpacity>
                 </View>
               );
@@ -382,7 +459,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EAF8F0',
+
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,

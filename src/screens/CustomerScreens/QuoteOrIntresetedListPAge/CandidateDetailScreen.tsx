@@ -21,10 +21,15 @@ import ImageViewing from 'react-native-image-viewing';
 import FileViewer from 'react-native-file-viewer';
 import RNFS from 'react-native-fs';
 import { triggerHaptic } from '../../../utils/hapticks';
+import sendNotification from '../../../utils/sendNotifications';
+import { useSelector } from 'react-redux';
 
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
   const user = candidate?.userId || {};
+
+  const token = useSelector((state: any) => state.auth.userToken);
+  const loggedInUser = useSelector((state: any) => state.auth.user);
 
   const [viewerVisible, setViewerVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,6 +43,14 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
       setImageUrls([{ uri: fileUrl }]);
       setCurrentIndex(0);
       setViewerVisible(true);
+
+      sendNotification({
+        userId: loggedInUser?._id,
+        professionalId: user?._id,
+        notificationType: 'QUOTATION_VIEWED',
+        projectName: candidate?.projectId?.projectName || '',
+        token,
+      });
     } else {
       try {
         const localPath = `${
@@ -51,6 +64,14 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
 
         if (download.statusCode === 200) {
           await FileViewer.open(localPath);
+
+          sendNotification({
+            userId: loggedInUser?._id,
+            professionalId: user?._id,
+            notificationType: 'QUOTATION_VIEWED',
+            projectName: candidate?.projectId?.projectName || '',
+            token,
+          });
         } else {
           Alert.alert('Failed to open file');
         }

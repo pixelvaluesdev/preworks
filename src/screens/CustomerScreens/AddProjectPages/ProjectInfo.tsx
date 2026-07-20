@@ -58,18 +58,24 @@ const ProjectInfo = ({ data, handleChange }: any) => {
     setShowDropdown(true);
   };
 
-  const handlePinSearch = text => {
+  const handlePinSearch = (text: string) => {
     handleChange('pinCode', text);
 
     if (text.length === 0) {
-      // Show all pincodes again
       setPinSuggestions(cityPincodes);
       setShowPinDropdown(cityPincodes.length > 0);
       return;
     }
 
+    const search = text.toLowerCase();
+
     const filteredPins = cityPincodes
-      .filter(item => item.Pincode.includes(text))
+      .filter(item => {
+        return (
+          item.Pincode.includes(search) ||
+          item.Name.toLowerCase().includes(search)
+        );
+      })
       .slice(0, 10);
 
     setPinSuggestions(filteredPins);
@@ -134,7 +140,6 @@ const ProjectInfo = ({ data, handleChange }: any) => {
           value={data.pinCode}
           onChangeText={handlePinSearch}
           height={HEIGHT(7)}
-          keyboardType="number-pad"
         />
 
         {showPinDropdown && pinSuggestions.length > 0 && (
@@ -145,7 +150,10 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                   key={index}
                   style={styles.item}
                   onPress={() => {
-                    handleChange('pinCode', `${item.Pincode} - ${item.Name}`);
+                    const selectedValue = `${item.Pincode} - ${item.Name}`;
+
+                    handleChange('pinCode', selectedValue);
+
                     setShowPinDropdown(false);
                   }}
                 >

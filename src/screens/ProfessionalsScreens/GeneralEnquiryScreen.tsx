@@ -118,7 +118,7 @@ const GeneralEnquiryScreen = () => {
             source={
               project?.image && project.image.length > 0 && !imgError
                 ? { uri: `${IMG_URL}${project.image[0]}` }
-                : require('../../assets/pngs/NoImg.png')
+                : require('../../assets/images/NoImg1.jpeg')
             }
             style={styles.image}
             onError={() => setImgError(true)}

@@ -72,17 +72,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     let updatedValue = value;
 
     if (key === 'pinCode') {
-      let cleaned = value.replace(/[^0-9]/g, '');
-
-      if (cleaned.length === 1 && cleaned === '0') {
-        return;
-      }
-
-      if (cleaned.length > 6) {
-        return;
-      }
-
-      updatedValue = cleaned;
+      updatedValue = value;
     }
 
     if (key === 'floorArea' || key === 'plotSize') {

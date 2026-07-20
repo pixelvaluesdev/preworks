@@ -38,14 +38,18 @@ import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
 import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
+import sendNotification from '../../../utils/sendNotifications';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  const { userId } = route.params;
+  const { userId, isSelfProfile = false } = route.params || {};
 
   const token = useSelector((state: any) => state.auth.userToken);
   console.log('ProfessionalProfileScreen token:', token);
   const navigation = useNavigation();
+  const user = useSelector(state => state.auth.user);
+
+  const userIdLoggedin = user?._id;
   const userType = useSelector((state: any) => state.auth.userType);
   const isProffesional = userType !== 'customer';
 
@@ -97,6 +101,15 @@ const ProfessionalProfileScreen = () => {
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
         console.log('Profile data:', res.data.data);
+
+        if (!isSelfProfile && userType === 'customer') {
+          sendNotification({
+            userId: userIdLoggedin,
+            professionalId: userId,
+            notificationType: 'PROFILE_VIEWED',
+            token,
+          });
+        }
       }
     } catch (error) {
       console.log('Profile Error:', error);
@@ -236,14 +249,24 @@ const ProfessionalProfileScreen = () => {
 
             {/* Action Buttons */}
             <View style={styles.actionRow}>
-              <TouchableOpacity style={styles.actionItem} onPress={handleCall}>
-                <View style={styles.iconCircle}>
-                  <CallIcon width={40} height={40} />
-                </View>
-                <Text style={styles.actionText}>Enquire now</Text>
-              </TouchableOpacity>
-
-              <View style={styles.divider} />
+              {!isSelfProfile && (
+                <>
+                  {!isSelfProfile && (
+                    <>
+                      <TouchableOpacity
+                        style={styles.actionItem}
+                        onPress={handleCall}
+                      >
+                        <View style={styles.iconCircle}>
+                          <CallIcon width={40} height={40} />
+                        </View>
+                        <Text style={styles.actionText}>Enquire now</Text>
+                      </TouchableOpacity>
+                      <View style={styles.divider} />
+                    </>
+                  )}
+                </>
+              )}
 
               <TouchableOpacity
                 style={styles.actionItem}

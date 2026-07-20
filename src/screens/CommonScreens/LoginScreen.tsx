@@ -40,6 +40,7 @@ const LoginScreen = () => {
   };
 
   const handleGetOtp = async () => {
+    Keyboard.dismiss();
     const trimmedMobile = mobile.trim();
 
     if (trimmedMobile.length !== 10) {

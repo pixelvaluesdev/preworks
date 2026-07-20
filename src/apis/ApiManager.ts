@@ -71,6 +71,9 @@ const requestPath = {
   deleteProject: '/customer/delete-project',
   getNotifications: '/customer/get-notification',
 
+  //send notification (trigger notification)
+  sendNotification: '/customer/sendNotification',
+
   // customer's projects in the professional acct
   projectsForProfessional: '/professional/customer-Projects',
 
@@ -163,19 +166,31 @@ const ApiManager = {
   deleteFile: (data: any, token?: string) => {
     return requests.post('/customer/delete-file', data, token);
   },
-  getSubscriptions: (token?: string) => {
-    return requests.get('/admin/getSubscription', token);
+  getPlans: (token?: string) => {
+    return requests.get('/admin/getPlans', token);
   },
 
   createOrder: (data: any, token?: string) => {
     return requests.post('/professional/create-order', data, token);
-  },
+  }, // this was for payment throuch link
+
+  createSubscription: (data: any, token?: string) => {
+    return requests.post('/professional/create-subscription', data, token);
+  }, // this is for payment through sdk
+
+  verifySubscription: (data: any, token?: string) => {
+    return requests.post('/professional/verify-subscription', data, token);
+  }, // this is for payment through sdk
 
   registerFcmToken: (data: any, token?: string) => {
     return requests.post(requestPath.registerFcmToken, data, token);
   },
   getFAQ: (token?: string) => {
     return requests.get(requestPath.getFAQ, token);
+  },
+
+  sendNotification: (data: any, token?: string) => {
+    return requests.post(requestPath.sendNotification, data, token);
   },
 };
 

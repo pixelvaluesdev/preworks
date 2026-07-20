@@ -35,7 +35,7 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
 
-        console.log('Profile data 12232424:', res.data.data);
+        // console.log('Profile data 12232424:', res.data.data);
       }
     } catch (error) {
       console.log('Profile Error:', error);
