@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Animated, Pressable, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Pressable, Text, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,6 +20,9 @@ import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 
 import Colors from '../constants/colors';
 import { triggerHaptic } from '../utils/hapticks';
+import { useSelector, useDispatch } from 'react-redux';
+import { setNotifications } from '../redux/slices/notificationSlice';
+import ApiManager from '../apis/ApiManager';
 
 const Tab = createBottomTabNavigator();
 
@@ -31,6 +34,7 @@ const AnimatedTabButton = (
   label,
   navigation,
   routeName,
+  showBadge = false,
 ) => {
   const { onPress } = props;
 
@@ -97,7 +101,11 @@ const AnimatedTabButton = (
         ]}
       >
         {/* ICON */}
-        <IconComponent height={24} />
+        <View style={styles.iconContainer}>
+          <IconComponent height={24} />
+
+          {showBadge && <View style={styles.greenDot} />}
+        </View>
 
         {/* TEXT */}
         <Text
@@ -120,6 +128,34 @@ const AnimatedTabButton = (
 const CustomerTabNavigator = () => {
   const insets = useSafeAreaInsets();
 
+  const unreadCount = useSelector(
+    (state: any) => state.notification.unreadCount,
+  );
+
+  const dispatch = useDispatch();
+
+  const user = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.userToken);
+
+  const userId = user?._id;
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await ApiManager.getNotifications(userId, token);
+
+      if (res?.data?.status === 'success') {
+        dispatch(setNotifications(res.data.data || []));
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      fetchNotifications();
+    }
+  }, [userId]);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -174,6 +210,7 @@ const CustomerTabNavigator = () => {
               'Notifications',
               navigation,
               route.name,
+              unreadCount > 0,
             ),
         })}
       />
@@ -212,5 +249,20 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 10,
     marginTop: 4,
+  },
+  iconContainer: {
+    position: 'relative',
+  },
+
+  greenDot: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#22D73D',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
 });

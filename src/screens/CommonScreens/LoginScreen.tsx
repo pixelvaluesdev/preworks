@@ -23,6 +23,8 @@ import ApiManager from '../../apis/ApiManager';
 import { useSnackbar } from '../../hooks/SnackbarProvider';
 import { ActivityIndicator } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
+import CheckBox from '@react-native-community/checkbox';
+import { Linking } from 'react-native';
 
 const LoginScreen = () => {
   const [mobile, setMobile] = useState('');
@@ -31,6 +33,7 @@ const LoginScreen = () => {
 
   const showSnackbar = useSnackbar();
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const userType = useSelector((state: any) => state.auth.userType);
 
@@ -75,6 +78,16 @@ const LoginScreen = () => {
     }
   };
 
+  const openURL = async (url: string) => {
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      showSnackbar('Unable to open the link', 'error');
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ImageBackground
@@ -107,11 +120,39 @@ const LoginScreen = () => {
               }}
             />
 
+            <View style={styles.checkboxContainer}>
+              <CheckBox
+                value={acceptedTerms}
+                onValueChange={setAcceptedTerms}
+                tintColors={{ true: '#3BA56A', false: '#FFFFFF' }}
+              />
+
+              <Text style={styles.checkboxText}>
+                I agree to the{' '}
+                <Text
+                  style={styles.link}
+                  onPress={() => openURL('https://preworks.in/privacy-policy/')}
+                >
+                  Terms & Conditions
+                </Text>{' '}
+                and{' '}
+                <Text
+                  style={styles.link}
+                  onPress={() => openURL('https://preworks.in/privacy-policy/')}
+                >
+                  Privacy Policy
+                </Text>
+              </Text>
+            </View>
+
             <SecondaryButton
               title={loading ? <ActivityIndicator color="#fff" /> : 'Get OTP'}
               onPress={handleGetOtp}
-              disabled={loading}
-              style={{ marginTop: 10 }}
+              disabled={loading || !acceptedTerms}
+              style={{
+                marginTop: 5,
+                opacity: acceptedTerms ? 1 : 0.5,
+              }}
             />
 
             {/* <SecondaryButton
@@ -198,5 +239,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     fontWeight: '600',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 20,
+    marginBottom: 10,
+  },
+
+  checkboxText: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 6,
+  },
+
+  link: {
+    color: '#3BA56A',
+    textDecorationLine: 'underline',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

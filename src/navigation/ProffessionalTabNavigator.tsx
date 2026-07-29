@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, Text, StyleSheet } from 'react-native';
+import { Animated, Pressable, Text, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -23,9 +23,10 @@ import ActSetting from '../assets/svgs/ActSettingIcon.svg';
 
 import Colors from '../constants/colors';
 import { triggerHaptic } from '../utils/hapticks';
-import { useSelector } from 'react-redux';
 import ApiManager from '../apis/ApiManager';
 import { useFocusEffect } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { setNotifications } from '../redux/slices/notificationSlice';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +37,8 @@ const AnimatedTabButton = (
   label,
   navigation,
   routeName,
-  showBadge = false,
+  showGlow = false,
+  showGreenDot = false,
 ) => {
   const { onPress } = props;
 
@@ -53,7 +55,7 @@ const AnimatedTabButton = (
   React.useEffect(() => {
     let animation;
 
-    if (showBadge) {
+    if (showGlow) {
       animation = Animated.loop(
         Animated.sequence([
           Animated.timing(blinkAnim, {
@@ -77,7 +79,7 @@ const AnimatedTabButton = (
     return () => {
       animation?.stop();
     };
-  }, [showBadge]);
+  }, [showGlow]);
 
   const activeScale = focused ? 1.15 : 1;
   const activeLift = focused ? -4 : 0;
@@ -133,7 +135,7 @@ const AnimatedTabButton = (
         ]}
       >
         {/* BLINKING RED CIRCLE */}
-        {showBadge && (
+        {showGlow && (
           <Animated.View
             style={[
               styles.glowRing,
@@ -152,8 +154,11 @@ const AnimatedTabButton = (
           />
         )}
 
-        <IconComponent height={24} />
+        <View style={styles.iconContainer}>
+          <IconComponent height={24} />
 
+          {showGreenDot && <View style={styles.greenDot} />}
+        </View>
         <Text
           style={[
             styles.label,
@@ -172,19 +177,43 @@ const AnimatedTabButton = (
 
 const ProfessionalTabNavigator = () => {
   const insets = useSafeAreaInsets();
-  const user = useSelector(state => state.auth.user);
-  const userId = user?._id;
-  const token = useSelector(state => state.auth.userToken);
-
-  console.log('Professspmdke', userId);
 
   const [workList, setWorkList] = useState([]);
+
+  const dispatch = useDispatch();
+
+  const unreadCount = useSelector(
+    (state: any) => state.notification.unreadCount,
+  );
+
+  const user = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.userToken);
+
+  const userId = user?._id;
 
   useFocusEffect(
     React.useCallback(() => {
       fetchProfile();
     }, []),
   );
+
+  useEffect(() => {
+    if (userId) {
+      fetchNotifications();
+    }
+  }, [userId]);
+
+  const fetchNotifications = async () => {
+    try {
+      const res = await ApiManager.getNotifications(userId, token);
+
+      if (res?.data?.status === 'success') {
+        dispatch(setNotifications(res.data.data || []));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -263,7 +292,8 @@ const ProfessionalTabNavigator = () => {
               'Add Work',
               navigation,
               route.name,
-              workList?.length === 0,
+              workList?.length === 0, // glow
+              false, // green dot
             ),
         })}
       />
@@ -280,6 +310,8 @@ const ProfessionalTabNavigator = () => {
               'Notifications',
               navigation,
               route.name,
+              false, // no glow
+              unreadCount > 0, // only green dot
             ),
         })}
       />
@@ -324,5 +356,20 @@ const styles = StyleSheet.create({
     height: 62,
     borderRadius: 26,
     backgroundColor: Colors.primary + '33',
+  },
+  iconContainer: {
+    position: 'relative',
+  },
+
+  greenDot: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#22D73D',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
 });

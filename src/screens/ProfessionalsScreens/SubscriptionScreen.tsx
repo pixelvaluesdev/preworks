@@ -130,9 +130,8 @@ const SubscriptionScreen = () => {
       const body = {
         userId,
         planId: plan._id,
-        // temp payment type for testing 
-        paymentType : "subscription"
-
+        // temp payment type for testing
+        paymentType: 'subscription',
       };
 
       console.log('CREATE SUBSCRIPTION BODY:', body);
@@ -223,6 +222,7 @@ const SubscriptionScreen = () => {
   };
 
   const renderCard = (plan: Plan) => {
+    console.log('Plannnns desi', plan.description);
     return (
       <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
@@ -361,22 +361,15 @@ const SubscriptionScreen = () => {
 
                   <View style={styles.divider} />
 
-                  {[
-                    'Unlimited Projects Access',
-                    'Contact Project Owners',
-                    'Submit Quotations',
-                    'Priority Visibility',
-                  ].map(item => (
-                    <View style={styles.featureRow} key={item}>
-                      {/* <Ionicons
+                  <View style={styles.featureRow}>
+                    {/* <Ionicons
                         name="checkmark-circle"
                         size={18}
                         color="#16A34A"
                       /> */}
 
-                      <Text style={styles.cardFeature}>{item}</Text>
-                    </View>
-                  ))}
+                    <Text style={styles.cardFeature}>{plan.description}</Text>
+                  </View>
 
                   <TouchableOpacity
                     style={styles.button}
@@ -418,10 +411,11 @@ const styles = StyleSheet.create({
   banner: {
     backgroundColor: '#EEF4EF',
 
-    padding: 16,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 18,
+    paddingHorizontal: 16,
   },
 
   bannerTitle: {
@@ -444,30 +438,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#EAEAEA',
     paddingVertical: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    paddingHorizontal: 16,
     marginBottom: 22,
     marginHorizontal: 20,
   },
 
   featureItem: {
-    width: '23%',
+    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
+    gap: 6,
   },
 
   featureIcon: {
-    width: 40,
-    height: 40,
+    width: 20,
+    height: 20,
     borderRadius: 20,
-
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    margin: 12,
   },
 
   featureText: {
-    fontSize: 11,
-    textAlign: 'center',
+    flex: 1,
+    fontSize: 14,
     color: '#444',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
@@ -478,19 +472,23 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1.5,
     borderColor: '#4CAF7D',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    paddingTop: 30, // Increase this
     marginRight: 15,
     marginTop: 18,
   },
 
   popularBadge: {
     position: 'absolute',
-    top: -15,
+    //top: -15,
     alignSelf: 'center',
     backgroundColor: '#3AA171',
     paddingHorizontal: 18,
     paddingVertical: 7,
-    borderRadius: 20,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+
     zIndex: 10,
   },
 
@@ -502,7 +500,6 @@ const styles = StyleSheet.create({
 
   planTitleCenter: {
     textAlign: 'center',
-    marginTop: 10,
     fontSize: 22,
     color: '#111',
     fontFamily: FONT.POPPINS_BOLD,

@@ -28,17 +28,21 @@ import Logoutcon from '../../assets/svgs/LogoutIcon.svg';
 import RightIcon from '../../assets/svgs/whiteBackIcon.svg';
 import ForwardIcon from '../../assets/svgs/ForwardArrow.svg';
 import YesIcon from '../../assets/svgs/YesIcon.svg';
-import { IMG_URL } from '../../apis/ApiManager';
+import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { triggerHaptic } from '../../utils/hapticks';
 import ScreenWrapper from '../../utils/screenWrapper';
 import { clearProjectDraft } from '../../redux/slices/projectDraftSlice';
 import { Persistor } from '../../redux/store';
+import { Linking } from 'react-native';
+import { useSnackbar } from '../../hooks/SnackbarProvider';
+import { clearNotifications } from '../../redux/slices/notificationSlice';
 
 const SettingsScreen = () => {
   const [notificationEnabled, setNotificationEnabled] = useState(true);
   const [showLogout, setShowLogout] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const showSnackbar = useSnackbar();
 
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -51,8 +55,41 @@ const SettingsScreen = () => {
   const isCustomer = userType === 'customer';
 
   const user = useSelector(state => state.auth.user);
+  const token = useSelector((state: any) => state.auth.userToken);
   const userId = user?._id;
   console.log('User ID:', userId);
+
+  const handleDeleteRequest = async () => {
+    try {
+      setLoading(true);
+
+      const body = {
+        id: userId,
+        type: 'delete',
+      };
+
+      const response = await ApiManager.helpRequest(body, token);
+
+      if (response?.data?.status === 'success') {
+        setShowDeletePopup(false);
+
+        showSnackbar(
+          response.data.message ||
+            'Account deletion request submitted successfully.',
+          'success',
+        );
+      }
+    } catch (error: any) {
+      console.log('Delete request error:', error);
+
+      showSnackbar(
+        error?.response?.data?.message || 'Something went wrong.',
+        'error',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -61,6 +98,7 @@ const SettingsScreen = () => {
       // AsyncStorage.removeItem('persist:root');
       dispatch(clearProjectDraft());
       dispatch(clearUser());
+      dispatch(clearNotifications());
 
       await Persistor.purge();
 
@@ -72,6 +110,16 @@ const SettingsScreen = () => {
       console.log('Logout error', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const openURL = async (url: string) => {
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      showSnackbar('Unable to open the link', 'error');
     }
   };
 
@@ -162,7 +210,10 @@ const SettingsScreen = () => {
           </View> */}
 
             {/* Privacy */}
-            <TouchableOpacity style={styles.row}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => openURL('https://preworks.in/privacy-policy/')}
+            >
               <View style={styles.rowLeft}>
                 <PrivacyIcon />
                 <Text style={styles.rowText}>Privacy Policy</Text>
@@ -172,7 +223,10 @@ const SettingsScreen = () => {
             </TouchableOpacity>
 
             {/* Terms */}
-            <TouchableOpacity style={styles.row}>
+            <TouchableOpacity
+              style={styles.row}
+              onPress={() => openURL('https://preworks.in/privacy-policy/')}
+            >
               <View style={styles.rowLeft}>
                 <PolicyIcon />
                 <Text style={styles.rowText}>Terms & Condition</Text>
@@ -251,11 +305,10 @@ const SettingsScreen = () => {
             }}
             buttons={[
               {
-                label: 'Send Request',
+                label: loading ? 'Sending...' : 'Send Request',
                 type: 'primary',
                 onPress: () => {
-                  console.log('Delete API call here');
-                  setShowDeletePopup(false);
+                  handleDeleteRequest();
                 },
               },
               {

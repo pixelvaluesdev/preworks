@@ -27,8 +27,10 @@ import { useBackExit } from '../../hooks/useBackExit';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import ScreenWrapper from '../../utils/screenWrapper';
+import useCheckLogin from '../../hooks/useCheckLogin';
 
 const ProfessionalHomeScreen = () => {
+  useCheckLogin();
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;

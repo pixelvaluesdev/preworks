@@ -135,7 +135,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       </View>
       <View style={{ position: 'relative' }}>
         <BorderTextInput
-          label="PIN Code"
+          label="PIN Code/Locality"
           placeholder="Enter postal code"
           value={data.pinCode}
           onChangeText={handlePinSearch}

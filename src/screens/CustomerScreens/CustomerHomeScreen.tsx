@@ -24,8 +24,10 @@ import HelpIcon from '../../assets/svgs/HelpUs.svg';
 import { useBackExit } from '../../hooks/useBackExit';
 import LocationIcon from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
+import useCheckLogin from '../../hooks/useCheckLogin';
 
 const CustomerHomeScreen = () => {
+  useCheckLogin();
   useEffect(() => {
     setTimeout(() => {
       triggerHaptic('impactHeavy');
@@ -91,13 +93,18 @@ const CustomerHomeScreen = () => {
     try {
       setHelpLoading(true);
 
-      const res = await ApiManager.helpRequest(user?._id, token);
+      const body = {
+        id: user?._id,
+        type: 'help',
+      };
+
+      const res = await ApiManager.helpRequest(body, token);
 
       if (res?.data?.status === 'success') {
         setHelpPopupVisible(false);
         navigation.navigate('HelpRequestSuccess');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Help request error:', error);
     } finally {
       setHelpLoading(false);

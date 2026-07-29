@@ -69,6 +69,28 @@ const VerificationScreen = () => {
 
       if (response.data.status === 'success') {
         const user = response.data.data;
+
+        // Check if account is deactivated
+        if (!user.status) {
+          showPopup(
+            'Your account has been deactivated. Please contact the administrator.',
+            [
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setPopupVisible(false);
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Welcome' }],
+                  });
+                },
+              },
+            ],
+          );
+
+          return;
+        }
         const token = response.data.token;
 
         dispatch(setUser(user));

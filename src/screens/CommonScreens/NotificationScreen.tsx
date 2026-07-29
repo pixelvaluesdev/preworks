@@ -16,19 +16,27 @@ import Colors from '../../constants/colors';
 
 import BackIcon from '../../assets/svgs/Back.svg';
 import ScreenHeader from '../../components/ScreenHeader';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
 import ScreenWrapper from '../../utils/screenWrapper';
+import {
+  setNotifications,
+  markAllNotificationsRead,
+} from '../../redux/slices/notificationSlice';
 
 const NotificationScreen = () => {
   const navigation = useNavigation();
-  const [notifications, setNotifications] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const dispatch = useDispatch();
 
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
   const token = useSelector(state => state.auth.userToken);
+  const notifications = useSelector(state => state.notification.notifications);
+
+  console.log('notifcations data', notifications);
 
   const getNotifications = async (isRefresh = false) => {
     try {
@@ -41,18 +49,34 @@ const NotificationScreen = () => {
       const res = await ApiManager.getNotifications(userId, token);
 
       if (res?.data?.status === 'success') {
-        setNotifications(res.data.data || []);
+        dispatch(setNotifications(res.data.data || []));
       }
     } catch (error) {
-      console.log('Notification API error:', error);
+      console.log(error);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
+  const readAllNotifications = async () => {
+    try {
+      const res = await ApiManager.readNotifications(userId, token);
+
+      if (res?.data?.status === 'success') {
+        dispatch(markAllNotificationsRead());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loadNotifications = async () => {
+    await getNotifications();
+    await readAllNotifications();
+  };
 
   useEffect(() => {
-    getNotifications();
+    loadNotifications();
   }, []);
 
   const renderItem = ({ item }: any) => {

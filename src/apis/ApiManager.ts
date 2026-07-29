@@ -88,6 +88,8 @@ const requestPath = {
   helpRequest: '/customer/helpUs',
   registerFcmToken: '/auth/register-fcm-token',
   getFAQ: '/admin/getFaqs',
+  readNotifications: '/admin/read-notification',
+  checkLogin: '/auth/check-Login',
 };
 
 const ApiManager = {
@@ -133,6 +135,10 @@ const ApiManager = {
   getNotifications: (userId: string, token?: string) => {
     return requests.get(`${requestPath.getNotifications}/${userId}`, token);
   },
+
+  readNotifications: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.readNotifications}/${userId}`, token);
+  },
   getProjectsForProfessional: (token?: string) => {
     return requests.get(`${requestPath.projectsForProfessional}`, token);
   },
@@ -155,8 +161,8 @@ const ApiManager = {
   updateWork: (workId: string, data: any, token?: string) => {
     return requests.put(`${requestPath.updateWork}/${workId}`, data, token);
   },
-  helpRequest: (userId: string, token?: string) => {
-    return requests.get(`${requestPath.helpRequest}/${userId}`, token);
+  helpRequest: (data: any, token?: string) => {
+    return requests.post(requestPath.helpRequest, data, token);
   },
 
   deleteWork: (workId: string, token?: string) => {
@@ -191,6 +197,9 @@ const ApiManager = {
 
   sendNotification: (data: any, token?: string) => {
     return requests.post(requestPath.sendNotification, data, token);
+  },
+  checkLogin: (userId: string, token?: string) => {
+    return requests.get(`${requestPath.checkLogin}/${userId}`, token);
   },
 };
 
