@@ -11,6 +11,7 @@ import { setUserType } from '../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { triggerHaptic } from '../../utils/hapticks';
+import UserTypeButton from '../../components/Buttons/UserTypeButton';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -26,7 +27,7 @@ const WelcomeScreen = () => {
 
   return (
     <ImageBackground
-      source={require('../../assets/pngs/BGImg.png')}
+      source={require('../../assets/pngs/BGImg1.png')}
       style={styles.container}
       resizeMode="cover"
     >
@@ -40,33 +41,32 @@ const WelcomeScreen = () => {
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Please Select Your User Type</Text>
 
-        <PrimaryButton
-          title="Customer"
-          width={WIDTH(50)}
-          Icon={Customer}
-          onPress={() => {
-            triggerHaptic('impactHeavy');
-            dispatch(setUserType('customer'));
+        <View style={styles.buttonContainer}>
+          <UserTypeButton
+            title="Customer"
+            Icon={Customer}
+            onPress={() => {
+              triggerHaptic('impactHeavy');
+              dispatch(setUserType('customer'));
 
-            if (!hasSeenOnboarding) {
-              navigation.navigate('Onboarding');
-            } else {
-              navigation.navigate('Login');
-            }
-          }}
-        />
+              if (!hasSeenOnboarding) {
+                navigation.navigate('Onboarding');
+              } else {
+                navigation.navigate('Login');
+              }
+            }}
+          />
 
-        <PrimaryButton
-          title="Professional"
-          Icon={Professional}
-          width={WIDTH(50)}
-          onPress={() => {
-            triggerHaptic('impactHeavy');
-            dispatch(setUserType('professional'));
-
-            navigation.navigate('ProfWelc');
-          }}
-        />
+          <UserTypeButton
+            title="Professional"
+            Icon={Professional}
+            onPress={() => {
+              triggerHaptic('impactHeavy');
+              dispatch(setUserType('professional'));
+              navigation.navigate('ProfWelc');
+            }}
+          />
+        </View>
       </View>
     </ImageBackground>
   );
@@ -81,24 +81,21 @@ const styles = StyleSheet.create({
 
   overlay: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: WIDTH(4),
-    //backgroundColor: 'rgba(0,0,0,0.45)',
-    shadowColor: 'black',
+    justifyContent: 'center',
+    paddingHorizontal: WIDTH(6),
   },
 
   title: {
-    fontSize: 32,
-    color: '#fff',
-
+    fontSize: 30,
+    color: 'black',
     marginBottom: 10,
     fontFamily: FONT.POPPINS_BOLD,
   },
 
   subtitle: {
     fontSize: 16,
-    color: '#fff',
+    color: '#787575',
     textAlign: 'center',
     marginBottom: 40,
     fontFamily: FONT.POPPINS_SEMIBOLD,
@@ -119,7 +116,11 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     width: 200,
-    height: 200,
-    alignSelf: 'center',
+    height: 160,
+    marginBottom: 15,
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
   },
 });
