@@ -39,7 +39,7 @@ const WelcomeScreen = () => {
         />
 
         <Text style={styles.title}>Welcome!</Text>
-        <Text style={styles.subtitle}>Please Select Your User Type</Text>
+        <Text style={styles.subtitle}>Please Select Your Role</Text>
 
         <View style={styles.buttonContainer}>
           <UserTypeButton
@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#787575',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logoImage: {
-    width: 200,
-    height: 160,
-    marginBottom: 15,
+    width: 230,
+    height: 180,
+    // marginBottom: 2,
   },
   buttonContainer: {
     width: '100%',

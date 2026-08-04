@@ -434,9 +434,26 @@ const EditProfileScreen = ({ navigation }: any) => {
         dispatch(setUser(updatedUser));
         setShowPopup(true);
       }
-    } catch (error) {
-      console.log('Update error:', error);
-      Alert.alert('Error', 'Update failed');
+    } catch (error: any) {
+      console.log('========== UPDATE ERROR ==========');
+      console.log('Message:', error?.message);
+      console.log('Code:', error?.code);
+      console.log('Status:', error?.response?.status);
+      console.log('Status Text:', error?.response?.statusText);
+      console.log(
+        'Response Data:',
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+      console.log('Request:', error?.request);
+      console.log('Full Error:', JSON.stringify(error, null, 2));
+      console.log('==================================');
+
+      Alert.alert(
+        'Update Failed',
+        error?.response?.data?.message ||
+          error?.message ||
+          'Something went wrong',
+      );
     } finally {
       setLoading(false);
     }

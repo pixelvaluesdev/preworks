@@ -29,16 +29,16 @@ export default UserTypeButton;
 
 const styles = StyleSheet.create({
   container: {
-    width: WIDTH(56),
+    width: WIDTH(50),
 
     backgroundColor: '#fff6e9', // Warm white
-    borderRadius: 18,
+    borderRadius: 12,
 
     flexDirection: 'row',
     alignItems: 'center',
 
     paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingHorizontal: 10,
 
     marginBottom: 18,
 
@@ -57,14 +57,14 @@ const styles = StyleSheet.create({
 
   iconContainer: {
     width: 48,
-    height: 48,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 8,
   },
 
   title: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#222222',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
