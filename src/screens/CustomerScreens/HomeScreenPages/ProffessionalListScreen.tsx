@@ -132,7 +132,6 @@ const ProfessionalListScreen = () => {
           )}
         />
       )} */}
-
       {/* Professionals Grid */}
       {loading ? (
         <ActivityIndicator
@@ -140,6 +139,10 @@ const ProfessionalListScreen = () => {
           color={Colors.primary}
           style={{ marginTop: HEIGHT(5), alignSelf: 'center' }}
         />
+      ) : finalList.length === 0 ? (
+        <View style={styles.noResultContainer}>
+          <Text style={styles.noResultText}>No results found</Text>
+        </View>
       ) : (
         <FlatList
           data={finalList}
@@ -184,10 +187,7 @@ const ProfessionalListScreen = () => {
                     {item.firstName} {item.lastName}
                   </Text>
 
-                  <Text style={styles.exp}>
-                    {' '}
-                    {item.userType?.toUpperCase()}
-                  </Text>
+                  <Text style={styles.exp}>{item.userType?.toUpperCase()}</Text>
 
                   <View style={{ flexDirection: 'row', gap: 4 }}>
                     <SuitCaseIcon width={16} height={16} />
@@ -279,5 +279,16 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
+  },
+  noResultContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingBottom: HEIGHT(10),
+  },
+  noResultText: {
+    fontSize: 16,
+    fontFamily: FONT.POPPINS_MEDIUM,
+    color: '#777',
   },
 });

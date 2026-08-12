@@ -597,6 +597,8 @@ const EditProfileScreen = ({ navigation }: any) => {
                     onPress={() => showImageOptions('profile')}
                   >
                     <Camera width={35} />
+
+                    <Text style={styles.requiredStar}>*</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -971,5 +973,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 0.5,
     borderColor: '#ccc',
+  },
+  requiredStar: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

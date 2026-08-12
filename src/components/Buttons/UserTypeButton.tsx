@@ -16,10 +16,8 @@ const UserTypeButton = ({ title, Icon, onPress }: Props) => {
       style={styles.container}
       onPress={onPress}
     >
-      <View style={styles.iconContainer}>
-        <Icon width={50} height={50} />
-      </View>
-
+      <View style={styles.iconContainer}></View>
+      <Icon width={45} height={45} />
       <Text style={styles.title}>{title}</Text>
     </TouchableOpacity>
   );
@@ -37,13 +35,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
 
-    paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingVertical: 6,
+    // paddingHorizontal: 8,
 
     marginBottom: 18,
 
-    borderWidth: 1,
-    borderColor: '#F3EEE8',
+    borderWidth: 1.2,
+    borderColor: '#ededed',
 
     shadowColor: '#000',
     shadowOffset: {
@@ -56,16 +54,16 @@ const styles = StyleSheet.create({
   },
 
   iconContainer: {
-    width: 48,
-    height: 44,
+    width: 31,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
+    //marginRight: 16,
   },
 
   title: {
     fontSize: 16,
-    color: '#222222',
-    fontFamily: FONT.POPPINS_MEDIUM,
+    color: '#4c4c4c',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 });

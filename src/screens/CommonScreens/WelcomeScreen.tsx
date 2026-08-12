@@ -87,17 +87,17 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 30,
-    color: 'black',
-    marginBottom: 10,
-    fontFamily: FONT.POPPINS_BOLD,
+    fontSize: 22,
+    color: '#4c4c4c',
+    marginTop: -20,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   subtitle: {
     fontSize: 14,
     color: '#787575',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
     fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
@@ -115,9 +115,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   logoImage: {
-    width: 230,
-    height: 180,
-    // marginBottom: 2,
+    width: 210,
+    height: 145,
+    //marginBottom: -66,
   },
   buttonContainer: {
     width: '100%',

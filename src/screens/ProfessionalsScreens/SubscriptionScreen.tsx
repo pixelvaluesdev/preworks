@@ -19,6 +19,7 @@ import Sub1 from '../../assets/svgs/Sub1.svg';
 import Sub2 from '../../assets/svgs/Sub2.svg';
 import Sub3 from '../../assets/svgs/Sub3.svg';
 import Sub4 from '../../assets/svgs/Sub4.svg';
+import TrustedIcon from '../../assets/svgs/TrustedSvg.svg';
 
 import {
   useNavigation,
@@ -211,10 +212,7 @@ const SubscriptionScreen = () => {
         .catch(error => {
           console.log('PAYMENT FAILED', error);
 
-          Alert.alert(
-            'Payment Cancelled',
-            error.description || 'Payment was not completed.',
-          );
+          Alert.alert('Payment Cancelled', 'Payment was not completed.');
         });
     } catch (error: any) {
       console.log('STATUS:', error?.response?.status);
@@ -226,7 +224,7 @@ const SubscriptionScreen = () => {
   };
 
   const renderCard = (plan: Plan) => {
-    console.log('Plannnns desi', plan.description);
+    console.log('Plannnns desi', plan);
     return (
       <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
@@ -396,6 +394,39 @@ const SubscriptionScreen = () => {
             })}
           </ScrollView>
         )}
+        {/* TRUSTED FOOTER */}
+
+        <View style={styles.trustedContainer}>
+          <View style={styles.trustedIconContainer}>
+            {/* <MaterialCommunityIcons
+              name="shield-check"
+              size={38}
+              color="#2F6FE4"
+            /> */}
+            <TrustedIcon />
+          </View>
+
+          <View style={styles.trustedContent}>
+            <Text style={styles.trustedTitle}>
+              Trusted by 10,000+ professionals
+            </Text>
+
+            <Text style={styles.trustedText}>
+              Join thousands of contractors and{'\n'}
+              service providers growing their business with Preworks.
+            </Text>
+          </View>
+        </View>
+
+        {/* SECURE PAYMENT FOOTER */}
+
+        <View style={styles.secureFooter}>
+          {/* <MaterialCommunityIcons name="lock" size={18} color="#A7A7A7" /> */}
+
+          <Text style={styles.secureText}>
+            Secure payments. Cancel anytime.
+          </Text>
+        </View>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -627,5 +658,75 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_MEDIUM,
     marginBottom: 8,
     marginLeft: 4,
+  },
+  trustedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    backgroundColor: '#FFF',
+
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    borderRadius: 18,
+
+    marginHorizontal: 18,
+    marginTop: 28,
+    paddingHorizontal: 12,
+    paddingVertical: 18,
+  },
+
+  trustedIconContainer: {
+    width: 54,
+    height: 44,
+
+    borderRadius: 14,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    marginRight: 16,
+  },
+
+  trustedContent: {
+    flex: 1,
+  },
+
+  trustedTitle: {
+    fontSize: 14,
+    color: '#111827',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    marginBottom: 5,
+  },
+
+  trustedText: {
+    fontSize: 12,
+    lineHeight: 19,
+    color: '#777',
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  secureFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    marginTop: 22,
+    marginBottom: 10,
+
+    paddingHorizontal: 10,
+  },
+
+  secureText: {
+    fontSize: 11,
+    color: '#A0A0A0',
+    fontFamily: FONT.POPPINS_REGULAR,
+    marginLeft: 6,
+  },
+
+  secureDivider: {
+    width: 1,
+    height: 14,
+    backgroundColor: '#CFCFCF',
+    marginHorizontal: 12,
   },
 });
