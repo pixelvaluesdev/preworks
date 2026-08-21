@@ -240,22 +240,31 @@ const EditProfileScreen = ({ navigation }: any) => {
     };
 
     launchCamera(options, response => {
-      if (response.didCancel) return;
+      console.log('Camera Response:', response);
 
-      if (response.errorCode) {
-        console.log('Error:', response.errorMessage);
-        Alert.alert('Camera Error', response.errorMessage);
+      if (response.didCancel) {
+        console.log('User cancelled camera');
         return;
       }
 
-      if (!response.assets || response.assets.length === 0) return;
+      if (response.errorCode) {
+        console.log('Error Code:', response.errorCode);
+        console.log('Error Message:', response.errorMessage);
+        Alert.alert(
+          'Camera Error',
+          `${response.errorCode}\n${response.errorMessage || ''}`,
+        );
+        return;
+      }
 
-      const image = response.assets[0];
+      if (response.assets?.length) {
+        const image = response.assets[0];
 
-      if (type === 'profile') {
-        setProfileImage(image);
-      } else {
-        setCoverImage(image);
+        if (type === 'profile') {
+          setProfileImage(image);
+        } else {
+          setCoverImage(image);
+        }
       }
     });
   };

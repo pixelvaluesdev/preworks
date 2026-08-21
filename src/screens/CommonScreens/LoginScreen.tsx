@@ -124,7 +124,12 @@ const LoginScreen = () => {
               <CheckBox
                 value={acceptedTerms}
                 onValueChange={setAcceptedTerms}
-                tintColors={{ true: '#3BA56A', false: '#FFFFFF' }}
+                tintColors={{
+                  true: '#3BA56A',
+                  false: '#FFFFFF',
+                }}
+                boxType="square"
+                style={styles.checkbox}
               />
 
               <Text style={styles.checkboxText}>
@@ -246,19 +251,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
   },
-
   checkboxText: {
     flex: 1,
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 13,
     lineHeight: 20,
-    marginTop: 6,
+    marginTop: Platform.OS === 'ios' ? 0 : 6,
   },
 
   link: {
     color: '#3BA56A',
     textDecorationLine: 'underline',
     fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  checkbox: {
+    width: Platform.OS === 'ios' ? 20 : 32,
+    height: Platform.OS === 'ios' ? 20 : 32,
+    marginRight: Platform.OS === 'ios' ? 6 : 0,
   },
 });

@@ -17,7 +17,11 @@ const CustomTextInput = ({
       {label && <Text style={styles.label}>{label}</Text>}
 
       <View style={styles.inputContainer}>
-        {prefix && <Text style={styles.prefix}>{prefix}</Text>}
+        {prefix && (
+          <View style={styles.prefixContainer}>
+            <Text style={styles.prefix}>{prefix}</Text>
+          </View>
+        )}
 
         <TextInput
           style={styles.input}
@@ -55,17 +59,6 @@ const styles = StyleSheet.create({
     height: 55,
   },
 
-  prefix: {
-    marginRight: 2,
-    color: '#757575',
-    fontFamily: FONT.POPPINS_REGULAR,
-    justifyContent: 'center',
-    fontSize: 16,
-    height: '100%',
-    textAlignVertical: 'center',
-    includeFontPadding: false,
-  },
-
   input: {
     flex: 1,
     fontSize: 16,
@@ -74,6 +67,19 @@ const styles = StyleSheet.create({
     height: '100%',
     textAlignVertical: 'center',
     paddingVertical: 0,
+    includeFontPadding: false,
+  },
+  prefixContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100%',
+    marginRight: 4,
+  },
+
+  prefix: {
+    color: '#757575',
+    fontFamily: FONT.POPPINS_REGULAR,
+    fontSize: 16,
     includeFontPadding: false,
   },
 });

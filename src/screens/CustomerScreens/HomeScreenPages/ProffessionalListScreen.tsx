@@ -23,6 +23,7 @@ import { IMG_URL } from '../../../apis/ApiManager';
 import ApiManager from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const suggestions = [
   'Residential',
@@ -92,7 +93,7 @@ const ProfessionalListScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <ScreenHeader
         title={
           search
@@ -204,7 +205,7 @@ const ProfessionalListScreen = () => {
           }}
         />
       )}
-    </View>
+    </ScreenWrapper>
   );
 };
 
