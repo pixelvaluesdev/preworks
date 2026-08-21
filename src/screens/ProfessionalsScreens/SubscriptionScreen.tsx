@@ -75,6 +75,10 @@ const SubscriptionScreen = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [extraDetails, setExtraDetails] = useState({
+    title: '',
+    description: '',
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -106,6 +110,7 @@ const SubscriptionScreen = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchExtraDetails();
   }, []);
 
   const fetchPlans = async () => {
@@ -123,6 +128,23 @@ const SubscriptionScreen = () => {
       console.log('Error fething plans', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExtraDetails = async () => {
+    try {
+      const res = await ApiManager.getExtraDetails(token);
+
+      console.log('EXTRA DETAILS:', res?.data);
+
+      if (res?.data?.status === 'success') {
+        setExtraDetails({
+          title: res.data.data?.title || '',
+          description: res.data.data?.description || '',
+        });
+      }
+    } catch (error) {
+      console.log('Error fetching extra details:', error);
     }
   };
 
@@ -210,13 +232,20 @@ const SubscriptionScreen = () => {
           }
         })
         .catch(error => {
-          console.log('PAYMENT FAILED', error);
+          console.log('PAYMENT FAILED:', error);
 
-          Alert.alert('Payment Cancelled', 'Payment was not completed.');
+          console.log('VERIFY ERROR STATUS:', error?.response?.status);
+
+          console.log('VERIFY ERROR DATA:', error?.response?.data);
+
+          Alert.alert(
+            'Payment Verification Failed',
+            error?.response?.data?.message || 'Payment verification failed.',
+          );
         });
     } catch (error: any) {
       console.log('STATUS:', error?.response?.status);
-      console.log('ERROR:', error?.response?.data);
+      console.log('ERROR:', error?.response);
       console.log('REQUEST:', error?.config?.data);
     } finally {
       setLoading(false);
@@ -396,25 +425,17 @@ const SubscriptionScreen = () => {
         )}
         {/* TRUSTED FOOTER */}
 
+        {/* TRUSTED FOOTER */}
+
         <View style={styles.trustedContainer}>
           <View style={styles.trustedIconContainer}>
-            {/* <MaterialCommunityIcons
-              name="shield-check"
-              size={38}
-              color="#2F6FE4"
-            /> */}
             <TrustedIcon />
           </View>
 
           <View style={styles.trustedContent}>
-            <Text style={styles.trustedTitle}>
-              Trusted by 10,000+ professionals
-            </Text>
+            <Text style={styles.trustedTitle}>{extraDetails.title}</Text>
 
-            <Text style={styles.trustedText}>
-              Join thousands of contractors and{'\n'}
-              service providers growing their business with Preworks.
-            </Text>
+            <Text style={styles.trustedText}>{extraDetails.description}</Text>
           </View>
         </View>
 

@@ -598,7 +598,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                   >
                     <Camera width={35} />
 
-                    <Text style={styles.requiredStar}>*</Text>
+                    {isProfessional && (
+                      <Text style={styles.requiredStar}>*</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
