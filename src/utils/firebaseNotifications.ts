@@ -5,6 +5,7 @@ import {
   onMessage,
   onNotificationOpenedApp,
   getInitialNotification,
+  registerDeviceForRemoteMessages,
 } from '@react-native-firebase/messaging';
 
 import { showLocalNotification } from './localNotifications';
@@ -34,6 +35,8 @@ export function notificationClickListener(navigation: any) {
 // Token
 export async function getFCMToken() {
   try {
+    await registerDeviceForRemoteMessages(messaging);
+
     const token = await getToken(messaging);
 
     console.log('FCM Token:', token);
