@@ -314,14 +314,20 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
             type: 'primary',
             onPress: () => {
               setPopupVisible(false);
-              pickImage(currentKey);
+
+              setTimeout(() => {
+                pickImage(currentKey);
+              }, 500);
             },
           },
           {
             label: 'PDF',
             onPress: () => {
               setPopupVisible(false);
-              pickDocument(currentKey);
+
+              setTimeout(() => {
+                pickDocument(currentKey);
+              }, 500);
             },
           },
           {

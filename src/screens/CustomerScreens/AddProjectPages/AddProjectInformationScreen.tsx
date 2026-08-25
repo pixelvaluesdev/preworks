@@ -26,6 +26,7 @@ import CustomPopup from '../../../components/Popups/CustomPopup';
 import Colors from '../../../constants/colors';
 import { triggerHaptic } from '../../../utils/hapticks';
 import { useDispatch, useSelector } from 'react-redux';
+import ScreenWrapper from '../../../utils/screenWrapper';
 import {
   saveProjectDraft,
   clearProjectDraft,
@@ -331,14 +332,16 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
   if (isEdit && fetchLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ScreenWrapper
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      >
         <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
+      </ScreenWrapper>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
           <BackArrow />
@@ -461,7 +464,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
           ]}
         />
       </KeyboardAvoidingView>
-    </View>
+    </ScreenWrapper>
   );
 };
 
