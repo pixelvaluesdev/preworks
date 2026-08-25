@@ -60,8 +60,8 @@ const useCheckLogin = () => {
           clearInterval(interval);
 
           Alert.alert(
-            'Account Removed',
-            'Your account has been deleted. Please contact support if you believe this is a mistake.',
+            'Account Temporarily Suspended',
+            'Your account is temporarily suspended while we review your account details. You currently cannot access Preworks professional features. If you believe this is a mistake, kindly contact Preworks Support.',
             [
               {
                 text: 'OK',

@@ -15,6 +15,11 @@ import {
 import { FONT } from '../../theme/fonts';
 import { WIDTH, HEIGHT } from '../../utils/responsive';
 import Building from '../../assets/svgs/Buildings.svg';
+import Sub1 from '../../assets/svgs/Sub1.svg';
+import Sub2 from '../../assets/svgs/Sub2.svg';
+import Sub3 from '../../assets/svgs/Sub3.svg';
+import Sub4 from '../../assets/svgs/Sub4.svg';
+import TrustedIcon from '../../assets/svgs/TrustedSvg.svg';
 
 import {
   useNavigation,
@@ -70,6 +75,10 @@ const SubscriptionScreen = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [extraDetails, setExtraDetails] = useState({
+    title: '',
+    description: '',
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -101,6 +110,7 @@ const SubscriptionScreen = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchExtraDetails();
   }, []);
 
   const fetchPlans = async () => {
@@ -118,6 +128,23 @@ const SubscriptionScreen = () => {
       console.log('Error fething plans', e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExtraDetails = async () => {
+    try {
+      const res = await ApiManager.getExtraDetails(token);
+
+      console.log('EXTRA DETAILS:', res?.data);
+
+      if (res?.data?.status === 'success') {
+        setExtraDetails({
+          title: res.data.data?.title || '',
+          description: res.data.data?.description || '',
+        });
+      }
+    } catch (error) {
+      console.log('Error fetching extra details:', error);
     }
   };
 
@@ -205,16 +232,20 @@ const SubscriptionScreen = () => {
           }
         })
         .catch(error => {
-          console.log('PAYMENT FAILED', error);
+          console.log('PAYMENT FAILED:', error);
+
+          console.log('VERIFY ERROR STATUS:', error?.response?.status);
+
+          console.log('VERIFY ERROR DATA:', error?.response?.data);
 
           Alert.alert(
-            'Payment Cancelled',
-            error.description || 'Payment was not completed.',
+            'Payment Verification Failed',
+            error?.response?.data?.message || 'Payment verification failed.',
           );
         });
     } catch (error: any) {
       console.log('STATUS:', error?.response?.status);
-      console.log('ERROR:', error?.response?.data);
+      console.log('ERROR:', error?.response);
       console.log('REQUEST:', error?.config?.data);
     } finally {
       setLoading(false);
@@ -222,11 +253,17 @@ const SubscriptionScreen = () => {
   };
 
   const renderCard = (plan: Plan) => {
-    console.log('Plannnns desi', plan.description);
+    console.log('Plannnns desi', plan);
     return (
       <View key={plan._id} style={styles.card}>
         <View style={styles.rowBetween}>
-          <Text style={styles.bigPrice}>₹{plan.amount}</Text>
+          <View style={styles.priceRow}>
+            <Text style={styles.rupeeSymbol}>₹</Text>
+            <Text style={styles.amount}>{plan.amount}</Text>
+            <Text style={styles.yearText}>
+              /{plan.interval === 'monthly' ? 'Month' : 'Year'}
+            </Text>
+          </View>
           <Text style={styles.planTitle}>{plan.name}</Text>
         </View>
 
@@ -278,14 +315,14 @@ const SubscriptionScreen = () => {
         <View style={styles.featureContainer}>
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <FileSvg />
+              <Sub1 />
             </View>
             <Text style={styles.featureText}>Full access to live projects</Text>
           </View>
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <EyeSvg />
+              <Sub2 />
             </View>
 
             <Text style={styles.featureText}>
@@ -295,7 +332,7 @@ const SubscriptionScreen = () => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <MsgSvg />
+              <Sub3 />
             </View>
 
             <Text style={styles.featureText}>
@@ -305,7 +342,7 @@ const SubscriptionScreen = () => {
 
           <View style={styles.featureItem}>
             <View style={styles.featureIcon}>
-              <EyeSvg />
+              <Sub4 />
             </View>
 
             <Text style={styles.featureText}>Submit Quotations</Text>
@@ -329,11 +366,11 @@ const SubscriptionScreen = () => {
 
               return (
                 <View key={plan._id} style={styles.planCard}>
-                  {yearly && (
+                  {plan.popularity ? (
                     <View style={styles.popularBadge}>
-                      <Text style={styles.popularText}>MOST POPULAR</Text>
+                      <Text style={styles.popularText}>{plan.popularity}</Text>
                     </View>
-                  )}
+                  ) : null}
 
                   <Text style={styles.planTitleCenter}>{plan.name}</Text>
 
@@ -342,12 +379,16 @@ const SubscriptionScreen = () => {
                   </Text>
 
                   <View style={styles.priceRow}>
-                    <Text style={styles.bigPrice}>₹{plan.amount}</Text>
-
-                    <Text style={styles.yearText}>
-                      /{plan.interval === 'monthly' ? 'Month' : 'Year'}
-                    </Text>
+                    <View style={styles.priceRow}>
+                      <Text style={styles.rupeeSymbol}>₹</Text>
+                      <Text style={styles.amount}>{plan.amount}</Text>
+                      <Text style={styles.yearText}>
+                        /{plan.interval === 'monthly' ? 'Month' : 'Year'}
+                      </Text>
+                    </View>
                   </View>
+
+                  <Text style={styles.oldPrice}>₹{plan.mainAmount}</Text>
 
                   {/* {yearly && (
                     <View style={styles.saveRow}>
@@ -382,6 +423,31 @@ const SubscriptionScreen = () => {
             })}
           </ScrollView>
         )}
+        {/* TRUSTED FOOTER */}
+
+        {/* TRUSTED FOOTER */}
+
+        <View style={styles.trustedContainer}>
+          <View style={styles.trustedIconContainer}>
+            <TrustedIcon />
+          </View>
+
+          <View style={styles.trustedContent}>
+            <Text style={styles.trustedTitle}>{extraDetails.title}</Text>
+
+            <Text style={styles.trustedText}>{extraDetails.description}</Text>
+          </View>
+        </View>
+
+        {/* SECURE PAYMENT FOOTER */}
+
+        <View style={styles.secureFooter}>
+          {/* <MaterialCommunityIcons name="lock" size={18} color="#A7A7A7" /> */}
+
+          <Text style={styles.secureText}>
+            Secure payments. Cancel anytime.
+          </Text>
+        </View>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -411,7 +477,7 @@ const styles = StyleSheet.create({
   banner: {
     backgroundColor: '#EEF4EF',
 
-    padding: 10,
+    padding: 6,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 18,
@@ -434,7 +500,7 @@ const styles = StyleSheet.create({
 
   featureContainer: {
     backgroundColor: '#FFF',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#EAEAEA',
     paddingVertical: 16,
@@ -447,12 +513,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
-    gap: 6,
+    gap: 8,
   },
 
   featureIcon: {
-    width: 20,
-    height: 20,
+    width: 10,
+    height: 10,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -461,7 +527,7 @@ const styles = StyleSheet.create({
 
   featureText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 12,
     color: '#444',
     fontFamily: FONT.POPPINS_MEDIUM,
   },
@@ -472,24 +538,23 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1.5,
     borderColor: '#4CAF7D',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    paddingTop: 30, // Increase this
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
     marginRight: 15,
     marginTop: 18,
   },
 
   popularBadge: {
     position: 'absolute',
-    //top: -15,
+    top: 0,
     alignSelf: 'center',
     backgroundColor: '#3AA171',
-    paddingHorizontal: 18,
-    paddingVertical: 7,
-    borderBottomRightRadius: 20,
-    borderBottomLeftRadius: 20,
-
-    zIndex: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderBottomLeftRadius: 18,
+    borderBottomRightRadius: 18,
+    zIndex: 100,
   },
 
   popularText: {
@@ -526,7 +591,7 @@ const styles = StyleSheet.create({
   },
 
   yearText: {
-    marginBottom: 8,
+    marginBottom: 2,
     fontSize: 16,
     color: '#666',
     fontFamily: FONT.POPPINS_MEDIUM,
@@ -541,9 +606,12 @@ const styles = StyleSheet.create({
 
   oldPrice: {
     textDecorationLine: 'line-through',
-    color: '#888',
-    marginRight: 8,
-    fontFamily: FONT.POPPINS_MEDIUM,
+    color: '#9A9A9A',
+    fontSize: 18,
+
+    marginBottom: 14,
+    textAlign: 'center',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   saveBadge: {
@@ -561,7 +629,7 @@ const styles = StyleSheet.create({
 
   divider: {
     height: 1,
-    backgroundColor: '#E8E8E8',
+    backgroundColor: '#ECECEC',
     marginVertical: 18,
   },
 
@@ -572,9 +640,10 @@ const styles = StyleSheet.create({
   },
 
   cardFeature: {
-    marginLeft: 10,
-    color: '#333',
-    fontFamily: FONT.POPPINS_MEDIUM,
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 22,
+    marginLeft: 0,
   },
 
   button: {
@@ -589,5 +658,96 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 15,
     fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
+  rupeeSymbol: {
+    fontSize: 26,
+    color: '#8A8A8A',
+    fontFamily: FONT.POPPINS_MEDIUM,
+    marginBottom: 8,
+    marginRight: 6,
+  },
+
+  amount: {
+    fontSize: 40,
+    color: '#111',
+    fontFamily: FONT.POPPINS_BOLD,
+  },
+
+  yearText: {
+    fontSize: 16,
+    color: '#666',
+    fontFamily: FONT.POPPINS_MEDIUM,
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  trustedContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    backgroundColor: '#FFF',
+
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    borderRadius: 18,
+
+    marginHorizontal: 18,
+    marginTop: 28,
+    paddingHorizontal: 12,
+    paddingVertical: 18,
+  },
+
+  trustedIconContainer: {
+    width: 54,
+    height: 44,
+
+    borderRadius: 14,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    marginRight: 16,
+  },
+
+  trustedContent: {
+    flex: 1,
+  },
+
+  trustedTitle: {
+    fontSize: 14,
+    color: '#111827',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    marginBottom: 5,
+  },
+
+  trustedText: {
+    fontSize: 12,
+    lineHeight: 19,
+    color: '#777',
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+
+  secureFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    marginTop: 22,
+    marginBottom: 10,
+
+    paddingHorizontal: 10,
+  },
+
+  secureText: {
+    fontSize: 11,
+    color: '#A0A0A0',
+    fontFamily: FONT.POPPINS_REGULAR,
+    marginLeft: 6,
+  },
+
+  secureDivider: {
+    width: 1,
+    height: 14,
+    backgroundColor: '#CFCFCF',
+    marginHorizontal: 12,
   },
 });

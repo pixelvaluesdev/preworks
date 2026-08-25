@@ -90,6 +90,7 @@ const requestPath = {
   getFAQ: '/admin/getFaqs',
   readNotifications: '/admin/read-notification',
   checkLogin: '/auth/check-Login',
+  getExtraDetails: '/admin/get-extraDetails',
 };
 
 const ApiManager = {
@@ -126,9 +127,6 @@ const ApiManager = {
     return requests.put(requestPath.updateProject, data, token);
   },
   deleteProject: (projectId: string, token?: string) => {
-    console.log('DELETE ID =>', projectId);
-    console.log('DELETE URL =>', requestPath.deleteProject + '/' + projectId);
-    console.log('TOKEN =>', token);
     return requests.get(`${requestPath.deleteProject}/${projectId}`, token);
   },
 
@@ -200,6 +198,9 @@ const ApiManager = {
   },
   checkLogin: (userId: string, token?: string) => {
     return requests.get(`${requestPath.checkLogin}/${userId}`, token);
+  },
+  getExtraDetails: (token?: string) => {
+    return requests.get(requestPath.getExtraDetails, token);
   },
 };
 

@@ -81,8 +81,6 @@ const Popup = ({
 
       const res = await ApiManager.projectEnquiry(formData, token);
 
-      console.log('Enquiry Response:', res?.data);
-
       if (res?.data?.status === 'success') {
         console.log('Notification Payload:', {
           userId: customerId,
