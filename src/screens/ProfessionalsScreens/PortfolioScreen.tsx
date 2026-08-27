@@ -425,6 +425,7 @@ const PortfolioScreen = () => {
                     setPopupVisible(false);
                     navigation.navigate('ProfessionalProfile', {
                       userId: userId,
+                      isSelfProfile: true,
                     });
                   }
                 },

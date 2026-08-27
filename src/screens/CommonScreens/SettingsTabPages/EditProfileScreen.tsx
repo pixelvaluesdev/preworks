@@ -756,6 +756,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                     value={experience}
                     onChangeText={setExperience}
                     placeholder="Enter your experience in years"
+                    keyboardType="number-pad"
                   />
                 )}
                 <View style={{}}>

@@ -73,7 +73,7 @@ const ProfessionalHomeScreen = () => {
       });
 
       setCurrentIndex(nextIndex);
-    }, 2000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [currentIndex, banners]);
@@ -288,7 +288,10 @@ const ProfessionalHomeScreen = () => {
             containerStyle={styles.searchHeader}
             onFocus={() => setShowSuggestions(true)}
             onProfilePress={() =>
-              navigation.navigate('ProfessionalProfile', { userId: userId })
+              navigation.navigate('ProfessionalProfile', {
+                userId: userId,
+                isSelfProfile: true,
+              })
             }
           />
 
