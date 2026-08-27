@@ -127,7 +127,7 @@ const CustomerHomeScreen = () => {
       });
 
       setCurrentIndex(nextIndex);
-    }, 2000); // change time here (3 sec)
+    }, 8000); // change time here (3 sec)
 
     return () => clearInterval(interval);
   }, [currentIndex, banners]);
