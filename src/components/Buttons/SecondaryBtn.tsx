@@ -7,6 +7,7 @@ import {
   GestureResponderEvent,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from 'react-native';
 
 import Colors from '../../constants/colors';
@@ -21,6 +22,7 @@ interface SecondaryButtonProps {
   textStyle?: TextStyle;
   disabled?: boolean;
   icon?: any;
+  loading?: boolean;
 }
 
 const SecondaryButton: React.FC<SecondaryButtonProps> = ({
@@ -30,19 +32,32 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
   textStyle,
   disabled = false,
   icon,
+  loading = false,
 }) => {
+  const handlePress = (event: GestureResponderEvent) => {
+    if (disabled || loading) {
+      return;
+    }
+
+    triggerHaptic('impactHeavy');
+    onPress(event);
+  };
   return (
     <TouchableOpacity
       style={[styles.button, style, disabled && styles.disabled]}
-      onPress={event => {
-        triggerHaptic('impactHeavy');
-        onPress(event);
-      }}
+      onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
     >
-      {icon && <View style={styles.icon}>{icon}</View>}
-      <Text style={[styles.text, textStyle]}>{title}</Text>
+      {loading ? (
+        <ActivityIndicator size="small" color="#FFFFFF" />
+      ) : (
+        <>
+          {icon && <View style={styles.icon}>{icon}</View>}
+
+          <Text style={[styles.text, textStyle]}>{title}</Text>
+        </>
+      )}
     </TouchableOpacity>
   );
 };

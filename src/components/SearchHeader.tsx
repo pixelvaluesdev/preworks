@@ -25,6 +25,8 @@ interface Props {
   containerStyle?: ViewStyle;
   onFocus?: () => void;
   onBlur?: () => void;
+  onPress?: () => void;
+  editable?: boolean;
 }
 
 const SearchHeader: React.FC<Props> = ({
@@ -37,6 +39,8 @@ const SearchHeader: React.FC<Props> = ({
   containerStyle,
   onFocus,
   onBlur,
+  onPress,
+  editable = true,
 }) => {
   const user = useSelector(state => state.auth.user);
   const profileImage = user?.image;
@@ -49,7 +53,12 @@ const SearchHeader: React.FC<Props> = ({
       ]}
     >
       {/* Search Bar */}
-      <View style={[styles.searchBar, style]}>
+      <TouchableOpacity
+        activeOpacity={editable ? 1 : 0.8}
+        onPress={onPress}
+        disabled={editable}
+        style={[styles.searchBar, style]}
+      >
         <SearchIcon width={22} height={22} />
 
         <TextInput
@@ -60,8 +69,10 @@ const SearchHeader: React.FC<Props> = ({
           onFocus={onFocus}
           placeholderTextColor="#757575"
           onBlur={onBlur}
+          editable={editable}
+          pointerEvents={editable ? 'auto' : 'none'}
         />
-      </View>
+      </TouchableOpacity>
 
       {/* Profile Avatar */}
       {showProfile && (

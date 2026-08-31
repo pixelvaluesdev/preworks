@@ -138,12 +138,17 @@ const CustomerHomeScreen = () => {
       <SearchHeader
         value={search}
         onChangeText={setSearch}
-        onFocus={() => {
-          navigation.navigate('ProfessionalList');
+        editable={false}
+        onPress={() => {
+          navigation.navigate('ProfessionalList', {
+            search: search,
+          });
         }}
         containerStyle={styles.searchHeader}
         onProfilePress={() =>
-          navigation.navigate('ProfileScreen', { userId: user?._id })
+          navigation.navigate('ProfileScreen', {
+            userId: user?._id,
+          })
         }
         placeholder="What are you looking for ?"
       />
@@ -291,7 +296,6 @@ const CustomerHomeScreen = () => {
           icon={<PlusIcon height={20} width={20} />}
           onPress={() => {
             navigation.navigate('AddProjectInformation');
-            triggerHaptic('Heavy');
           }}
         />
 
@@ -405,7 +409,7 @@ const styles = StyleSheet.create({
   seeAll: {
     color: '#3BA56A',
     fontSize: 14,
-    fontFamily: FONT.POPPINS_REGULAR,
+    fontFamily: FONT.POPPINS_SEMIBOLD,
   },
 
   proCard: {

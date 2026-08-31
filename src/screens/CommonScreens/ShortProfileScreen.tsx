@@ -37,6 +37,15 @@ const ShortProfileScreen = () => {
   const [popupMessage, setPopupMessage] = useState('');
 
   const handleNext = async () => {
+    if (loading) {
+      return;
+    }
+
+    if (!userId || !token) {
+      setPopupMessage('Session expired. Please login again.');
+      setPopupVisible(true);
+      return;
+    }
     const fName = firstName.trim();
     const lName = lastName.trim();
 
@@ -58,8 +67,8 @@ const ShortProfileScreen = () => {
       const response = await ApiManager.shortProfile(userId, body, token);
 
       if (response.data?.status === 'success') {
-        setPopupMessage(response.data.message || 'Profile added successfully');
-        setPopupVisible(true);
+        // setPopupMessage(response.data.message || 'Profile added successfully');
+        // setPopupVisible(true);
 
         const updatedUser = {
           ...user,
@@ -77,7 +86,9 @@ const ShortProfileScreen = () => {
         if (isCustomer) {
           navigation.replace('CustmTabNav');
         } else if (isProfessional && !updatedUser.image) {
-          navigation.replace('EditProfileScreen', { userId: user._id });
+          navigation.replace('EditProfileScreen', {
+            userId,
+          });
         } else {
           navigation.replace('ProfTabNav');
         }
@@ -121,7 +132,9 @@ const ShortProfileScreen = () => {
           />
 
           <SecondaryButton
-            title={loading ? 'Saving...' : 'Next'}
+            title="Next"
+            loading={loading}
+            disabled={loading}
             onPress={handleNext}
           />
         </View>

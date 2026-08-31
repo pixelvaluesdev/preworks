@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#757575',
     fontFamily: FONT.POPPINS_REGULAR,
-    marginBottom: 0,
+    marginBottom: 2,
     marginRight: 10,
   },
 
