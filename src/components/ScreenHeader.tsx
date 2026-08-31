@@ -10,6 +10,9 @@ const ScreenHeader = ({ title, showBack = false, onBackPress }) => {
   const navigation = useNavigation();
 
   const handleBack = () => {
+    console.log('BACK PRESSED');
+    console.log('Can go back:', navigation.canGoBack());
+
     if (onBackPress) {
       onBackPress();
     } else {

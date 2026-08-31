@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONT.POPPINS_SEMIBOLD,
     marginBottom: 20,
-    fontWeight: '600',
+    //fontWeight: '600',
   },
 
   submitBtn: {
@@ -289,11 +289,13 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 6,
     maxWidth: '45%',
+    overflow: 'hidden',
   },
 
   fileText: {
     fontSize: 12,
     fontFamily: FONT.POPPINS_REGULAR,
+    width: '80%',
   },
 
   cross: {

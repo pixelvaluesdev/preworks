@@ -305,6 +305,24 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
         existingDrawings: form.existingDrawings,
       });
       console.log('FormDataaaaaa', formData);
+      console.log('UPDATE PROJECT DATA:', {
+        projectId,
+        projectName: form.projectName,
+        plotAddress: form.address,
+        city: form.city,
+        pinCode: form.pinCode,
+        floorArea: form.floorArea,
+        plotSize: form.plotSize,
+        noOfFloors: form.floors,
+        quoteType: form.quoteType,
+        startDate: form.startDate,
+        lastDate: form.lastDate,
+        description: form.description,
+        budget: form.budget,
+        hasDrawing: form.hasDrawing,
+        services: form.services,
+        userId,
+      });
 
       const response = isEdit
         ? await ApiManager.updateProject(formData, token)
@@ -320,10 +338,19 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
         subtitle:
           'You will start receiving responses soon.\nYou can track your project in the Projects tab.',
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.log(
+        'UPDATE PROJECT ERROR:',
+        JSON.stringify(error?.response?.data, null, 2),
+      );
+
       setIsSuccess(false);
-      setPopupMessage(error?.response?.data?.message || 'Something went wrong');
-      console.log(error?.response?.data?.message);
+
+      setPopupMessage(
+        error?.response?.data?.message ||
+          error?.response?.data?.errors?.[0]?.message ||
+          'Something went wrong',
+      );
     } finally {
       setLoading(false);
       setPopupVisible(true);

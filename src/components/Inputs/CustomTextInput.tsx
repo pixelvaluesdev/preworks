@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 14,
+    marginBottom: 4,
   },
 
   inputContainer: {
