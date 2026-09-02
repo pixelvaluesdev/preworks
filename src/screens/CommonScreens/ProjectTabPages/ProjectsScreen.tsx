@@ -93,6 +93,8 @@ const ProjectsScreen = ({ route }: any) => {
       if (res?.data?.status === 'success') {
         const data = res.data.data || [];
 
+        console.log('Prof blurrrr', data);
+
         // Split into two lists
         const quoted = data.filter(item => item.type === 'quotation');
         const interested = data.filter(item => item.type === 'enquiry');
@@ -156,7 +158,20 @@ const ProjectsScreen = ({ route }: any) => {
         ? { uri: `${IMG_URL}/${project.image[0]}` }
         : require('../../../assets/images/NoImg1.jpeg');
 
-    const statusText = project?.status ? 'Active' : 'Closed';
+    const isExpired =
+      item?.quoteLastDate && new Date(item.quoteLastDate) < new Date();
+
+    const statusText = isExpired
+      ? 'Expired'
+      : item?.appliedStatus
+      ? 'Applied'
+      : 'New';
+
+    const isQuoteExpired =
+      !isCustomer &&
+      item?.type === 'quotation' &&
+      project?.quoteLastDate &&
+      new Date(project.quoteLastDate) < new Date();
 
     return (
       <TouchableOpacity
@@ -180,7 +195,12 @@ const ProjectsScreen = ({ route }: any) => {
         <View style={styles.card}>
           <Image
             source={imageUrl}
-            style={[styles.projectImage, !item.status && styles.closedImage]}
+            style={[
+              styles.projectImage,
+              isCustomer
+                ? !project?.status && styles.closedImage
+                : isQuoteExpired && styles.closedImage,
+            ]}
           />
 
           {/*  Only show menu for customer */}
@@ -551,7 +571,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   closedImage: {
-    opacity: 0.5,
+    opacity: 0.2,
     // tintColor: 'gray',
   },
   loaderContainer: {

@@ -72,7 +72,7 @@ const PlotWorkDetails = ({ data, handleChange }: any) => {
       /> */}
 
       <BorderTextInput
-        label="No of Floors..."
+        label="No of Floors"
         placeholder="Enter number of floors"
         value={data.floors || ''}
         onChangeText={text => {

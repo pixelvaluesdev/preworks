@@ -175,6 +175,7 @@ const ProfessionalHomeScreen = () => {
           selectedTab={selectedTab}
           item={item}
           time={moment(item.createdAt).fromNow()}
+          appliedStatus={item.appliedStatus}
         />
       );
     },
@@ -193,7 +194,10 @@ const ProfessionalHomeScreen = () => {
     try {
       setLoading(true);
 
-      const response = await ApiManager.getProjectsForProfessional(token);
+      const response = await ApiManager.getProjectsForProfessional(
+        userId,
+        token,
+      );
 
       if (response?.data?.status === 'success') {
         setProjects(response.data.data.projects);
@@ -246,11 +250,11 @@ const ProfessionalHomeScreen = () => {
                   resizeMode="cover"
                 />
 
-                <View style={styles.bannerTextContainer}>
+                {/* <View style={styles.bannerTextContainer}>
                   <Text style={styles.bannerSmall}>Your Trusted</Text>
                   <Text style={styles.bannerTitle}>Construction</Text>
                   <Text style={styles.bannerSmall}>Make Your Dream House</Text>
-                </View>
+                </View> */}
               </>
             )}
           />
