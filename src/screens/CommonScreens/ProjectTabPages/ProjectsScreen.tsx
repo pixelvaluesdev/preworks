@@ -232,7 +232,9 @@ const ProjectsScreen = ({ route }: any) => {
               <Text
                 style={[
                   styles.status,
-                  project?.status ? styles.activeStatus : styles.closedStatus,
+                  statusText === 'New' && styles.newStatus,
+                  statusText === 'Applied' && styles.appliedStatus,
+                  statusText === 'Expired' && styles.expiredStatus,
                 ]}
               >
                 {statusText}
@@ -570,9 +572,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+  status: {
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  newStatus: {
+    color: '#0E77EF', // Blue
+  },
+
+  appliedStatus: {
+    color: '#3AA171', // Green
+  },
+
+  expiredStatus: {
+    color: '#FF3B30', // Red
+  },
+
   closedImage: {
-    opacity: 0.2,
-    // tintColor: 'gray',
+    opacity: 0.5,
   },
   loaderContainer: {
     flex: 1,
