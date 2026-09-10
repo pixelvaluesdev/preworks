@@ -113,6 +113,20 @@ const PortfolioScreen = () => {
     caption: '',
   });
 
+  const getImageNameFromFile = file => {
+    if (!file) return '';
+
+    if (typeof file.name === 'string' && file.name) {
+      return file.name;
+    }
+
+    if (typeof file.uri === 'string') {
+      return file.uri.replace(IMG_URL, '');
+    }
+
+    return '';
+  };
+
   const submitPortfolio = async () => {
     try {
       setLoading(true);
@@ -127,23 +141,12 @@ const PortfolioScreen = () => {
       formData.append('caption', form.caption);
 
       const remainingOldImages = (form.image || [])
-        .filter(file => file.isOld)
-        .map(file => {
-          if (file.name && file.name.startsWith('http')) {
-            return file.name;
-          }
-
-          if (file.name) {
-            return file.name;
-          }
-
-          return file.uri?.replace(IMG_URL, '') || '';
-        })
+        .filter(file => file?.isOld)
+        .map(file => getImageNameFromFile(file))
         .filter(Boolean);
 
-      // New images only
       form.image.forEach((file, index) => {
-        if (!file.isOld) {
+        if (!file?.isOld && file?.uri) {
           formData.append('images', {
             uri: file.uri,
             type: file.type || 'image/jpeg',
@@ -236,6 +239,7 @@ const PortfolioScreen = () => {
           uri: item.uri,
           type: item.type,
           name: item.fileName,
+          isOld: false,
         })) || [];
 
       if (files.length) {

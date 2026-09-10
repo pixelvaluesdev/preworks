@@ -17,21 +17,31 @@ const InternetContext = createContext<InternetContextType | undefined>(
 );
 
 export const InternetProvider = ({ children }: { children: ReactNode }) => {
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState<boolean | null>(null);
 
   useEffect(() => {
+    const updateNetworkState = state => {
+      const connected =
+        state?.isConnected !== false && state?.isInternetReachable !== false;
+      setIsConnected(connected);
+    };
+
+    NetInfo.fetch()
+      .then(updateNetworkState)
+      .catch(() => setIsConnected(true));
+
     const unsubscribe = NetInfo.addEventListener(state => {
       console.log('NET STATUS:', state);
-      setIsConnected(state.isInternetReachable === true);
+      updateNetworkState(state);
     });
 
     return () => unsubscribe();
   }, []);
 
   return (
-    <InternetContext.Provider value={{ isConnected }}>
+    <InternetContext.Provider value={{ isConnected: isConnected !== false }}>
       {children}
-      {!isConnected && <InternetModal />}
+      {isConnected === false && <InternetModal />}
     </InternetContext.Provider>
   );
 };
