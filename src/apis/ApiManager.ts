@@ -3,6 +3,9 @@ import axios from 'axios';
 export const BASE_URL = 'https://preworksdemo.reviewdevelopment.net/api/v1';
 export const IMG_URL = 'https://preworksdemo.reviewdevelopment.net/';
 
+// export const BASE_URL = 'http://192.168.1.12:3001/api/v1';
+// export const IMG_URL = 'http://192.168.1.12:3001/';
+
 const getHeader = (isFormData = false) => ({
   'Content-Type': isFormData ? 'multipart/form-data' : 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -137,8 +140,8 @@ const ApiManager = {
   readNotifications: (userId: string, token?: string) => {
     return requests.get(`${requestPath.readNotifications}/${userId}`, token);
   },
-  getProjectsForProfessional: (token?: string) => {
-    return requests.get(`${requestPath.projectsForProfessional}`, token);
+  getProjectsForProfessional: (id: string, token?: string) => {
+    return requests.get(`${requestPath.projectsForProfessional}/${id}`, token);
   },
   projectEnquiry: (data: any, token?: string) => {
     return requests.post(requestPath.projectEnquiry, data, token);

@@ -209,10 +209,11 @@ const SubscriptionScreen = () => {
 
           const verifyBody = {
             userId,
-            razorpay_payment_id: payment.razorpay_payment_id,
-            razorpay_subscription_id: payment.razorpay_subscription_id,
+            razorpay_payment_id: payment?.razorpay_payment_id,
+            razorpay_subscription_id:
+              payment?.razorpay_subscription_id || data?.subscriptionId,
 
-            razorpay_signature: payment.razorpay_signature,
+            razorpay_signature: payment?.razorpay_signature,
           };
 
           console.log('VERIFY BODY', verifyBody);

@@ -189,11 +189,11 @@ const CustomerHomeScreen = () => {
                   style={styles.bannerImage}
                   resizeMode="cover"
                 />
-                <View style={styles.bannerTextContainer}>
+                {/* <View style={styles.bannerTextContainer}>
                   <Text style={styles.bannerSmall}>Your Trusted</Text>
                   <Text style={styles.bannerTitle}>Construction</Text>
                   <Text style={styles.bannerSmall}>Make Your Dream House</Text>
-                </View>
+                </View> */}
               </>
             )}
           />

@@ -182,37 +182,30 @@ const styles = StyleSheet.create({
 
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginHorizontal: 10,
   },
 
   title: {
+    flex: 1,
     fontSize: 16,
     fontFamily: FONT.POPPINS_MEDIUM,
-  },
-
-  message: {
-    fontSize: 14,
-    fontFamily: FONT.POPPINS_REGULAR,
-    color: 'black',
-    marginTop: 4,
-    fontWeight: '400',
-    marginHorizontal: 10,
+    marginRight: WIDTH(2),
   },
 
   timeRow: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    width: WIDTH(22),
+    alignItems: 'flex-end',
+    flexShrink: 0,
   },
 
   time: {
     fontSize: 12,
     color: 'grey',
-    marginRight: 6,
     fontWeight: '400',
     marginBottom: 6,
     fontFamily: FONT.POPPINS_REGULAR,
+    textAlign: 'right',
   },
 
   dot: {
@@ -220,8 +213,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: '#22D73D',
-    alignSelf: 'flex-end',
-    marginRight: 6,
+    marginRight: 2,
   },
 
   divider: {

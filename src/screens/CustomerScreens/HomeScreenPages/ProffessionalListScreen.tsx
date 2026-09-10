@@ -38,6 +38,7 @@ const ProfessionalListScreen = () => {
   const route = useRoute();
 
   const type = route?.params?.type;
+  const title = route?.params?.title;
   // const professionals = route?.params?.professionals || [];
 
   const [search, setSearch] = useState('');
@@ -98,6 +99,8 @@ const ProfessionalListScreen = () => {
         title={
           search
             ? 'Search'
+            : title
+            ? title
             : type
             ? `${
                 type.toLowerCase() === 'all'

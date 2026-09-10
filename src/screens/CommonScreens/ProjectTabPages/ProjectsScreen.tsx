@@ -93,6 +93,8 @@ const ProjectsScreen = ({ route }: any) => {
       if (res?.data?.status === 'success') {
         const data = res.data.data || [];
 
+        console.log('Prof blurrrr', data);
+
         // Split into two lists
         const quoted = data.filter(item => item.type === 'quotation');
         const interested = data.filter(item => item.type === 'enquiry');
@@ -156,7 +158,20 @@ const ProjectsScreen = ({ route }: any) => {
         ? { uri: `${IMG_URL}/${project.image[0]}` }
         : require('../../../assets/images/NoImg1.jpeg');
 
-    const statusText = project?.status ? 'Active' : 'Closed';
+    const isExpired =
+      item?.quoteLastDate && new Date(item.quoteLastDate) < new Date();
+
+    const statusText = isExpired
+      ? 'Expired'
+      : item?.appliedStatus
+      ? 'Applied'
+      : 'New';
+
+    const isQuoteExpired =
+      !isCustomer &&
+      item?.type === 'quotation' &&
+      project?.quoteLastDate &&
+      new Date(project.quoteLastDate) < new Date();
 
     return (
       <TouchableOpacity
@@ -180,7 +195,12 @@ const ProjectsScreen = ({ route }: any) => {
         <View style={styles.card}>
           <Image
             source={imageUrl}
-            style={[styles.projectImage, !item.status && styles.closedImage]}
+            style={[
+              styles.projectImage,
+              isCustomer
+                ? !project?.status && styles.closedImage
+                : isQuoteExpired && styles.closedImage,
+            ]}
           />
 
           {/*  Only show menu for customer */}
@@ -212,7 +232,9 @@ const ProjectsScreen = ({ route }: any) => {
               <Text
                 style={[
                   styles.status,
-                  project?.status ? styles.activeStatus : styles.closedStatus,
+                  statusText === 'New' && styles.newStatus,
+                  statusText === 'Applied' && styles.appliedStatus,
+                  statusText === 'Expired' && styles.expiredStatus,
                 ]}
               >
                 {statusText}
@@ -550,9 +572,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+  status: {
+    fontSize: 14,
+    fontFamily: FONT.POPPINS_MEDIUM,
+  },
+
+  newStatus: {
+    color: '#0E77EF', // Blue
+  },
+
+  appliedStatus: {
+    color: '#3AA171', // Green
+  },
+
+  expiredStatus: {
+    color: '#FF3B30', // Red
+  },
+
   closedImage: {
     opacity: 0.5,
-    // tintColor: 'gray',
   },
   loaderContainer: {
     flex: 1,

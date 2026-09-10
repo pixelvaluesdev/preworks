@@ -352,7 +352,10 @@ const ProfessionalProfileScreen = () => {
                 workList.map((item: any, index: number) => (
                   <TouchableOpacity
                     key={index}
-                    style={styles.gridItem}
+                    style={[
+                      styles.gridItem,
+                      index % 3 === 2 && styles.lastColumnItem,
+                    ]}
                     onPress={() =>
                       navigation.navigate('ProfessionalsProject', {
                         project: item,
@@ -367,7 +370,6 @@ const ProfessionalProfileScreen = () => {
                         style={styles.gridImage}
                       />
 
-                      {/* MULTI IMAGE ICON */}
                       {item.images?.length > 1 && (
                         <View style={styles.multiIcon}>
                           <MultiImg width={14} height={14} />
@@ -513,7 +515,7 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
   },
 
   gridImage: {
@@ -524,6 +526,7 @@ const styles = StyleSheet.create({
   gridItem: {
     width: '31%',
     marginBottom: 10,
+    marginRight: '2%',
   },
   editBtn: {
     position: 'absolute',
@@ -636,5 +639,8 @@ const styles = StyleSheet.create({
   submitBtn: {
     width: WIDTH(40),
     alignSelf: 'center',
+  },
+  lastColumnItem: {
+    marginRight: 0,
   },
 });

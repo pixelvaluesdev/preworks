@@ -45,15 +45,19 @@ import ScreenWrapper from '../../../utils/screenWrapper';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
 const CommonProjectDetailsScreen = ({ route }: any) => {
-  const { projectId, fromProjectsScreen } = route.params || {};
+  const { projectId, fromProjectsScreen, appliedStatus } = route.params || {};
   const flatListRef = React.useRef(null);
 
   const userTypeRed = useSelector(state => state.auth.userType);
+  console.log('USER TYPE 👉', userTypeRed);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
   const token = useSelector(state => state.auth.userToken);
   const isCustomer = userTypeRed === 'customer';
-  const isProfessional = userTypeRed === 'professional';
+  const isProfessional =
+    userTypeRed === 'contractor' ||
+    userTypeRed === 'architect' ||
+    userTypeRed === 'designer';
 
   const [project, setProject] = useState(null);
   const drawings = project?.drawing || [];
@@ -285,6 +289,22 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
     return range ? range.label : '2 CR+';
   };
+
+  const isQuoteExpired = project?.quoteLastDate
+    ? new Date(project.quoteLastDate).getTime() < new Date().getTime()
+    : false;
+
+  console.log('QUOTATION DEBUG 👉', {
+    projectId,
+    quoteLastDate: project?.quoteLastDate,
+    appliedStatus,
+    fromProjectsScreen,
+    isProfessional,
+    isQuoteExpired,
+  });
+
+  const showQuotationButton =
+    isProfessional && !isQuoteExpired && (!appliedStatus || fromProjectsScreen);
 
   return (
     <ScreenWrapper style={styles.container}>
@@ -587,7 +607,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
             </>
           )}
 
-          {!isCustomer && (
+          {showQuotationButton && (
             <View style={{ marginTop: 15 }}>
               <SecondaryButton
                 title={

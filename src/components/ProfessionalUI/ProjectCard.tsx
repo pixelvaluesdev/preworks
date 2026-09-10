@@ -9,7 +9,15 @@ import { triggerHaptic } from '../../utils/hapticks';
 import { useSelector } from 'react-redux';
 import ApiManager from '../../apis/ApiManager';
 
-const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
+const ProjectCard = ({
+  title,
+  location,
+  image,
+  selectedTab,
+  item,
+  time,
+  appliedStatus,
+}) => {
   const user = useSelector(state => state.auth.user);
 
   const userId = user?._id;
@@ -19,6 +27,15 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
   const [profile, setProfile] = React.useState(null);
 
   const navigation = useNavigation();
+
+  const isExpired =
+    item?.quoteLastDate && new Date(item.quoteLastDate) < new Date();
+
+  const status = isExpired
+    ? 'Expired'
+    : item?.appliedStatus
+    ? 'Applied'
+    : 'New';
 
   useFocusEffect(
     useCallback(() => {
@@ -53,7 +70,7 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
               ? { uri: image }
               : require('../../assets/images/NoImg1.jpeg')
           }
-          style={styles.image}
+          style={[styles.image, isExpired && styles.expiredImage]}
           resizeMode="cover"
           onError={() => setImgError(true)}
         />
@@ -68,11 +85,21 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
       <View style={styles.content}>
         <View style={styles.row}>
           <Text style={styles.title}>{title}</Text>
-          <Text style={styles.new}>New</Text>
+          <Text
+            style={[
+              styles.new,
+              item?.appliedStatus && !isExpired && styles.applied,
+              isExpired && styles.expired,
+            ]}
+          >
+            {status}
+          </Text>
         </View>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
+        <View style={styles.locationRow}>
           <Location width={18} height={18} />
-          <Text style={styles.location}>{location}</Text>
+          <Text style={styles.location} numberOfLines={2}>
+            {location}
+          </Text>
         </View>
 
         {selectedTab == 'project' ? (
@@ -82,8 +109,12 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
               profile?.user?.isSubscribed
                 ? navigation.navigate('CommonProjectDetails', {
                     projectId: item._id,
+                    appliedStatus: item?.appliedStatus,
+                    fromProjectsScreen:
+                      selectedTab === 'project' && item?.appliedStatus,
                   })
                 : navigation.navigate('Subscription');
+
               triggerHaptic('impactHeavy');
             }}
           >
@@ -96,8 +127,10 @@ const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
               profile?.user?.isSubscribed
                 ? navigation.navigate('GeneralEnquiry', {
                     projectId: item._id,
+                    interestedStatus: item?.appliedStatus,
                   })
                 : navigation.navigate('Subscription');
+
               triggerHaptic('impactHeavy');
             }}
           >
@@ -147,10 +180,18 @@ const styles = StyleSheet.create({
     fontFamily: FONT.POPPINS_MEDIUM,
   },
 
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    flex: 1,
+  },
+
   location: {
     fontFamily: FONT.POPPINS_REGULAR,
     fontSize: 12,
     fontWeight: '400',
+    flex: 1,
   },
 
   button: {
@@ -185,5 +226,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 10,
     fontFamily: FONT.POPPINS_REGULAR,
+  },
+  expiredImage: {
+    opacity: 0.2,
+  },
+  applied: {
+    color: Colors.primary,
+  },
+  expired: {
+    color: '#FF0000',
   },
 });

@@ -15,19 +15,19 @@ import { triggerHaptic } from '../../utils/hapticks';
 
 const services = [
   {
-    title: 'Contractor',
+    title: 'Contractors',
     Icon: ContractorIcon,
     type: 'contractor',
     subtitle: 'For Construction Work',
   },
   {
-    title: 'Architect',
+    title: 'Architects',
     Icon: ArchitectIcon,
     type: 'architect',
     subtitle: 'Planning & Designing',
   },
   {
-    title: 'Interior Designer',
+    title: 'Interior Designers',
     Icon: InteriorIcon,
     type: 'designer',
     subtitle: 'For Designing Your Space',
@@ -37,8 +37,11 @@ const services = [
 const WhatWeDoSection = () => {
   const navigation = useNavigation();
 
-  const handlePress = (type: string) => {
-    navigation.navigate('ProfessionalList', { type });
+  const handlePress = (type: string, title: string) => {
+    navigation.navigate('ProfessionalList', {
+      type,
+      title,
+    });
   };
 
   return (
@@ -53,7 +56,7 @@ const WhatWeDoSection = () => {
             subtitle={item.subtitle}
             Icon={item.Icon}
             onPress={() => {
-              handlePress(item.type);
+              handlePress(item.type, item.title);
               triggerHaptic('impactMedium');
             }}
           />
