@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 
 import { WIDTH, HEIGHT } from '../../../utils/responsive';
@@ -26,7 +27,8 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
 const ProfileScreen = ({ navigation }: any) => {
   const route = useRoute();
-  const userId = route?.params?.userId;
+  const loggedInUser = useSelector((state: any) => state.auth.user);
+  const userId = route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
   console.log('Received userId:', userId);
 
   const token = useSelector((state: any) => state.auth.userToken);
@@ -34,6 +36,7 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // useEffect(() => {
   //   if (userId) {
@@ -64,6 +67,26 @@ const ProfileScreen = ({ navigation }: any) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditPress = () => {
+    if (isNavigating) {
+      return;
+    }
+
+    const targetUserId = userId || loggedInUser?._id || loggedInUser?.id;
+
+    if (!targetUserId) {
+      Alert.alert('Profile not available', 'Please try again.');
+      return;
+    }
+
+    setIsNavigating(true);
+    navigation.navigate('EditProfileScreen', { userId: targetUserId });
+
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 700);
   };
 
   if (loading) {
@@ -113,12 +136,7 @@ const ProfileScreen = ({ navigation }: any) => {
               }
             />
 
-            <TouchableOpacity
-              style={styles.editBtn}
-              onPress={() =>
-                navigation.navigate('EditProfileScreen', { userId })
-              }
-            >
+            <TouchableOpacity style={styles.editBtn} onPress={handleEditPress}>
               <Text style={styles.editText}>Edit</Text>
             </TouchableOpacity>
           </View>

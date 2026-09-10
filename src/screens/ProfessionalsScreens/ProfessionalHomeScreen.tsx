@@ -14,6 +14,7 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
@@ -37,6 +38,20 @@ const ProfessionalHomeScreen = () => {
 
   const navigation = useNavigation();
 
+  const openEditProfile = useCallback(() => {
+    const targetUserId = user?._id || userId;
+
+    if (!targetUserId) {
+      Alert.alert(
+        'Profile not available',
+        'Please log in again and try once more.',
+      );
+      return;
+    }
+
+    navigation.navigate('EditProfileScreen', { userId: targetUserId });
+  }, [navigation, user, userId]);
+
   const [banners, setBanners] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTab, setSelectedTab] = useState('project');
@@ -52,10 +67,14 @@ const ProfessionalHomeScreen = () => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    if (!user?.image) {
+    if (!user) {
+      return;
+    }
+
+    if (!user.image && user._id) {
       navigation.replace('EditProfileScreen', { userId: user._id });
     }
-  }, []);
+  }, [navigation, user]);
 
   useEffect(() => {
     if (banners.length === 0) return;

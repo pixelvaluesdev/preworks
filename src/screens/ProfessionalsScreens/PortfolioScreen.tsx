@@ -126,7 +126,22 @@ const PortfolioScreen = () => {
       formData.append('budget', form.budget.replace(/,/g, ''));
       formData.append('caption', form.caption);
 
-      // Images
+      const remainingOldImages = (form.image || [])
+        .filter(file => file.isOld)
+        .map(file => {
+          if (file.name && file.name.startsWith('http')) {
+            return file.name;
+          }
+
+          if (file.name) {
+            return file.name;
+          }
+
+          return file.uri?.replace(IMG_URL, '') || '';
+        })
+        .filter(Boolean);
+
+      // New images only
       form.image.forEach((file, index) => {
         if (!file.isOld) {
           formData.append('images', {
@@ -136,6 +151,10 @@ const PortfolioScreen = () => {
           });
         }
       });
+
+      if (isEdit && remainingOldImages.length > 0) {
+        formData.append('existingImages', JSON.stringify(remainingOldImages));
+      }
 
       const res = isEdit
         ? await ApiManager.updateWork(workId, formData, token)

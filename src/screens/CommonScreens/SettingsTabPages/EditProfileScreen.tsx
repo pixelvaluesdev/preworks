@@ -34,17 +34,18 @@ import { IMG_URL } from '../../../apis/ApiManager';
 import { setUser } from '../../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
 import ScreenWrapper from '../../../utils/screenWrapper';
-import { City } from 'country-state-city';
+import { City, State } from 'country-state-city';
 import { useMemo } from 'react';
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state.auth.userType);
+  const loggedInUser = useSelector((state: any) => state.auth.user);
   console.log('userType:', userType);
   const isProfessional = userType !== 'customer';
   const token = useSelector((state: any) => state.auth.userToken);
 
   const route = useRoute();
-  const userId = route?.params?.userId;
+  const userId = route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
   console.log('EditProfileScreen userId:', userId);
 
   const dispatch = useDispatch();
@@ -83,9 +84,19 @@ const EditProfileScreen = ({ navigation }: any) => {
     return City.getCitiesOfCountry('IN');
   }, []);
 
+  const indianStates = useMemo(() => {
+    return State.getStatesOfCountry('IN');
+  }, []);
+
   useEffect(() => {
     if (userId) {
       fetchProfile();
+    } else {
+      Alert.alert(
+        'Profile not available',
+        'Please try again from your profile.',
+      );
+      navigation.goBack();
     }
   }, [userId]);
 
@@ -136,6 +147,11 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const fetchProfile = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -388,6 +404,14 @@ const EditProfileScreen = ({ navigation }: any) => {
       return;
     }
 
+    if (!userId) {
+      Alert.alert(
+        'Profile not available',
+        'Please try again from your profile.',
+      );
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -468,7 +492,7 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
   };
 
-  const fetchPincodes = async cityName => {
+  const fetchPincodes = async (cityName, fallbackState = '') => {
     try {
       const response = await fetch(
         `https://api.postalpincode.in/postoffice/${cityName}`,
@@ -481,6 +505,12 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         setCityPincodes(pins);
         setPinSuggestions(pins);
+
+        if (fallbackState) {
+          setState(fallbackState);
+        } else if (pins[0]?.State) {
+          setState(pins[0].State);
+        }
       } else {
         setCityPincodes([]);
         setPinSuggestions([]);
@@ -490,25 +520,68 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
   };
 
+  const getCityMatchScore = (cityName, query) => {
+    const normalizedCity = cityName.toLowerCase().trim();
+    const normalizedQuery = query.toLowerCase().trim();
+
+    if (!normalizedQuery) return Number.MAX_SAFE_INTEGER;
+    if (normalizedCity === normalizedQuery) return 0;
+    if (normalizedCity.startsWith(normalizedQuery)) return 1;
+
+    const cityWords = normalizedCity.split(/\s+/);
+    const wordMatchIndex = cityWords.findIndex(word =>
+      word.startsWith(normalizedQuery),
+    );
+
+    if (wordMatchIndex !== -1) {
+      return 2 + wordMatchIndex * 0.1;
+    }
+
+    const containsIndex = normalizedCity.indexOf(normalizedQuery);
+    if (containsIndex !== -1) {
+      return 3 + containsIndex;
+    }
+
+    return Number.MAX_SAFE_INTEGER;
+  };
+
   const handleCitySearch = text => {
     setCity(text);
 
-    if (text.length < 2) {
+    const trimmedText = text.trim();
+
+    if (trimmedText.length < 2) {
       setCitySuggestions([]);
       setShowDropdown(false);
       return;
     }
 
-    const filteredCities = indianCities
-      .filter(city => city.name.toLowerCase().includes(text.toLowerCase()))
+    const query = trimmedText.toLowerCase();
+
+    const filteredCities = [...indianCities]
+      .filter(city => city.name.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const scoreDiff =
+          getCityMatchScore(a.name, query) - getCityMatchScore(b.name, query);
+
+        if (scoreDiff !== 0) return scoreDiff;
+
+        return a.name.localeCompare(b.name);
+      })
       .slice(0, 10);
 
     setCitySuggestions(filteredCities);
-    setShowDropdown(true);
+    setShowDropdown(filteredCities.length > 0);
   };
 
   const handlePinSearch = text => {
     handleInputChange('pin', text, setPin);
+
+    if (!text.trim()) {
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
+      return;
+    }
 
     const filteredPins = cityPincodes
       .filter(item => item.Pincode.includes(text))
@@ -679,8 +752,20 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 key={index}
                                 style={styles.item}
                                 onPress={() => {
+                                  const matchedState = indianStates.find(
+                                    state =>
+                                      state.isoCode === item.stateCode ||
+                                      state.name.toLowerCase() ===
+                                        item.name.toLowerCase(),
+                                  );
+
                                   setCity(item.name);
-                                  fetchPincodes(item.name);
+                                  setPin('');
+                                  setState(matchedState?.name || '');
+                                  fetchPincodes(
+                                    item.name,
+                                    matchedState?.name || '',
+                                  );
 
                                   setShowDropdown(false);
                                   setShowPinDropdown(true);
@@ -722,7 +807,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 key={index}
                                 onPress={() => {
                                   setPin(item.Pincode);
-                                  setState(item.State || '');
                                   setShowPinDropdown(false);
                                 }}
                               >
