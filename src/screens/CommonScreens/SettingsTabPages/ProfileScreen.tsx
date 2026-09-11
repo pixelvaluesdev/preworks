@@ -71,18 +71,44 @@ const ProfileScreen = ({ navigation }: any) => {
 
   const handleEditPress = () => {
     if (isNavigating) {
+      console.log(
+        'ProfileScreen edit press ignored because already navigating',
+      );
       return;
     }
 
-    const targetUserId = userId || loggedInUser?._id || loggedInUser?.id;
+    const targetUserId =
+      route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
 
-    if (!targetUserId) {
-      Alert.alert('Profile not available', 'Please try again.');
+    console.log('ProfileScreen handleEditPress:', {
+      routeParams: route?.params,
+      loggedInUserId: loggedInUser?._id,
+      targetUserId,
+      navigationState: navigation?.getState?.(),
+    });
+
+    if (!targetUserId || !String(targetUserId).trim()) {
+      console.log('ProfileScreen edit blocked: missing targetUserId');
+      Alert.alert(
+        'Profile not available',
+        'Please login again and try once more.',
+      );
       return;
     }
 
     setIsNavigating(true);
-    navigation.navigate('EditProfileScreen', { userId: targetUserId });
+
+    try {
+      console.log('ProfileScreen navigating to EditProfileScreen with:', {
+        userId: String(targetUserId),
+      });
+      navigation.push('EditProfileScreen', {
+        userId: String(targetUserId),
+      });
+    } catch (error) {
+      console.log('Edit profile navigation error:', error);
+      Alert.alert('Navigation error', 'Unable to open edit profile right now.');
+    }
 
     setTimeout(() => {
       setIsNavigating(false);

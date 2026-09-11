@@ -28,7 +28,7 @@ import ScreenWrapper from '../../../utils/screenWrapper';
 
 const ProjectDetailsScreen = () => {
   const route = useRoute();
-  const { project } = route.params;
+  const { project } = route.params || {};
   const token = useSelector(state => state.auth.userToken);
   console.log('Received project data:', project);
   console.log('Tokennnnnn123', token);

@@ -20,7 +20,7 @@ import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
 
 const QuoteListScreen = ({ route }: any) => {
   const token = useSelector(state => state.auth.userToken);
-  const { projectId, isQuote } = route.params;
+  const { projectId, isQuote } = route.params || {};
   const navigation = useNavigation();
 
   const [list, setList] = useState([]);

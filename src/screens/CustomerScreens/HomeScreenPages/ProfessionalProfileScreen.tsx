@@ -298,7 +298,7 @@ const ProfessionalProfileScreen = () => {
 
             {showLinks && (
               <View style={styles.linksPopup}>
-                {profile?.user?.links.map((link: string, index: number) => (
+                {profile?.user?.links?.map((link: string, index: number) => (
                   <View key={index} style={styles.linkRow}>
                     {/* White box (ONLY text) */}
                     <View style={styles.linkBox}>
@@ -365,12 +365,14 @@ const ProfessionalProfileScreen = () => {
                     <View>
                       <Image
                         source={{
-                          uri: IMG_URL + item.images[0],
+                          uri: item?.images?.[0]
+                            ? IMG_URL + item.images[0]
+                            : '',
                         }}
                         style={styles.gridImage}
                       />
 
-                      {item.images?.length > 1 && (
+                      {item?.images?.length > 1 && (
                         <View style={styles.multiIcon}>
                           <MultiImg width={14} height={14} />
                         </View>

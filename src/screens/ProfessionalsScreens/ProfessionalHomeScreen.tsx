@@ -67,14 +67,34 @@ const ProfessionalHomeScreen = () => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !user._id) {
+      console.log('ProfessionalHomeScreen redirect check skipped:', {
+        hasUser: !!user,
+        userId: user?._id,
+        token: !!token,
+      });
       return;
     }
 
-    if (!user.image && user._id) {
+    const currentRoute = navigation.getCurrentRoute?.();
+    const isHomeRoute = currentRoute?.name === 'Home';
+
+    console.log('ProfessionalHomeScreen redirect check:', {
+      userId: user._id,
+      hasImage: !!user.image,
+      currentRouteName: currentRoute?.name,
+      isHomeRoute,
+      navigationState: navigation?.getState?.(),
+    });
+
+    if (!user.image && isHomeRoute) {
+      console.log('ProfessionalHomeScreen redirecting to EditProfileScreen:', {
+        userId: user._id,
+        routeName: currentRoute?.name,
+      });
       navigation.replace('EditProfileScreen', { userId: user._id });
     }
-  }, [navigation, user]);
+  }, [navigation, user, token]);
 
   useEffect(() => {
     if (banners.length === 0) return;
@@ -188,7 +208,7 @@ const ProfessionalHomeScreen = () => {
           }`}
           image={
             item.image && item.image.length > 0
-              ? `${IMG_URL}${item.image[0]}`
+              ? `${IMG_URL}${item?.image?.[0]}`
               : null
           }
           selectedTab={selectedTab}
@@ -320,7 +340,7 @@ const ProfessionalHomeScreen = () => {
 
           {/* Dots */}
           <View style={styles.dotContainer}>
-            {banners.map((_, index) => (
+            {banners?.map((_, index) => (
               <View
                 key={index}
                 style={[styles.dot, currentIndex === index && styles.activeDot]}

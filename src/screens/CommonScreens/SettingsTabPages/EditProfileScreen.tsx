@@ -73,6 +73,8 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [stateSuggestions, setStateSuggestions] = useState([]);
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
 
   const [pinSuggestions, setPinSuggestions] = useState([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
@@ -89,16 +91,28 @@ const EditProfileScreen = ({ navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
+    console.log('EditProfileScreen mounted/updated:', {
+      routeParams: route?.params,
+      userId,
+      loggedInUserId: loggedInUser?._id,
+      userType,
+      tokenPresent: !!token,
+      navigationState: navigation?.getState?.(),
+    });
+
+    if (userId && String(userId).trim()) {
+      console.log('EditProfileScreen fetching profile with userId:', userId);
       fetchProfile();
-    } else {
-      Alert.alert(
-        'Profile not available',
-        'Please try again from your profile.',
-      );
+      return;
+    }
+
+    console.log('EditProfileScreen missing userId, cannot fetch profile');
+    Alert.alert('Profile not available', 'Please try again from your profile.');
+
+    if (navigation?.canGoBack?.()) {
       navigation.goBack();
     }
-  }, [userId]);
+  }, [userId, navigation, route, loggedInUser?._id, userType, token]);
 
   useEffect(() => {
     const backAction = () => {
@@ -147,7 +161,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const fetchProfile = async () => {
-    if (!userId) {
+    if (!userId || !String(userId).trim()) {
       setLoading(false);
       return;
     }
@@ -208,7 +222,9 @@ const EditProfileScreen = ({ navigation }: any) => {
         return;
       }
 
-      const image = response.assets[0];
+      const image = response?.assets?.[0];
+
+      if (!image) return;
 
       if (type === 'profile') {
         setProfileImage(image);
@@ -273,7 +289,7 @@ const EditProfileScreen = ({ navigation }: any) => {
         return;
       }
 
-      if (response.assets?.length) {
+      if (response?.assets?.length) {
         const image = response.assets[0];
 
         if (type === 'profile') {
@@ -545,6 +561,31 @@ const EditProfileScreen = ({ navigation }: any) => {
     return Number.MAX_SAFE_INTEGER;
   };
 
+  const getStateMatchScore = (stateName, query) => {
+    const normalizedState = stateName.toLowerCase().trim();
+    const normalizedQuery = query.toLowerCase().trim();
+
+    if (!normalizedQuery) return Number.MAX_SAFE_INTEGER;
+    if (normalizedState === normalizedQuery) return 0;
+    if (normalizedState.startsWith(normalizedQuery)) return 1;
+
+    const stateWords = normalizedState.split(/\s+/);
+    const wordMatchIndex = stateWords.findIndex(word =>
+      word.startsWith(normalizedQuery),
+    );
+
+    if (wordMatchIndex !== -1) {
+      return 2 + wordMatchIndex * 0.1;
+    }
+
+    const containsIndex = normalizedState.indexOf(normalizedQuery);
+    if (containsIndex !== -1) {
+      return 3 + containsIndex;
+    }
+
+    return Number.MAX_SAFE_INTEGER;
+  };
+
   const handleCitySearch = text => {
     setCity(text);
 
@@ -572,6 +613,36 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     setCitySuggestions(filteredCities);
     setShowDropdown(filteredCities.length > 0);
+  };
+
+  const handleStateSearch = text => {
+    const cleanedText = text.replace(/[^a-zA-Z ]/g, '');
+    setState(cleanedText);
+
+    const trimmedText = cleanedText.trim();
+
+    if (trimmedText.length < 2) {
+      setStateSuggestions([]);
+      setShowStateDropdown(false);
+      return;
+    }
+
+    const query = trimmedText.toLowerCase();
+
+    const filteredStates = [...indianStates]
+      .filter(item => item.name.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const scoreDiff =
+          getStateMatchScore(a.name, query) - getStateMatchScore(b.name, query);
+
+        if (scoreDiff !== 0) return scoreDiff;
+
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 10);
+
+    setStateSuggestions(filteredStates);
+    setShowStateDropdown(filteredStates.length > 0);
   };
 
   const handlePinSearch = text => {
@@ -826,14 +897,43 @@ const EditProfileScreen = ({ navigation }: any) => {
                   </View>
                 </View>
 
-                <BorderTextInput
-                  label="State"
-                  value={state}
-                  onChangeText={text =>
-                    handleInputChange('state', text, setState)
-                  }
-                  placeholder="Enter your State"
-                />
+                <View style={[styles.col, { zIndex: 998, width: '100%' }]}>
+                  <View style={{ position: 'relative' }}>
+                    <BorderTextInput
+                      label="State"
+                      value={state}
+                      onChangeText={handleStateSearch}
+                      placeholder="Enter your State"
+                    />
+
+                    {showStateDropdown && stateSuggestions.length > 0 && (
+                      <View style={styles.dropdown}>
+                        <ScrollView
+                          nestedScrollEnabled
+                          keyboardShouldPersistTaps="handled"
+                          showsVerticalScrollIndicator={false}
+                        >
+                          {stateSuggestions.map((item, index) => (
+                            <Text
+                              key={index}
+                              style={styles.item}
+                              onPress={() => {
+                                setState(item.name);
+                                setStateSuggestions([]);
+                                setShowStateDropdown(false);
+                                if (!city.trim()) {
+                                  setCity('');
+                                }
+                              }}
+                            >
+                              {item.name}
+                            </Text>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
+                  </View>
+                </View>
 
                 <BorderTextInput
                   label="Address"

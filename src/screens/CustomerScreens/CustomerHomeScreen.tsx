@@ -199,7 +199,7 @@ const CustomerHomeScreen = () => {
           />
 
           <View style={styles.dotContainer}>
-            {banners.map((_, index) => (
+            {banners?.map((_, index) => (
               <View
                 key={index}
                 style={[styles.dot, currentIndex === index && styles.activeDot]}
