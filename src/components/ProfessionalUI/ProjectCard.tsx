@@ -6,7 +6,7 @@ import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 import ApiManager from '../../apis/ApiManager';
 
 const ProjectCard = ({
@@ -18,13 +18,13 @@ const ProjectCard = ({
   time,
   appliedStatus,
 }) => {
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
 
   const userId = user?._id;
-  const token = useSelector((state: any) => state.auth.userToken);
+  const token = useAppSelector(state => state.auth.userToken);
   const [imgError, setImgError] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [profile, setProfile] = React.useState(null);
+  const [profile, setProfile] = React.useState<any>(null);
 
   const navigation = useNavigation();
 

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
 import ApiManager from '../apis/ApiManager';
 import { clearUser } from '../redux/slices/authSlice';
+import { useAppSelector } from '../redux/hooks';
 import { clearNotifications } from '../redux/slices/notificationSlice';
 import { clearProjectDraft } from '../redux/slices/projectDraftSlice';
 import { Persistor } from '../redux/store';
@@ -15,8 +16,8 @@ const useCheckLogin = () => {
   const navigation = useNavigation<any>();
   const dispatch = useDispatch();
 
-  const token = useSelector((state: any) => state.auth.userToken);
-  const user = useSelector((state: any) => state.auth.user);
+  const token = useAppSelector(state => state.auth.userToken);
+  const user = useAppSelector(state => state.auth.user);
   const [popupVisible, setPopupVisible] = useState(false);
 
   const [popupConfig, setPopupConfig] = useState({

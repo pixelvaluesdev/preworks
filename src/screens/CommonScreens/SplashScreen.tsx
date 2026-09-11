@@ -2,23 +2,23 @@ import { View, StyleSheet } from 'react-native';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 
 const SplashScreen = () => {
   const navigation = useNavigation<any>();
 
-  const token = useSelector((state: any) => state.auth.userToken);
-  const user = useSelector((state: any) => state.auth.user);
+  const token = useAppSelector(state => state.auth.userToken);
+  const user = useAppSelector(state => state.auth.user);
   console.log('USer Object', user);
-  const userType = useSelector((state: any) => state.auth.userType);
+  const userType = useAppSelector(state => state.auth.userType);
 
-  const isRehydrated = useSelector((state: any) => state._persist?.rehydrated);
+  const isRehydrated = useAppSelector(state => state._persist?.rehydrated);
 
-  const hasSeenOnboarding = useSelector(
-    (state: any) => state.auth.hasSeenOnboarding,
+  const hasSeenOnboarding = useAppSelector(
+    state => state.auth.hasSeenOnboarding,
   );
-  const hasSeenProfessionalOnboarding = useSelector(
-    (state: any) => state.auth.hasSeenProfessionalOnboarding,
+  const hasSeenProfessionalOnboarding = useAppSelector(
+    state => state.auth.hasSeenProfessionalOnboarding,
   );
 
   useEffect(() => {

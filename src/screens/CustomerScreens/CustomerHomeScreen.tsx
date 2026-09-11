@@ -46,6 +46,7 @@ const CustomerHomeScreen = () => {
   const [search, setSearch] = useState('');
   const flatListRef = useRef(null);
   const [helpLoading, setHelpLoading] = useState(false);
+  const [postLoading, setPostLoading] = useState(false);
 
   useEffect(() => {
     console.log(token, 'Tokennnn here');
@@ -290,12 +291,30 @@ const CustomerHomeScreen = () => {
 
         {/* Add Project Button */}
         <SecondaryButton
-          title="Post Your Project"
-          style={{ marginHorizontal: WIDTH(4), marginVertical: HEIGHT(2) }}
+          title={postLoading ? 'Opening...' : 'Post Your Project'}
+          style={{
+            marginHorizontal: WIDTH(4),
+            marginVertical: HEIGHT(2),
+            opacity: postLoading ? 0.9 : 1,
+          }}
           textStyle={{ fontSize: 18 }}
           icon={<PlusIcon height={20} width={20} />}
+          loading={postLoading}
           onPress={() => {
-            navigation.navigate('AddProjectInformation');
+            if (postLoading) {
+              return;
+            }
+
+            setPostLoading(true);
+            triggerHaptic('impactHeavy');
+
+            requestAnimationFrame(() => {
+              navigation.navigate('AddProjectInformation');
+            });
+
+            setTimeout(() => {
+              setPostLoading(false);
+            }, 1200);
           }}
         />
 

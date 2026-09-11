@@ -21,7 +21,7 @@ import { FONT } from '../../../theme/fonts';
 
 import QuoteIcon from '../../../assets/svgs/Quote.svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../redux/hooks';
 import GreyMobile from '../../../assets/svgs/greyMobile.svg';
 import GreyAdress from '../../../assets/svgs/GreyAdress.svg';
 import Area from '../../../assets/svgs/GreyArea.svg';
@@ -48,11 +48,11 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, fromProjectsScreen, appliedStatus } = route.params || {};
   const flatListRef = React.useRef(null);
 
-  const userTypeRed = useSelector(state => state.auth.userType);
+  const userTypeRed = useAppSelector(state => state.auth.userType);
   console.log('USER TYPE 👉', userTypeRed);
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   const userId = user?._id;
-  const token = useSelector(state => state.auth.userToken);
+  const token = useAppSelector(state => state.auth.userToken);
   const isCustomer = userTypeRed === 'customer';
   const isProfessional =
     userTypeRed === 'contractor' ||

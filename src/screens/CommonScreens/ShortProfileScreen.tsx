@@ -6,8 +6,9 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
+import { useAppSelector } from '../../redux/hooks';
 
 import CustomTextInput from '../../components/Inputs/CustomTextInput';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
@@ -22,10 +23,10 @@ const ShortProfileScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   console.log(user);
-  const token = useSelector(state => state.auth.userToken);
-  const userType = useSelector((state: any) => state.auth.userType);
+  const token = useAppSelector(state => state.auth.userToken);
+  const userType = useAppSelector(state => state.auth.userType);
   const isCustomer = userType === 'customer';
 
   const userId = user?._id;
