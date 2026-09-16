@@ -14,7 +14,8 @@ import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { useNavigation } from '@react-navigation/native';
 import { clearUser } from '../../redux/slices/authSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -47,15 +48,15 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const fName = useSelector(state => state.auth.user?.firstName);
-  const lName = useSelector(state => state.auth.user?.lastName);
+  const fName = useAppSelector(state => state.auth.user?.firstName);
+  const lName = useAppSelector(state => state.auth.user?.lastName);
 
-  const userType = useSelector((state: any) => state.auth.userType);
+  const userType = useAppSelector(state => state.auth.userType);
   console.log('userType:', userType);
   const isCustomer = userType === 'customer';
 
-  const user = useSelector(state => state.auth.user);
-  const token = useSelector((state: any) => state.auth.userToken);
+  const user = useAppSelector(state => state.auth.user);
+  const token = useAppSelector(state => state.auth.userToken);
   const userId = user?._id;
   console.log('User ID:', userId);
 

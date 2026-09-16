@@ -61,7 +61,7 @@ const GeneralEnquiryScreen = () => {
   }, [projectId, token]);
 
   const imageUrls =
-    project?.image?.map(img => ({
+    (Array.isArray(project?.image) ? project.image : []).map(img => ({
       uri: `${IMG_URL}${img}`,
     })) || [];
 
@@ -204,11 +204,13 @@ const GeneralEnquiryScreen = () => {
         <Text style={styles.sectionTitle}>services customer need</Text>
         {/* from api services are not comming */}
         <View style={styles.tagRow}>
-          {project?.services?.map((item, index) => (
-            <View key={index} style={styles.tag}>
-              <Text style={styles.tagText}>{item}</Text>
-            </View>
-          ))}
+          {(Array.isArray(project?.services) ? project.services : []).map(
+            (item, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{item}</Text>
+              </View>
+            ),
+          )}
         </View>
         {/* Details */}
         <Text style={styles.sectionTitle}>Project Detail</Text>

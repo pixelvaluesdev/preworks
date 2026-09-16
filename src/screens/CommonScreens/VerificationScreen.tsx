@@ -38,7 +38,7 @@ const VerificationScreen = () => {
     buttons: [],
   });
   const route = useRoute();
-  const { phone } = route.params;
+  const { phone } = route.params || {};
 
   const navigation = useNavigation();
   const dispatch = useDispatch();

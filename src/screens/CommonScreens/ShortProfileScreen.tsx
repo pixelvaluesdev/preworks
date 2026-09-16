@@ -6,8 +6,9 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
+import { useAppSelector } from '../../redux/hooks';
 
 import CustomTextInput from '../../components/Inputs/CustomTextInput';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
@@ -19,13 +20,13 @@ import { setUser } from '../../redux/slices/authSlice';
 import CustomPopup from '../../components/Popups/CustomPopup';
 
 const ShortProfileScreen = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const dispatch = useDispatch();
 
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   console.log(user);
-  const token = useSelector(state => state.auth.userToken);
-  const userType = useSelector((state: any) => state.auth.userType);
+  const token = useAppSelector(state => state.auth.userToken);
+  const userType = useAppSelector(state => state.auth.userType);
   const isCustomer = userType === 'customer';
 
   const userId = user?._id;
@@ -66,12 +67,12 @@ const ShortProfileScreen = () => {
 
       const response = await ApiManager.shortProfile(userId, body, token);
 
-      if (response.data?.status === 'success') {
+      if (response?.data?.status === 'success') {
         // setPopupMessage(response.data.message || 'Profile added successfully');
         // setPopupVisible(true);
 
         const updatedUser = {
-          ...user,
+          ...(user || {}),
           firstName: fName,
           lastName: lName,
         };
@@ -83,20 +84,28 @@ const ShortProfileScreen = () => {
           userType === 'architect' ||
           userType === 'designer';
 
-        if (isCustomer) {
-          navigation.replace('CustmTabNav');
-        } else if (isProfessional && !updatedUser.image) {
-          navigation.replace('EditProfileScreen', {
-            userId,
-          });
-        } else {
-          navigation.replace('ProfTabNav');
+        try {
+          if (isCustomer) {
+            navigation.replace('CustmTabNav');
+          } else if (isProfessional && !updatedUser.image) {
+            navigation.replace('EditProfileScreen', {
+              userId,
+            });
+          } else {
+            navigation.replace('ProfTabNav');
+          }
+        } catch (navigationError) {
+          console.log('Short profile navigation error:', navigationError);
+          setPopupMessage(
+            'Profile saved, but we could not open the next screen.',
+          );
+          setPopupVisible(true);
         }
       } else {
-        setPopupMessage(response.data?.message || 'Something went wrong');
+        setPopupMessage(response?.data?.message || 'Something went wrong');
         setPopupVisible(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       const serverMessage = error?.response?.data?.message;
 
       setPopupMessage(serverMessage || 'Network error');

@@ -12,7 +12,7 @@ import SearchIcon from '../assets/svgs/Search.svg';
 import { WIDTH } from '../utils/responsive';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../redux/hooks';
 import { IMG_URL } from '../apis/ApiManager';
 
 interface Props {
@@ -42,7 +42,7 @@ const SearchHeader: React.FC<Props> = ({
   onPress,
   editable = true,
 }) => {
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   const profileImage = user?.image;
   return (
     <View

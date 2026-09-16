@@ -9,7 +9,7 @@ import { WIDTH } from '../../utils/responsive';
 import Logo from '../../assets/svgs/PreworksLogo.svg';
 import { setUserType } from '../../redux/slices/authSlice';
 import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 import { triggerHaptic } from '../../utils/hapticks';
 import UserTypeButton from '../../components/Buttons/UserTypeButton';
 
@@ -17,12 +17,12 @@ const WelcomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const hasSeenOnboarding = useSelector(
-    (state: any) => state.auth.hasSeenOnboarding,
+  const hasSeenOnboarding = useAppSelector(
+    state => state.auth.hasSeenOnboarding,
   );
 
-  const hasSeenProfessionalOnboarding = useSelector(
-    (state: any) => state.auth.hasSeenProfessionalOnboarding,
+  const hasSeenProfessionalOnboarding = useAppSelector(
+    state => state.auth.hasSeenProfessionalOnboarding,
   );
 
   return (

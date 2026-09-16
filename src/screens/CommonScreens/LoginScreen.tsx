@@ -18,7 +18,7 @@ import CustomTextInput from '../../components/Inputs/CustomTextInput';
 import PrimaryButton from '../../components/Buttons/PrimaryButton';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
 import { useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 import ApiManager from '../../apis/ApiManager';
 import { useSnackbar } from '../../hooks/SnackbarProvider';
 import { ActivityIndicator } from 'react-native-paper';
@@ -35,7 +35,7 @@ const LoginScreen = () => {
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  const userType = useSelector((state: any) => state.auth.userType);
+  const userType = useAppSelector(state => state.auth.userType);
 
   const capitalizeFirstLetter = (text: string) => {
     if (!text) return '';

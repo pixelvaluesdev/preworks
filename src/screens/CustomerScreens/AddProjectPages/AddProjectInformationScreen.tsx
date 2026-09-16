@@ -34,8 +34,60 @@ import {
 
 const TOTAL_STEPS = 4;
 
+const emptyProjectForm = {
+  projectName: '',
+  address: '',
+  city: '',
+  pinCode: '',
+  floorArea: '',
+  plotSize: '',
+  floors: '',
+  quoteType: '',
+  startDate: '',
+  lastDate: '',
+  description: '',
+  budget: '',
+  siteImage: [],
+  archDrawing: [],
+  existingImages: [],
+  existingDrawings: [],
+  hasDrawing: true,
+  services: [],
+  hideNumber: false,
+};
+
+const normalizeProjectForm = (draftForm = {}) => ({
+  ...emptyProjectForm,
+  ...draftForm,
+  projectName: String(draftForm?.projectName ?? ''),
+  address: String(draftForm?.address ?? ''),
+  city: String(draftForm?.city ?? ''),
+  pinCode: String(draftForm?.pinCode ?? ''),
+  floorArea: String(draftForm?.floorArea ?? ''),
+  plotSize: String(draftForm?.plotSize ?? ''),
+  floors: String(draftForm?.floors ?? ''),
+  quoteType: String(draftForm?.quoteType ?? ''),
+  startDate: String(draftForm?.startDate ?? ''),
+  lastDate: String(draftForm?.lastDate ?? ''),
+  description: String(draftForm?.description ?? ''),
+  budget: String(draftForm?.budget ?? ''),
+  siteImage: Array.isArray(draftForm?.siteImage) ? draftForm.siteImage : [],
+  archDrawing: Array.isArray(draftForm?.archDrawing)
+    ? draftForm.archDrawing
+    : [],
+  existingImages: Array.isArray(draftForm?.existingImages)
+    ? draftForm.existingImages
+    : [],
+  existingDrawings: Array.isArray(draftForm?.existingDrawings)
+    ? draftForm.existingDrawings
+    : [],
+  hasDrawing: draftForm?.hasDrawing ?? true,
+  services: Array.isArray(draftForm?.services) ? draftForm.services : [],
+  hideNumber: !!draftForm?.hideNumber,
+});
+
 const AddProjectInformationScreen = ({ navigation, route }: any) => {
-  const { isEdit, projectId } = route.params || {};
+  const { isEdit, projectId } = route?.params || {};
   const [step, setStep] = useState<number>(0);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupMessage, setPopupMessage] = useState('');
@@ -48,7 +100,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   const draftForm = useSelector(state => state.projectDraft.form);
   const [initialForm, setInitialForm] = useState(null);
 
-  console.log('Redux draft:', draftForm.hasDrawing);
+  console.log('Redux draft:', draftForm?.hasDrawing);
 
   useEffect(() => {
     if (isEdit && projectId) {
@@ -56,13 +108,17 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     }
   }, [isEdit, projectId]);
 
-  const [form, setForm] = useState({
-    ...draftForm,
-    hasDrawing: isEdit ? draftForm?.hasDrawing : draftForm?.hasDrawing ?? true,
-  });
+  const [form, setForm] = useState(() =>
+    normalizeProjectForm({
+      ...draftForm,
+      hasDrawing: isEdit
+        ? draftForm?.hasDrawing
+        : draftForm?.hasDrawing ?? true,
+    }),
+  );
 
   useEffect(() => {
-    dispatch(saveProjectDraft(form));
+    dispatch(saveProjectDraft(normalizeProjectForm(form)));
   }, [form]);
 
   console.log('Form state:', form.hasDrawing);
@@ -70,62 +126,63 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
   const handleChange = (key: string, value: any) => {
     console.log('handleChange', key, value);
-    let updatedValue = value;
+    let updatedValue = value ?? '';
 
     if (key === 'pinCode') {
-      updatedValue = value;
+      updatedValue = String(updatedValue);
     }
 
     if (key === 'floorArea' || key === 'plotSize') {
-      updatedValue = value.replace(/[^0-9.]/g, '');
+      updatedValue = String(updatedValue).replace(/[^0-9.]/g, '');
     }
 
     if (key === 'city') {
-      updatedValue = value.replace(/[^a-zA-Z ]/g, '');
+      updatedValue = String(updatedValue).replace(/[^a-zA-Z ]/g, '');
     }
 
     setForm(prev => ({
-      ...prev,
+      ...normalizeProjectForm(prev),
       [key]: updatedValue,
     }));
   };
 
   const validateStep = () => {
-    // STEP 0 validation (ProjectInfo)
+    const safeForm = normalizeProjectForm(form);
+
     if (step === 0) {
-      if (!form.projectName.trim()) return false;
-      if (!form.address.trim()) return false;
-      if (!form.city.trim()) return false;
-      if (!form.pinCode.trim()) return false;
+      if (!String(safeForm.projectName).trim()) return false;
+      if (!String(safeForm.address).trim()) return false;
+      if (!String(safeForm.city).trim()) return false;
+      if (!String(safeForm.pinCode).trim()) return false;
     }
 
-    // STEP 1 validation (PlotWorkDetails)
     if (step === 1) {
-      if (!form.floorArea) return false;
-      if (!form.floors) return false;
-      if (!form.quoteType) return false;
+      if (!String(safeForm.floorArea).trim()) return false;
+      if (!String(safeForm.floors).trim()) return false;
+      if (!String(safeForm.quoteType).trim()) return false;
     }
 
-    // STEP 2 validation (Timeline)
     if (step === 2) {
-      if (!form.startDate) return false;
-      if (!form.lastDate) return false;
-      if (!form.description) return false;
-      if (!form.budget) return false;
+      if (!String(safeForm.startDate).trim()) return false;
+      if (!String(safeForm.lastDate).trim()) return false;
+      if (!String(safeForm.description).trim()) return false;
+      if (!String(safeForm.budget).trim()) return false;
     }
 
-    // STEP 3 validation (Files)
     if (step === 3) {
-      // REMOVE mandatory image check
-
-      if (form.hasDrawing) {
+      if (safeForm.hasDrawing) {
         const totalDrawings =
-          (form.archDrawing?.length || 0) +
-          (form.existingDrawings?.length || 0);
+          (safeForm.archDrawing?.length || 0) +
+          (safeForm.existingDrawings?.length || 0);
 
         if (totalDrawings === 0) return false;
       } else {
-        if (!form.services || form.services.length === 0) return false;
+        if (
+          !Array.isArray(safeForm.services) ||
+          safeForm.services.length === 0
+        ) {
+          return false;
+        }
       }
     }
 
@@ -229,98 +286,108 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
   const submitProjectApi = async () => {
     try {
+      const safeForm = normalizeProjectForm(form);
       setLoading(true);
       setIsSuccess(false);
 
       const formData = new FormData();
-      formData.append('projectId', projectId);
+      formData.append('projectId', projectId || '');
 
-      formData.append('projectName', form.projectName);
-      formData.append('plotAddress', form.address);
-      formData.append('city', form.city);
-      formData.append('pinCode', form.pinCode);
-      formData.append('floorArea', form.floorArea);
+      formData.append('projectName', String(safeForm.projectName || ''));
+      formData.append('plotAddress', String(safeForm.address || ''));
+      formData.append('city', String(safeForm.city || ''));
+      formData.append('pinCode', String(safeForm.pinCode || ''));
+      formData.append('floorArea', String(safeForm.floorArea || ''));
 
-      formData.append('plotSize', form.plotSize || '0');
-
-      formData.append('noOfFloors', `Ground + ${form.floors}`);
+      formData.append('plotSize', String(safeForm.plotSize || '0'));
+      formData.append(
+        'noOfFloors',
+        `Ground + ${String(safeForm.floors || '')}`,
+      );
 
       formData.append(
         'typeOfQuote',
-        form.quoteType === 'Labour Only' ? 'labour' : 'labour+material',
+        String(safeForm.quoteType || '') === 'Labour Only'
+          ? 'labour'
+          : 'labour+material',
       );
 
-      formData.append('constStartDate', form.startDate);
-      formData.append('quoteLastDate', form.lastDate);
-      formData.append('requirementDesc', form.description);
-      formData.append('priceRange', form.budget);
+      formData.append('constStartDate', String(safeForm.startDate || ''));
+      formData.append('quoteLastDate', String(safeForm.lastDate || ''));
+      formData.append('requirementDesc', String(safeForm.description || ''));
+      formData.append('priceRange', String(safeForm.budget || ''));
 
-      formData.append('drawingStatus', form.hasDrawing ? true : false);
-      formData.append('hideNumber', form.hideNumber ? true : false);
+      formData.append('drawingStatus', safeForm.hasDrawing ? true : false);
+      formData.append('hideNumber', safeForm.hideNumber ? true : false);
 
-      if (!form.hasDrawing) {
-        formData.append('services', JSON.stringify(form.services));
+      if (!safeForm.hasDrawing) {
+        formData.append('services', JSON.stringify(safeForm.services || []));
       }
 
-      // images
-      if (form.siteImage?.length) {
-        form.siteImage.forEach((file, index) => {
+      if (Array.isArray(safeForm.siteImage) && safeForm.siteImage.length) {
+        safeForm.siteImage.forEach((file, index) => {
           formData.append('image', {
-            uri: file.uri,
-            type: file.type || 'image/jpeg',
-            name: file.name || `image_${index}.jpg`,
+            uri: file?.uri,
+            type: file?.type || 'image/jpeg',
+            name: file?.name || `image_${index}.jpg`,
           });
         });
       }
 
-      // drawings
-      if (form.archDrawing?.length) {
-        form.archDrawing.forEach((file, index) => {
+      if (Array.isArray(safeForm.archDrawing) && safeForm.archDrawing.length) {
+        safeForm.archDrawing.forEach((file, index) => {
           formData.append('drawing', {
-            uri: file.uri,
-            type: file.type || 'application/pdf',
-            name: file.name || `drawing_${index}.pdf`,
+            uri: file?.uri,
+            type: file?.type || 'application/pdf',
+            name: file?.name || `drawing_${index}.pdf`,
           });
         });
       }
 
-      formData.append('userId', userId);
+      formData.append('userId', userId || '');
 
-      if (form.existingImages?.length) {
-        formData.append('existingImages', JSON.stringify(form.existingImages));
+      if (
+        Array.isArray(safeForm.existingImages) &&
+        safeForm.existingImages.length
+      ) {
+        formData.append(
+          'existingImages',
+          JSON.stringify(safeForm.existingImages),
+        );
       }
 
-      // EXISTING DRAWINGS
-      if (form.existingDrawings?.length) {
+      if (
+        Array.isArray(safeForm.existingDrawings) &&
+        safeForm.existingDrawings.length
+      ) {
         formData.append(
           'existingDrawings',
-          JSON.stringify(form.existingDrawings),
+          JSON.stringify(safeForm.existingDrawings),
         );
       }
 
       console.log('FORM DATA DEBUG', {
-        siteImage: form.siteImage,
-        existingImages: form.existingImages,
-        archDrawing: form.archDrawing,
-        existingDrawings: form.existingDrawings,
+        siteImage: safeForm.siteImage,
+        existingImages: safeForm.existingImages,
+        archDrawing: safeForm.archDrawing,
+        existingDrawings: safeForm.existingDrawings,
       });
-      console.log('FormDataaaaaa', formData);
       console.log('UPDATE PROJECT DATA:', {
         projectId,
-        projectName: form.projectName,
-        plotAddress: form.address,
-        city: form.city,
-        pinCode: form.pinCode,
-        floorArea: form.floorArea,
-        plotSize: form.plotSize,
-        noOfFloors: form.floors,
-        quoteType: form.quoteType,
-        startDate: form.startDate,
-        lastDate: form.lastDate,
-        description: form.description,
-        budget: form.budget,
-        hasDrawing: form.hasDrawing,
-        services: form.services,
+        projectName: safeForm.projectName,
+        plotAddress: safeForm.address,
+        city: safeForm.city,
+        pinCode: safeForm.pinCode,
+        floorArea: safeForm.floorArea,
+        plotSize: safeForm.plotSize,
+        noOfFloors: safeForm.floors,
+        quoteType: safeForm.quoteType,
+        startDate: safeForm.startDate,
+        lastDate: safeForm.lastDate,
+        description: safeForm.description,
+        budget: safeForm.budget,
+        hasDrawing: safeForm.hasDrawing,
+        services: safeForm.services,
         userId,
       });
 

@@ -6,7 +6,7 @@ import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../redux/hooks';
 import ApiManager from '../../apis/ApiManager';
 
 const ProjectCard = ({
@@ -18,13 +18,14 @@ const ProjectCard = ({
   time,
   appliedStatus,
 }) => {
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
 
   const userId = user?._id;
-  const token = useSelector((state: any) => state.auth.userToken);
+  const token = useAppSelector(state => state.auth.userToken);
   const [imgError, setImgError] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [profile, setProfile] = React.useState(null);
+  const [profile, setProfile] = React.useState<any>(null);
+  const [isNavigating, setIsNavigating] = React.useState(false);
 
   const navigation = useNavigation();
 
@@ -51,13 +52,57 @@ const ProjectCard = ({
 
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
-
-        // console.log('Profile data 12232424:', res.data.data);
+        return res.data.data;
       }
     } catch (error) {
       console.log('Profile Error:', error);
     } finally {
       setLoading(false);
+    }
+
+    return null;
+  };
+
+  const handleViewPress = async () => {
+    if (isNavigating) {
+      return;
+    }
+
+    const projectId = item?._id;
+
+    if (!projectId) {
+      console.log('Project card navigation skipped: missing project ID');
+      return;
+    }
+
+    setIsNavigating(true);
+
+    try {
+      const currentProfile = profile || (await fetchProfile());
+
+      if (!currentProfile?.user?.isSubscribed) {
+        navigation.navigate('Subscription');
+        return;
+      }
+
+      if (selectedTab === 'project') {
+        navigation.navigate('CommonProjectDetails', {
+          projectId,
+          appliedStatus: item?.appliedStatus,
+          fromProjectsScreen: !!item?.appliedStatus,
+        });
+      } else {
+        navigation.navigate('GeneralEnquiry', {
+          projectId,
+          interestedStatus: item?.appliedStatus,
+        });
+      }
+
+      triggerHaptic('impactHeavy');
+    } catch (error) {
+      console.log('Project card navigation error:', error);
+    } finally {
+      setIsNavigating(false);
     }
   };
 
@@ -105,34 +150,16 @@ const ProjectCard = ({
         {selectedTab == 'project' ? (
           <TouchableOpacity
             style={styles.button}
-            onPress={() => {
-              profile?.user?.isSubscribed
-                ? navigation.navigate('CommonProjectDetails', {
-                    projectId: item._id,
-                    appliedStatus: item?.appliedStatus,
-                    fromProjectsScreen:
-                      selectedTab === 'project' && item?.appliedStatus,
-                  })
-                : navigation.navigate('Subscription');
-
-              triggerHaptic('impactHeavy');
-            }}
+            disabled={isNavigating}
+            onPress={handleViewPress}
           >
             <Text style={styles.buttonText}>View Full Details</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
             style={styles.button}
-            onPress={() => {
-              profile?.user?.isSubscribed
-                ? navigation.navigate('GeneralEnquiry', {
-                    projectId: item._id,
-                    interestedStatus: item?.appliedStatus,
-                  })
-                : navigation.navigate('Subscription');
-
-              triggerHaptic('impactHeavy');
-            }}
+            disabled={isNavigating}
+            onPress={handleViewPress}
           >
             <Text style={styles.buttonText}>View Full Enquiry</Text>
           </TouchableOpacity>

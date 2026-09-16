@@ -57,6 +57,7 @@ const ProfessionalHomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('project');
   const [projects, setProjects] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
@@ -67,14 +68,34 @@ const ProfessionalHomeScreen = () => {
   const flatListRef = useRef(null);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !user._id) {
+      console.log('ProfessionalHomeScreen redirect check skipped:', {
+        hasUser: !!user,
+        userId: user?._id,
+        token: !!token,
+      });
       return;
     }
 
-    if (!user.image && user._id) {
+    const currentRoute = navigation.getCurrentRoute?.();
+    const isHomeRoute = currentRoute?.name === 'Home';
+
+    console.log('ProfessionalHomeScreen redirect check:', {
+      userId: user._id,
+      hasImage: !!user.image,
+      currentRouteName: currentRoute?.name,
+      isHomeRoute,
+      navigationState: navigation?.getState?.(),
+    });
+
+    if (!user.image && isHomeRoute) {
+      console.log('ProfessionalHomeScreen redirecting to EditProfileScreen:', {
+        userId: user._id,
+        routeName: currentRoute?.name,
+      });
       navigation.replace('EditProfileScreen', { userId: user._id });
     }
-  }, [navigation, user]);
+  }, [navigation, user, token]);
 
   useEffect(() => {
     if (banners.length === 0) return;
@@ -100,8 +121,21 @@ const ProfessionalHomeScreen = () => {
   useEffect(() => {
     if (token) {
       fetchBanners();
+      fetchProfile();
     }
   }, [token]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await ApiManager.getProfile(userId, token);
+
+      if (response?.data?.status === 'success') {
+        setProfile(response.data.data);
+      }
+    } catch (error) {
+      console.log('Professional profile error', error);
+    }
+  };
 
   const fetchBanners = async () => {
     try {
@@ -164,6 +198,11 @@ const ProfessionalHomeScreen = () => {
     setSearchText('');
 
     setTimeout(() => {
+      if (!profile?.user?.isSubscribed) {
+        navigation.navigate('Subscription');
+        return;
+      }
+
       if (item.type === 'project') {
         navigation.navigate('CommonProjectDetails', {
           projectId: item._id,
@@ -188,7 +227,7 @@ const ProfessionalHomeScreen = () => {
           }`}
           image={
             item.image && item.image.length > 0
-              ? `${IMG_URL}${item.image[0]}`
+              ? `${IMG_URL}${item?.image?.[0]}`
               : null
           }
           selectedTab={selectedTab}
@@ -320,7 +359,7 @@ const ProfessionalHomeScreen = () => {
 
           {/* Dots */}
           <View style={styles.dotContainer}>
-            {banners.map((_, index) => (
+            {banners?.map((_, index) => (
               <View
                 key={index}
                 style={[styles.dot, currentIndex === index && styles.activeDot]}

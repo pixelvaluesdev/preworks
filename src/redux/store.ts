@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import persistConfig from './persistConfig';
 import RootReducer from './rootReducer';
-const persistedReducer = persistReducer(persistConfig, RootReducer);
+const persistedReducer = persistReducer<RootState>(persistConfig, RootReducer);
 
 export const Store = configureStore({
   reducer: persistedReducer,

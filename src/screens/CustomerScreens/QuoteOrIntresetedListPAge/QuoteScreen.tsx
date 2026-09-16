@@ -17,10 +17,11 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { ActivityIndicator } from 'react-native-paper';
 import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const QuoteListScreen = ({ route }: any) => {
   const token = useSelector(state => state.auth.userToken);
-  const { projectId, isQuote } = route.params;
+  const { projectId, isQuote } = route.params || {};
   const navigation = useNavigation();
 
   const [list, setList] = useState([]);
@@ -96,7 +97,7 @@ const QuoteListScreen = ({ route }: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <ScreenHeader
         title={isQuote ? 'Quote List' : 'Interested List'}
         showBack
@@ -179,7 +180,7 @@ const QuoteListScreen = ({ route }: any) => {
           );
         }}
       />
-    </View>
+    </ScreenWrapper>
   );
 };
 

@@ -19,14 +19,13 @@ import {
   useRoute,
 } from '@react-navigation/native';
 
-import { FONTSIZE, WIDTH, HEIGHT } from '../../../utils/responsive';
+import { WIDTH, HEIGHT } from '../../../utils/responsive';
 import { FONT } from '../../../theme/fonts';
 import Colors from '../../../constants/colors';
 
 import CallIcon from '../../../assets/svgs/Call.svg';
 import ChatIcon from '../../../assets/svgs/Chat.svg';
 import LinkIcon from '../../../assets/svgs/Links.svg';
-import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import MultiImg from '../../../assets/svgs/MultiImgIcon.svg';
@@ -34,7 +33,6 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Redirect from '../../../assets/svgs/RedirectIcon.svg';
 import Copy from '../../../assets/svgs/CopyIcon.svg';
-import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
 import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
@@ -84,15 +82,9 @@ const ProfessionalProfileScreen = () => {
         setShowComingSoon(false);
       }, 3000);
     }
-  }, [showComingSoon]);
+  }, [blinkAnim, showComingSoon]);
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfile();
-    }, []),
-  );
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -116,7 +108,13 @@ const ProfessionalProfileScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isSelfProfile, token, userId, userIdLoggedin, userType]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile]),
+  );
 
   const requestCallPermission = async () => {
     if (Platform.OS !== 'android') return true;
@@ -135,14 +133,28 @@ const ProfessionalProfileScreen = () => {
   };
 
   const handleCall = async () => {
-    const hasPermission = await requestCallPermission();
+    const phone = profile?.user?.phone;
 
-    if (!hasPermission) {
-      Alert.alert('Permission Denied');
+    if (!phone) {
+      Alert.alert('No phone number available');
       return;
     }
 
-    RNImmediatePhoneCall.immediatePhoneCall(profile?.user?.phone);
+    try {
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestCallPermission();
+
+        if (!hasPermission) {
+          Alert.alert('Permission Denied');
+          return;
+        }
+      }
+
+      RNImmediatePhoneCall.immediatePhoneCall(phone);
+    } catch (error) {
+      console.error('Unable to place phone call:', error);
+      Alert.alert('Unable to make call', 'Please try again later.');
+    }
   };
 
   const handleLinks = () => {
@@ -298,7 +310,7 @@ const ProfessionalProfileScreen = () => {
 
             {showLinks && (
               <View style={styles.linksPopup}>
-                {profile?.user?.links.map((link: string, index: number) => (
+                {profile?.user?.links?.map((link: string, index: number) => (
                   <View key={index} style={styles.linkRow}>
                     {/* White box (ONLY text) */}
                     <View style={styles.linkBox}>
@@ -365,12 +377,14 @@ const ProfessionalProfileScreen = () => {
                     <View>
                       <Image
                         source={{
-                          uri: IMG_URL + item.images[0],
+                          uri: item?.images?.[0]
+                            ? IMG_URL + item.images[0]
+                            : '',
                         }}
                         style={styles.gridImage}
                       />
 
-                      {item.images?.length > 1 && (
+                      {item?.images?.length > 1 && (
                         <View style={styles.multiIcon}>
                           <MultiImg width={14} height={14} />
                         </View>

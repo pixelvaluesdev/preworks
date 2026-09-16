@@ -21,7 +21,7 @@ import { FONT } from '../../../theme/fonts';
 
 import QuoteIcon from '../../../assets/svgs/Quote.svg';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '../../../redux/hooks';
 import GreyMobile from '../../../assets/svgs/greyMobile.svg';
 import GreyAdress from '../../../assets/svgs/GreyAdress.svg';
 import Area from '../../../assets/svgs/GreyArea.svg';
@@ -44,15 +44,18 @@ import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
 import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
+const isImageFile = (file: unknown): file is string =>
+  typeof file === 'string' && /\.(jpg|png|jpeg)$/i.test(file);
+
 const CommonProjectDetailsScreen = ({ route }: any) => {
   const { projectId, fromProjectsScreen, appliedStatus } = route.params || {};
   const flatListRef = React.useRef(null);
 
-  const userTypeRed = useSelector(state => state.auth.userType);
+  const userTypeRed = useAppSelector(state => state.auth.userType);
   console.log('USER TYPE 👉', userTypeRed);
-  const user = useSelector(state => state.auth.user);
+  const user = useAppSelector(state => state.auth.user);
   const userId = user?._id;
-  const token = useSelector(state => state.auth.userToken);
+  const token = useAppSelector(state => state.auth.userToken);
   const isCustomer = userTypeRed === 'customer';
   const isProfessional =
     userTypeRed === 'contractor' ||
@@ -60,7 +63,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
     userTypeRed === 'designer';
 
   const [project, setProject] = useState(null);
-  const drawings = project?.drawing || [];
+  const drawings = Array.isArray(project?.drawing) ? project.drawing : [];
 
   const [loading, setLoading] = useState(false);
   const [enquiryCount, setEnquiryCount] = useState(0);
@@ -119,22 +122,12 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   };
   const allImages = [
     ...(project?.image || []),
-    ...drawings.filter(
-      file =>
-        file.endsWith('.jpg') ||
-        file.endsWith('.png') ||
-        file.endsWith('.jpeg'),
-    ),
+    ...drawings.filter(isImageFile),
   ];
 
   const imageUrls = [
     ...(project?.image || []),
-    ...drawings.filter(
-      file =>
-        file.endsWith('.jpg') ||
-        file.endsWith('.png') ||
-        file.endsWith('.jpeg'),
-    ),
+    ...drawings.filter(isImageFile),
   ].map(img => ({
     uri: `${IMG_URL}/${img}`,
   }));
@@ -169,14 +162,14 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   );
 
   const openFile = async (file, index) => {
+    if (typeof file !== 'string' || !file) {
+      return;
+    }
+
     const fileUrl = `${IMG_URL}/${file}`;
 
     // IMAGE
-    if (
-      file.endsWith('.jpg') ||
-      file.endsWith('.png') ||
-      file.endsWith('.jpeg')
-    ) {
+    if (isImageFile(file)) {
       setCurrentIndex(index);
       setViewerVisible(true);
     } else {
