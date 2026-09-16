@@ -57,6 +57,7 @@ const ProfessionalHomeScreen = () => {
   const [selectedTab, setSelectedTab] = useState('project');
   const [projects, setProjects] = useState([]);
   const [enquiries, setEnquiries] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
@@ -120,8 +121,21 @@ const ProfessionalHomeScreen = () => {
   useEffect(() => {
     if (token) {
       fetchBanners();
+      fetchProfile();
     }
   }, [token]);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await ApiManager.getProfile(userId, token);
+
+      if (response?.data?.status === 'success') {
+        setProfile(response.data.data);
+      }
+    } catch (error) {
+      console.log('Professional profile error', error);
+    }
+  };
 
   const fetchBanners = async () => {
     try {
@@ -184,6 +198,11 @@ const ProfessionalHomeScreen = () => {
     setSearchText('');
 
     setTimeout(() => {
+      if (!profile?.user?.isSubscribed) {
+        navigation.navigate('Subscription');
+        return;
+      }
+
       if (item.type === 'project') {
         navigation.navigate('CommonProjectDetails', {
           projectId: item._id,

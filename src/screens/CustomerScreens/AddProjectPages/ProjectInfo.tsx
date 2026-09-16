@@ -44,18 +44,20 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   const handleCitySearch = text => {
     handleChange('city', text);
 
-    if (text.length < 2) {
+    const query = text.trim().toLowerCase();
+
+    if (query.length < 2) {
       setCitySuggestions([]);
       setShowDropdown(false);
       return;
     }
 
     const filteredCities = indianCities
-      .filter(city => city.name.toLowerCase().includes(text.toLowerCase()))
+      .filter(city => city.name.toLowerCase().startsWith(query))
       .slice(0, 10);
 
     setCitySuggestions(filteredCities);
-    setShowDropdown(true);
+    setShowDropdown(filteredCities.length > 0);
   };
 
   const handlePinSearch = (text: string) => {

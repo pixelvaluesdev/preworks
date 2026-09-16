@@ -62,6 +62,16 @@ const Popup = ({
         return;
       }
 
+      if (!projectId || !userId || !token) {
+        console.error('[Quotation Submit] Missing required request data:', {
+          hasProjectId: !!projectId,
+          hasUserId: !!userId,
+          hasToken: !!token,
+        });
+        Alert.alert('Error', 'Required project or user details are missing');
+        return;
+      }
+
       setLoading(true);
 
       const formData = new FormData();
@@ -79,9 +89,30 @@ const Popup = ({
         });
       });
 
+      console.log('[Quotation Submit] Request:', {
+        projectId,
+        userId,
+        customerId,
+        projectName,
+        type: showQuotation ? 'quotation' : 'enquiry',
+        messageLength: message.length,
+        files: quotationFiles.map(file => ({
+          name: file.name || 'file.jpg',
+          type: file.type || 'image/jpeg',
+          hasUri: !!file.uri,
+        })),
+      });
+
       const res = await ApiManager.projectEnquiry(formData, token);
 
+      console.log('[Quotation Submit] Response:', {
+        status: res?.status,
+        data: res?.data,
+        dataJson: JSON.stringify(res?.data),
+      });
+
       if (res?.data?.status === 'success') {
+        console.log('[Quotation Submit] API succeeded. Sending notification.');
         console.log('Notification Payload:', {
           userId: customerId,
           professionalId: userId,
@@ -95,6 +126,7 @@ const Popup = ({
           projectName,
           token,
         });
+        console.log('[Quotation Submit] Notification sent.');
         const selectedType = showQuotation ? 'quotation' : 'enquiry';
 
         setMessage('');
@@ -107,9 +139,35 @@ const Popup = ({
           projectId,
           selectedTab: selectedType,
         });
+      } else {
+        console.error('[Quotation Submit] API rejected request:', {
+          status: res?.status,
+          data: res?.data,
+          dataJson: JSON.stringify(res?.data),
+        });
+        Alert.alert(
+          'Submission failed',
+          res?.data?.message || 'Unable to submit the quotation right now.',
+        );
       }
-    } catch (error) {
-      console.log('Submit error:', error);
+    } catch (error: any) {
+      const serverMessage = error?.response?.data?.message;
+
+      console.error('[Quotation Submit] Flow failed:', {
+        message: error?.message,
+        code: error?.code,
+        status: error?.response?.status,
+        statusText: error?.response?.statusText,
+        responseData: error?.response?.data,
+        responseDataJson: JSON.stringify(error?.response?.data),
+        requestUrl: error?.config?.url,
+        requestMethod: error?.config?.method,
+      });
+
+      Alert.alert(
+        'Submission failed',
+        serverMessage || 'Unable to submit the quotation right now.',
+      );
     } finally {
       setLoading(false);
     }

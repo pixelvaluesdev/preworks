@@ -228,7 +228,7 @@ const ProfileScreen = ({ navigation }: any) => {
                 <Pincode />
                 <View style={{ marginLeft: 10 }}>
                   <Text style={styles.label}>Pincode</Text>
-                  <Text style={styles.value}>{profile?.pin ?? 'NA'}</Text>
+                  <Text style={styles.value}>{profile?.pincode ?? 'NA'}</Text>
                 </View>
               </View>
 
