@@ -9,6 +9,7 @@ import {
 } from '@react-native-firebase/messaging';
 
 import { showLocalNotification } from './localNotifications';
+import { Platform } from 'react-native';
 
 const app = getApp();
 const messaging = getMessaging(app);
@@ -52,6 +53,10 @@ export async function getFCMToken() {
 export function notificationListener() {
   onMessage(messaging, async remoteMessage => {
     console.log('Foreground Notification:', remoteMessage);
+
+    if (Platform.OS === 'ios' && remoteMessage.notification) {
+      return;
+    }
 
     const title = remoteMessage.notification?.title || 'No Title';
     const body = remoteMessage.notification?.body || 'No Body';

@@ -1,17 +1,27 @@
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import { Platform } from 'react-native';
 
 export async function showLocalNotification(title: string, body: string) {
-  // Create channel (required for Android)
+  if (Platform.OS === 'ios') {
+    await notifee.displayNotification({
+      title,
+      body,
+      ios: {
+        sound: 'default',
+      },
+    });
+    return;
+  }
+
   const channelId = await notifee.createChannel({
     id: 'default',
     name: 'Default Channel',
     importance: AndroidImportance.HIGH,
   });
 
-  // Display notification
   await notifee.displayNotification({
-    title: title,
-    body: body,
+    title,
+    body,
     android: {
       channelId,
       pressAction: {
