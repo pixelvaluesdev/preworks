@@ -1,29 +1,20 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
-import { FONTSIZE, WIDTH } from '../../utils/responsive';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { WIDTH } from '../../utils/responsive';
+import { useNavigation } from '@react-navigation/native';
 import Location from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
 import { useAppSelector } from '../../redux/hooks';
 import ApiManager from '../../apis/ApiManager';
 
-const ProjectCard = ({
-  title,
-  location,
-  image,
-  selectedTab,
-  item,
-  time,
-  appliedStatus,
-}) => {
+const ProjectCard = ({ title, location, image, selectedTab, item, time }) => {
   const user = useAppSelector(state => state.auth.user);
 
   const userId = user?._id;
   const token = useAppSelector(state => state.auth.userToken);
   const [imgError, setImgError] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
   const [profile, setProfile] = React.useState<any>(null);
   const [isNavigating, setIsNavigating] = React.useState(false);
 
@@ -38,16 +29,8 @@ const ProjectCard = ({
     ? 'Applied'
     : 'New';
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfile();
-    }, []),
-  );
-
   const fetchProfile = async () => {
     try {
-      setLoading(true);
-
       const res = await ApiManager.getProfile(userId, token);
 
       if (res?.data?.status === 'success') {
@@ -56,8 +39,6 @@ const ProjectCard = ({
       }
     } catch (error) {
       console.log('Profile Error:', error);
-    } finally {
-      setLoading(false);
     }
 
     return null;
@@ -147,7 +128,7 @@ const ProjectCard = ({
           </Text>
         </View>
 
-        {selectedTab == 'project' ? (
+        {selectedTab === 'project' ? (
           <TouchableOpacity
             style={styles.button}
             disabled={isNavigating}

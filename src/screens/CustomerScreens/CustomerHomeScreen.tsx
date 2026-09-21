@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   },
   searchHeader: {
     position: 'absolute',
-    top: 50,
+    top: 65,
     left: 0,
     right: 0,
     zIndex: 20,
@@ -552,7 +552,7 @@ const styles = StyleSheet.create({
   helpButtonFixed: {
     position: 'absolute',
     right: 20,
-    top: 110,
+    top: 115,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.primary,

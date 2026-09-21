@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable, Text, StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -79,7 +79,7 @@ const AnimatedTabButton = (
     return () => {
       animation?.stop();
     };
-  }, [showGlow]);
+  }, [blinkAnim, showGlow]);
 
   const activeScale = focused ? 1.15 : 1;
   const activeLift = focused ? -4 : 0;
@@ -191,19 +191,7 @@ const ProfessionalTabNavigator = () => {
 
   const userId = user?._id;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchProfile();
-    }, []),
-  );
-
-  useEffect(() => {
-    if (userId) {
-      fetchNotifications();
-    }
-  }, [userId]);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const res = await ApiManager.getNotifications(userId, token);
 
@@ -213,21 +201,39 @@ const ProfessionalTabNavigator = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [dispatch, token, userId]);
 
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
+    if (!userId) {
+      setWorkList([]);
+      return;
+    }
+
     try {
       const res = await ApiManager.getProfile(userId, token);
 
-      console.log('FULL RESPONSE =>', JSON.stringify(res, null, 2));
-
       if (res?.data?.status === 'success') {
-        setWorkList(res?.data?.data?.workList || []);
+        const nextWorkList = Array.isArray(res?.data?.data?.workList)
+          ? res.data.data.workList
+          : [];
+        setWorkList(nextWorkList);
       }
     } catch (error) {
       console.log('Profile Error:', error);
     }
-  };
+  }, [token, userId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfile();
+    }, [fetchProfile]),
+  );
+
+  useEffect(() => {
+    if (userId) {
+      fetchNotifications();
+    }
+  }, [fetchNotifications, userId]);
 
   return (
     <Tab.Navigator

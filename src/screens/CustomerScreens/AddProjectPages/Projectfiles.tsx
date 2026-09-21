@@ -21,11 +21,12 @@ import { useSelector } from 'react-redux';
 import { ActivityIndicator } from 'react-native-paper';
 import { Image as Compressor } from 'react-native-compressor';
 
-const Projectfile = ({ data, handleChange, loading }: any) => {
+const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
   const token = useSelector(state => state.auth.userToken);
 
   const hasDrawing = data?.hasDrawing ?? true;
   const services = data?.services || [];
+  const isDrawingToggleDisabled = !!isEdit;
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [currentKey, setCurrentKey] = useState('');
@@ -207,8 +208,14 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
 
         <View style={styles.radioRow}>
           <TouchableOpacity
-            style={styles.radioItem}
-            onPress={() => handleChange('hasDrawing', true)}
+            style={[
+              styles.radioItem,
+              isDrawingToggleDisabled && styles.disabledRadioItem,
+            ]}
+            disabled={isDrawingToggleDisabled}
+            onPress={() =>
+              !isDrawingToggleDisabled && handleChange('hasDrawing', true)
+            }
           >
             <View style={styles.radioOuter}>
               {hasDrawing && <View style={styles.radioInner} />}
@@ -217,8 +224,14 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.radioItem}
-            onPress={() => handleChange('hasDrawing', false)}
+            style={[
+              styles.radioItem,
+              isDrawingToggleDisabled && styles.disabledRadioItem,
+            ]}
+            disabled={isDrawingToggleDisabled}
+            onPress={() =>
+              !isDrawingToggleDisabled && handleChange('hasDrawing', false)
+            }
           >
             <View style={styles.radioOuter}>
               {!hasDrawing && <View style={styles.radioInner} />}
@@ -226,20 +239,37 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
             <Text style={styles.radioLabel}>NO</Text>
           </TouchableOpacity>
         </View>
+
+        <View style={styles.infoBox}>
+          <View style={styles.infoIconWrap}>
+            <Text style={styles.infoIcon}>i</Text>
+          </View>
+          <Text style={styles.infoText}>
+            <Text style={styles.infoLabel}>Note: </Text>
+            This section cannot be edited later. If your drawing status changes,
+            please create a new project.
+          </Text>
+        </View>
       </View>
 
       {hasDrawing && (
-        <TouchableOpacity onPress={() => openPickerPopup('archDrawing')}>
+        <TouchableOpacity
+          onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
+          disabled={isDrawingToggleDisabled}
+        >
           <UploadBox
             label="Upload architectural drawings (Preferred PDF)"
             value={[
               ...(data.existingDrawings || []),
               ...(data.archDrawing || []),
             ]}
-            onRemove={(file, index) => handleRemove(file, index, 'drawing')}
-            onPress={() => openPickerPopup('archDrawing')}
+            onRemove={(file, index) =>
+              !isDrawingToggleDisabled && handleRemove(file, index, 'drawing')
+            }
+            onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
             rightComponent={<UploadIcon />}
             textStyle={{ fontSize: 12 }}
+            disabled={isDrawingToggleDisabled}
           />
         </TouchableOpacity>
       )}
@@ -293,16 +323,23 @@ const Projectfile = ({ data, handleChange, loading }: any) => {
         <Switch
           value={data?.hideNumber || false}
           onValueChange={val => handleChange('hideNumber', val)}
-          trackColor={{ false: '#ccc', true: Colors.primary }}
-          thumbColor="#fff"
+          trackColor={{ false: '#d9d9d9', true: '#1d9d78' }}
+          thumbColor="#ffffff"
+          ios_backgroundColor="#d9d9d9"
+          style={styles.switchStyle}
         />
       </View>
 
-      <Text style={styles.note}>
-        <Text style={styles.noteLabel}>Note: </Text>
-        Recommended for faster responses. You can hide your number anytime
-        later.
-      </Text>
+      <View style={styles.infoBox}>
+        <View style={styles.infoIconWrap}>
+          <Text style={styles.infoIcon}>i</Text>
+        </View>
+        <Text style={styles.infoText}>
+          <Text style={styles.infoLabel}>Note: </Text>
+          Recommended for faster responses. You can hide your number anytime
+          later.
+        </Text>
+      </View>
 
       <CustomPopup
         visible={popupVisible}
@@ -351,6 +388,7 @@ const UploadBox = ({
   textStyle,
   onRemove,
   required,
+  disabled = false,
 }: any) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -372,9 +410,14 @@ const UploadBox = ({
       </Text>
 
       <TouchableOpacity
-        style={[styles.uploadBox, value?.length > 0 && styles.focusedUploadBox]}
+        style={[
+          styles.uploadBox,
+          value?.length > 0 && styles.focusedUploadBox,
+          disabled && styles.disabledUploadBox,
+        ]}
         onPress={handlePress}
         activeOpacity={0.8}
+        disabled={disabled}
       >
         {rightComponent && (
           <View style={styles.uploadIcon}>{rightComponent}</View>
@@ -498,6 +541,13 @@ const styles = StyleSheet.create({
 
     backgroundColor: '#FFFFFF',
   },
+  disabledUploadBox: {
+    opacity: 0.5,
+    backgroundColor: '#F5F5F5',
+    borderColor: '#D9D9D9',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
 
   questionContainer: {
     marginTop: 10,
@@ -544,6 +594,49 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: FONT.POPPINS_REGULAR,
   },
+  disabledRadioItem: {
+    opacity: 0.5,
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#fff2db',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: '#F2D28B',
+    width: '100%',
+  },
+  infoIconWrap: {
+    width: 20,
+    height: 20,
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: '#D9A433',
+    backgroundColor: '#FFF9EC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    marginTop: 2,
+  },
+  infoIcon: {
+    fontSize: 11,
+    color: '#D9A433',
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+    lineHeight: 18,
+  },
+  infoText: {
+    flex: 1,
+    color: '#7A6200',
+    fontSize: 11,
+    lineHeight: 20,
+    fontFamily: FONT.POPPINS_REGULAR,
+  },
+  infoLabel: {
+    fontFamily: FONT.POPPINS_SEMIBOLD,
+  },
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -586,6 +679,9 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 20,
     backgroundColor: '#ccc',
+  },
+  switchStyle: {
+    transform: [{ scaleX: 1.08 }, { scaleY: 1.08 }],
   },
 
   note: {

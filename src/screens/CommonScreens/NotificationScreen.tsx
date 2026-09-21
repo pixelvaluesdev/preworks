@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -34,28 +34,31 @@ const NotificationScreen = () => {
     state => state.notification.notifications,
   );
 
-  const getNotifications = async (isRefresh = false) => {
-    try {
-      if (isRefresh) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
+  const getNotifications = useCallback(
+    async (isRefresh = false) => {
+      try {
+        if (isRefresh) {
+          setRefreshing(true);
+        } else {
+          setLoading(true);
+        }
+
+        const res = await ApiManager.getNotifications(userId, token);
+
+        if (res?.data?.status === 'success') {
+          dispatch(setNotifications(res.data.data || []));
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
+    },
+    [dispatch, token, userId],
+  );
 
-      const res = await ApiManager.getNotifications(userId, token);
-
-      if (res?.data?.status === 'success') {
-        dispatch(setNotifications(res.data.data || []));
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const readAllNotifications = async () => {
+  const readAllNotifications = useCallback(async () => {
     try {
       const res = await ApiManager.readNotifications(userId, token);
 
@@ -65,16 +68,16 @@ const NotificationScreen = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [dispatch, token, userId]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     await getNotifications();
     await readAllNotifications();
-  };
+  }, [getNotifications, readAllNotifications]);
 
   useEffect(() => {
     loadNotifications();
-  }, []);
+  }, [loadNotifications]);
 
   const renderItem = ({ item }: any) => {
     const isRead = Boolean(item?.isRead);
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
   },
 
   dotWrap: {
-    width: 14,
+    width: 8,
     alignItems: 'center',
     paddingTop: HEIGHT(0.4),
   },

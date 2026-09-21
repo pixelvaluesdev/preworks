@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ const ProfileScreen = ({ navigation }: any) => {
   const route = useRoute();
   const loggedInUser = useSelector((state: any) => state.auth.user);
   const userId = route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
-  console.log('Received userId:', userId);
+  console.log('Logeed in usewee', loggedInUser);
 
   const token = useSelector((state: any) => state.auth.userToken);
   console.log('Token from Redux:', token);
@@ -44,15 +44,7 @@ const ProfileScreen = ({ navigation }: any) => {
   //   }
   // }, [userId]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userId) {
-        fetchProfile();
-      }
-    }, [userId]),
-  );
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -67,28 +59,22 @@ const ProfileScreen = ({ navigation }: any) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token, userId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        fetchProfile();
+      }
+    }, [fetchProfile, userId]),
+  );
 
   const handleEditPress = () => {
     if (isNavigating) {
-      console.log(
-        'ProfileScreen edit press ignored because already navigating',
-      );
       return;
     }
 
-    const targetUserId =
-      route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
-
-    console.log('ProfileScreen handleEditPress:', {
-      routeParams: route?.params,
-      loggedInUserId: loggedInUser?._id,
-      targetUserId,
-      navigationState: navigation?.getState?.(),
-    });
-
-    if (!targetUserId || !String(targetUserId).trim()) {
-      console.log('ProfileScreen edit blocked: missing targetUserId');
+    if (!userId || !String(userId).trim()) {
       Alert.alert(
         'Profile not available',
         'Please login again and try once more.',
@@ -97,18 +83,9 @@ const ProfileScreen = ({ navigation }: any) => {
     }
 
     setIsNavigating(true);
-
-    try {
-      console.log('ProfileScreen navigating to EditProfileScreen with:', {
-        userId: String(targetUserId),
-      });
-      navigation.push('EditProfileScreen', {
-        userId: String(targetUserId),
-      });
-    } catch (error) {
-      console.log('Edit profile navigation error:', error);
-      Alert.alert('Navigation error', 'Unable to open edit profile right now.');
-    }
+    navigation.navigate('EditProfileScreen', {
+      userId: String(userId),
+    });
 
     setTimeout(() => {
       setIsNavigating(false);

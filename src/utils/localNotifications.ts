@@ -12,6 +12,14 @@ export async function showLocalNotification(title: string, body: string) {
   await notifee.displayNotification({
     title: title,
     body: body,
+    ios: {
+      sound: 'default',
+      foregroundPresentationOptions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+    },
     android: {
       channelId,
       pressAction: {
@@ -22,7 +30,7 @@ export async function showLocalNotification(title: string, body: string) {
 }
 
 export function onForegroundEventHandler(navigation: any) {
-  notifee.onForegroundEvent(({ type, detail }) => {
+  notifee.onForegroundEvent(({ type }) => {
     if (type === EventType.PRESS) {
       console.log('User pressed notification');
 

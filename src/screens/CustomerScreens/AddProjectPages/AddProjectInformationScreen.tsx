@@ -479,6 +479,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
               data={{ ...form, projectId }}
               handleChange={handleChange}
               loading={fetchLoading}
+              isEdit={isEdit}
             />
           )}
         </ScrollView>

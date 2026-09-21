@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import {
 import ScreenHeader from '../../components/ScreenHeader';
 import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
-import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
+import { WIDTH } from '../../utils/responsive';
 import AreaIcon from '../../assets/svgs/Area.svg';
 import CalenderIcon from '../../assets/svgs/Calender.svg';
 import ConstructionIcon from '../../assets/svgs/Construction.svg';
@@ -54,18 +54,12 @@ const GeneralEnquiryScreen = () => {
 
   console.log();
 
-  useEffect(() => {
-    if (projectId && token) {
-      fetchProjectDetails();
-    }
-  }, [projectId, token]);
-
   const imageUrls =
     (Array.isArray(project?.image) ? project.image : []).map(img => ({
       uri: `${IMG_URL}${img}`,
     })) || [];
 
-  const handleCall = () => {
+  const handleCall = async () => {
     const phone = project?.userId?.phone;
 
     if (!phone) {
@@ -73,11 +67,21 @@ const GeneralEnquiryScreen = () => {
       return;
     }
 
-    Linking.openURL(`tel:${phone}`);
-    triggerHaptic('impactHeavy');
+    try {
+      await Linking.openURL(`tel:${phone}`);
+      triggerHaptic('impactHeavy');
+    } catch (error) {
+      console.error('Unable to open enquiry call:', error);
+      Alert.alert('Unable to make call', 'Please try again later.');
+    }
   };
 
-  const fetchProjectDetails = async () => {
+  const fetchProjectDetails = useCallback(async () => {
+    if (!projectId || !token) {
+      setProject(null);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -91,7 +95,11 @@ const GeneralEnquiryScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, token]);
+
+  useEffect(() => {
+    fetchProjectDetails();
+  }, [fetchProjectDetails]);
 
   const priceRanges = [
     { max: 0, label: '0 - 5 Lakh' },

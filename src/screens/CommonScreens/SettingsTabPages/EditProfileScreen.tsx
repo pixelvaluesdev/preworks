@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -14,7 +14,6 @@ import {
   PermissionsAndroid,
   ActivityIndicator,
   BackHandler,
-  FlatList,
 } from 'react-native';
 
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
@@ -24,36 +23,30 @@ import Colors from '../../../constants/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import Camera from '../../../assets/svgs/CameraSvg.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useRoute } from '@react-navigation/native';
-import ApiManager from '../../../apis/ApiManager';
-import { IMG_URL } from '../../../apis/ApiManager';
+import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { setUser } from '../../../redux/slices/authSlice';
-import { useDispatch } from 'react-redux';
 import ScreenWrapper from '../../../utils/screenWrapper';
 import { City, State } from 'country-state-city';
-import { useMemo } from 'react';
 
 const EditProfileScreen = ({ navigation }: any) => {
-  const userType = useSelector((state: any) => state.auth.userType);
-  const loggedInUser = useSelector((state: any) => state.auth.user);
-  console.log('loggedInId from redux', loggedInUser?._id);
+  const userType = useSelector((state: any) => state?.auth?.userType);
+  const loggedInUser = useSelector((state: any) => state?.auth?.user);
+  const token = useSelector((state: any) => state?.auth?.userToken);
   const isProfessional = userType !== 'customer';
-  const token = useSelector((state: any) => state.auth.userToken);
 
   const route = useRoute();
 
-  console.log('UserIdparams', route?.params?.userId);
   const rawUserId =
     route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
   const userId =
     rawUserId !== undefined && rawUserId !== null && String(rawUserId).trim()
       ? String(rawUserId).trim()
       : '';
-  console.log('EditProfileScreen userId:', userId);
 
   const dispatch = useDispatch();
 
@@ -100,22 +93,11 @@ const EditProfileScreen = ({ navigation }: any) => {
   }, []);
 
   useEffect(() => {
-    console.log('EditProfileScreen mounted/updated:', {
-      routeParams: route?.params,
-      userId,
-      loggedInUserId: loggedInUser?._id,
-      userType,
-      tokenPresent: !!token,
-      navigationState: navigation?.getState?.(),
-    });
-
     if (userId) {
-      console.log('EditProfileScreen fetching profile with userId:', userId);
       fetchProfile();
       return;
     }
 
-    console.log('EditProfileScreen missing userId, cannot fetch profile');
     Alert.alert('Profile not available', 'Please try again from your profile.');
 
     if (navigation?.canGoBack?.()) {
@@ -136,7 +118,7 @@ const EditProfileScreen = ({ navigation }: any) => {
         },
       ]);
 
-      return true; // prevent default back action
+      return true;
     };
 
     const backHandler = BackHandler.addEventListener(
@@ -144,7 +126,7 @@ const EditProfileScreen = ({ navigation }: any) => {
       backAction,
     );
 
-    return () => backHandler.remove();
+    return () => backHandler?.remove?.();
   }, []);
 
   const handleLinkChange = (text, index) => {
@@ -156,6 +138,7 @@ const EditProfileScreen = ({ navigation }: any) => {
     updatedErrors[index] = validateLink(text);
     setLinkErrors(updatedErrors);
   };
+
   const addMoreLinks = () => {
     setLinks([...links, '']);
     setLinkErrors([...linkErrors, '']);
@@ -178,13 +161,12 @@ const EditProfileScreen = ({ navigation }: any) => {
     try {
       setLoading(true);
 
-      const response = await ApiManager.getProfile(userId, token);
-      console.log('Profile response:', response?.data?.data);
+      const response = await ApiManager?.getProfile?.(userId, token);
 
       if (response?.data?.status === 'success') {
         let data = response?.data?.data;
 
-        if (data && typeof data === 'object' && data.user) {
+        if (data && typeof data === 'object' && data?.user) {
           data = data.user;
         }
 
@@ -195,8 +177,8 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         setProfile(data);
 
-        const fullName = `${data.firstName || ''} ${
-          data.lastName || ''
+        const fullName = `${data?.firstName || ''} ${
+          data?.lastName || ''
         }`.trim();
         setName(fullName);
         setMobile(data?.phone || '');
@@ -219,7 +201,7 @@ const EditProfileScreen = ({ navigation }: any) => {
         }
       }
     } catch (error) {
-      console.log('Edit Profile error:', error);
+      // Fetch failed; leave existing state untouched.
     } finally {
       setLoading(false);
     }
@@ -231,13 +213,9 @@ const EditProfileScreen = ({ navigation }: any) => {
       quality: 0.7,
     };
 
-    // OPEN GALLERY
     launchImageLibrary(options, response => {
-      if (response.didCancel) return;
-      if (response.errorCode) {
-        console.log('Error:', response.errorMessage);
-        return;
-      }
+      if (response?.didCancel) return;
+      if (response?.errorCode) return;
 
       const image = response?.assets?.[0];
 
@@ -270,7 +248,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
       return true;
     } catch (err) {
-      console.warn(err);
       return false;
     }
   };
@@ -289,19 +266,12 @@ const EditProfileScreen = ({ navigation }: any) => {
     };
 
     launchCamera(options, response => {
-      console.log('Camera Response:', response);
+      if (response?.didCancel) return;
 
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-        return;
-      }
-
-      if (response.errorCode) {
-        console.log('Error Code:', response.errorCode);
-        console.log('Error Message:', response.errorMessage);
+      if (response?.errorCode) {
         Alert.alert(
           'Camera Error',
-          `${response.errorCode}\n${response.errorMessage || ''}`,
+          `${response?.errorCode}\n${response?.errorMessage || ''}`,
         );
         return;
       }
@@ -319,7 +289,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const validateLink = link => {
-    if (!link.trim()) return '';
+    if (!link?.trim()) return '';
 
     const regex = /^https:\/\/.+/i;
 
@@ -382,27 +352,24 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const isFormValid = () => {
-    if (!name.trim()) return false;
-    if (!mobile.trim()) return false;
-    if (!city.trim()) return false;
-    if (!pin.trim()) return false;
-    if (!state.trim()) return false;
-    if (!address.trim()) return false;
+    if (!name?.trim()) return false;
+    if (!mobile?.trim()) return false;
+    if (!city?.trim()) return false;
+    if (!pin?.trim()) return false;
+    if (!state?.trim()) return false;
+    if (!address?.trim()) return false;
 
-    // Only for customer (email required)
-    if (!isProfessional && !email.trim()) return false;
+    if (!isProfessional && !email?.trim()) return false;
 
-    // Only for professional
     if (isProfessional) {
-      if (!experience.trim()) return false;
-      if (!bio.trim()) return false;
+      if (!experience?.trim()) return false;
+      if (!bio?.trim()) return false;
 
       const hasInvalidLinks = links.some(
-        link => link.trim() !== '' && validateLink(link),
+        link => link?.trim() !== '' && validateLink(link),
       );
 
       if (hasInvalidLinks) return false;
-      // IMAGE REQUIRED
       if (!profileImage && !profile?.image) return false;
     }
 
@@ -429,7 +396,7 @@ const EditProfileScreen = ({ navigation }: any) => {
     }
 
     const invalidLink = links.find(
-      link => link.trim() !== '' && validateLink(link),
+      link => link?.trim() !== '' && validateLink(link),
     );
 
     if (invalidLink) {
@@ -450,8 +417,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
       const formData = new FormData();
 
-      // formData.append('phone', mobile);
-
       const [firstName, ...rest] = name.split(' ');
       const lastName = rest.join(' ');
 
@@ -467,7 +432,7 @@ const EditProfileScreen = ({ navigation }: any) => {
       if (experience) formData.append('experience', experience);
       if (bio) formData.append('bio', bio);
 
-      const filteredLinks = links.filter(link => link.trim() !== '');
+      const filteredLinks = links.filter(link => link?.trim() !== '');
 
       if (filteredLinks.length > 0) {
         formData.append('links', JSON.stringify(filteredLinks));
@@ -475,45 +440,32 @@ const EditProfileScreen = ({ navigation }: any) => {
 
       if (profileImage) {
         formData.append('image', {
-          uri: profileImage.uri,
-          type: profileImage.type || 'image/jpeg',
-          name: profileImage.fileName || 'profile.jpg',
+          uri: profileImage?.uri,
+          type: profileImage?.type || 'image/jpeg',
+          name: profileImage?.fileName || 'profile.jpg',
         });
       }
 
       if (coverImage) {
         formData.append('userBanner', {
-          uri: coverImage.uri,
-          type: coverImage.type || 'image/jpeg',
-          name: coverImage.fileName || 'banner.jpg',
+          uri: coverImage?.uri,
+          type: coverImage?.type || 'image/jpeg',
+          name: coverImage?.fileName || 'banner.jpg',
         });
       }
 
-      console.log('USER ID:', userId);
-
-      const response = await ApiManager.updateProfile(userId, formData, token);
-
-      console.log('UPDATE RESPONSE:', response.data);
+      const response = await ApiManager?.updateProfile?.(
+        userId,
+        formData,
+        token,
+      );
 
       if (response?.data?.status === 'success') {
-        const updatedUser = response.data.data;
+        const updatedUser = response?.data?.data;
         dispatch(setUser(updatedUser));
         setShowPopup(true);
       }
     } catch (error: any) {
-      console.log('========== UPDATE ERROR ==========');
-      console.log('Message:', error?.message);
-      console.log('Code:', error?.code);
-      console.log('Status:', error?.response?.status);
-      console.log('Status Text:', error?.response?.statusText);
-      console.log(
-        'Response Data:',
-        JSON.stringify(error?.response?.data, null, 2),
-      );
-      console.log('Request:', error?.request);
-      console.log('Full Error:', JSON.stringify(error, null, 2));
-      console.log('==================================');
-
       Alert.alert(
         'Update Failed',
         error?.response?.data?.message ||
@@ -531,17 +483,17 @@ const EditProfileScreen = ({ navigation }: any) => {
         `https://api.postalpincode.in/postoffice/${cityName}`,
       );
 
-      const result = await response.json();
+      const result = await response?.json?.();
 
-      if (result[0]?.Status === 'Success') {
-        const pins = result[0]?.PostOffice || [];
+      if (result?.[0]?.Status === 'Success') {
+        const pins = result?.[0]?.PostOffice || [];
 
         setCityPincodes(pins);
         setPinSuggestions(pins);
 
         if (fallbackState) {
           setState(fallbackState);
-        } else if (pins[0]?.State) {
+        } else if (pins?.[0]?.State) {
           setState(pins[0].State);
         }
       } else {
@@ -549,28 +501,28 @@ const EditProfileScreen = ({ navigation }: any) => {
         setPinSuggestions([]);
       }
     } catch (error) {
-      console.log(error);
+      // Pincode lookup failed; keep existing suggestions empty.
     }
   };
 
   const getCityMatchScore = (cityName, query) => {
-    const normalizedCity = cityName.toLowerCase().trim();
-    const normalizedQuery = query.toLowerCase().trim();
+    const normalizedCity = cityName?.toLowerCase?.().trim();
+    const normalizedQuery = query?.toLowerCase?.().trim();
 
     if (!normalizedQuery) return Number.MAX_SAFE_INTEGER;
     if (normalizedCity === normalizedQuery) return 0;
-    if (normalizedCity.startsWith(normalizedQuery)) return 1;
+    if (normalizedCity?.startsWith(normalizedQuery)) return 1;
 
-    const cityWords = normalizedCity.split(/\s+/);
+    const cityWords = normalizedCity?.split(/\s+/) || [];
     const wordMatchIndex = cityWords.findIndex(word =>
-      word.startsWith(normalizedQuery),
+      word?.startsWith(normalizedQuery),
     );
 
     if (wordMatchIndex !== -1) {
       return 2 + wordMatchIndex * 0.1;
     }
 
-    const containsIndex = normalizedCity.indexOf(normalizedQuery);
+    const containsIndex = normalizedCity?.indexOf(normalizedQuery) ?? -1;
     if (containsIndex !== -1) {
       return 3 + containsIndex;
     }
@@ -579,23 +531,23 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const getStateMatchScore = (stateName, query) => {
-    const normalizedState = stateName.toLowerCase().trim();
-    const normalizedQuery = query.toLowerCase().trim();
+    const normalizedState = stateName?.toLowerCase?.().trim();
+    const normalizedQuery = query?.toLowerCase?.().trim();
 
     if (!normalizedQuery) return Number.MAX_SAFE_INTEGER;
     if (normalizedState === normalizedQuery) return 0;
-    if (normalizedState.startsWith(normalizedQuery)) return 1;
+    if (normalizedState?.startsWith(normalizedQuery)) return 1;
 
-    const stateWords = normalizedState.split(/\s+/);
+    const stateWords = normalizedState?.split(/\s+/) || [];
     const wordMatchIndex = stateWords.findIndex(word =>
-      word.startsWith(normalizedQuery),
+      word?.startsWith(normalizedQuery),
     );
 
     if (wordMatchIndex !== -1) {
       return 2 + wordMatchIndex * 0.1;
     }
 
-    const containsIndex = normalizedState.indexOf(normalizedQuery);
+    const containsIndex = normalizedState?.indexOf(normalizedQuery) ?? -1;
     if (containsIndex !== -1) {
       return 3 + containsIndex;
     }
@@ -606,7 +558,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   const handleCitySearch = text => {
     setCity(text);
 
-    const trimmedText = text.trim();
+    const trimmedText = text?.trim?.() || '';
 
     if (trimmedText.length < 2) {
       setCitySuggestions([]);
@@ -617,14 +569,14 @@ const EditProfileScreen = ({ navigation }: any) => {
     const query = trimmedText.toLowerCase();
 
     const filteredCities = [...indianCities]
-      .filter(city => city.name.toLowerCase().includes(query))
+      .filter(city => city?.name?.toLowerCase?.().includes(query))
       .sort((a, b) => {
         const scoreDiff =
-          getCityMatchScore(a.name, query) - getCityMatchScore(b.name, query);
+          getCityMatchScore(a?.name, query) - getCityMatchScore(b?.name, query);
 
         if (scoreDiff !== 0) return scoreDiff;
 
-        return a.name.localeCompare(b.name);
+        return a?.name?.localeCompare(b?.name);
       })
       .slice(0, 10);
 
@@ -633,7 +585,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   };
 
   const handleStateSearch = text => {
-    const cleanedText = text.replace(/[^a-zA-Z ]/g, '');
+    const cleanedText = text?.replace(/[^a-zA-Z ]/g, '') || '';
     setState(cleanedText);
 
     const trimmedText = cleanedText.trim();
@@ -647,14 +599,15 @@ const EditProfileScreen = ({ navigation }: any) => {
     const query = trimmedText.toLowerCase();
 
     const filteredStates = [...indianStates]
-      .filter(item => item.name.toLowerCase().includes(query))
+      .filter(item => item?.name?.toLowerCase?.().includes(query))
       .sort((a, b) => {
         const scoreDiff =
-          getStateMatchScore(a.name, query) - getStateMatchScore(b.name, query);
+          getStateMatchScore(a?.name, query) -
+          getStateMatchScore(b?.name, query);
 
         if (scoreDiff !== 0) return scoreDiff;
 
-        return a.name.localeCompare(b.name);
+        return a?.name?.localeCompare(b?.name);
       })
       .slice(0, 10);
 
@@ -665,14 +618,14 @@ const EditProfileScreen = ({ navigation }: any) => {
   const handlePinSearch = text => {
     handleInputChange('pin', text, setPin);
 
-    if (!text.trim()) {
+    if (!text?.trim?.()) {
       setPinSuggestions([]);
       setShowPinDropdown(false);
       return;
     }
 
     const filteredPins = cityPincodes
-      .filter(item => item.Pincode.includes(text))
+      .filter(item => item?.Pincode?.includes(text))
       .slice(0, 10);
 
     setPinSuggestions(filteredPins);
@@ -694,11 +647,9 @@ const EditProfileScreen = ({ navigation }: any) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
-        {/* Hide keyboard on outside tap */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* HEADER */}
               <LinearGradient
                 colors={['#53d78e', '#166850']}
                 start={{ x: 0, y: 0 }}
@@ -709,16 +660,16 @@ const EditProfileScreen = ({ navigation }: any) => {
                   style={styles.coverImage}
                   source={
                     coverImage?.uri
-                      ? { uri: coverImage.uri } // newly selected
+                      ? { uri: coverImage.uri }
                       : profile?.userBanner
-                      ? { uri: `${IMG_URL}${profile.userBanner}` } // backend image
+                      ? { uri: `${IMG_URL}${profile.userBanner}` }
                       : require('../../../assets/pngs/Placeholder.png')
                   }
                 />
                 <TouchableOpacity
                   style={styles.backBtn}
                   onPress={() => {
-                    if (navigation.canGoBack()) {
+                    if (navigation?.canGoBack?.()) {
                       navigation.goBack();
                     } else {
                       Alert.alert('Exit App', 'Do you want to close the app?', [
@@ -748,16 +699,15 @@ const EditProfileScreen = ({ navigation }: any) => {
                 </TouchableOpacity>
               </LinearGradient>
 
-              {/* PROFILE IMAGE */}
               <View style={styles.profileWrapper}>
                 <View style={styles.profileSection}>
                   <Image
                     style={styles.profileImage}
                     source={
                       profileImage?.uri
-                        ? { uri: profileImage.uri } // newly selected
+                        ? { uri: profileImage.uri }
                         : profile?.image
-                        ? { uri: `${IMG_URL}${profile.image}` } // backend image
+                        ? { uri: `${IMG_URL}${profile.image}` }
                         : require('../../../assets/pngs/Placeholder.png')
                     }
                   />
@@ -775,7 +725,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                 </View>
               </View>
 
-              {/* FORM CARD */}
               <View style={styles.card}>
                 <BorderTextInput
                   label="Name"
@@ -803,12 +752,12 @@ const EditProfileScreen = ({ navigation }: any) => {
                       value={email}
                       onChangeText={text => {
                         setEmail(text);
-                        setErrors(prev => ({ ...prev, email: '' })); // clear error while typing
+                        setErrors(prev => ({ ...prev, email: '' }));
                       }}
                       placeholder="Enter your email"
                     />
 
-                    {errors.email ? (
+                    {errors?.email ? (
                       <Text style={{ color: 'red', marginTop: -20 }}>
                         {errors.email}
                       </Text>
@@ -816,9 +765,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                   </>
                 )}
 
-                {/* ROW */}
                 <View style={styles.row}>
-                  {/* CITY */}
                   <View style={[styles.col, { zIndex: 1000 }]}>
                     <View style={{ position: 'relative' }}>
                       <BorderTextInput
@@ -841,17 +788,17 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 style={styles.item}
                                 onPress={() => {
                                   const matchedState = indianStates.find(
-                                    state =>
-                                      state.isoCode === item.stateCode ||
-                                      state.name.toLowerCase() ===
-                                        item.name.toLowerCase(),
+                                    s =>
+                                      s?.isoCode === item?.stateCode ||
+                                      s?.name?.toLowerCase() ===
+                                        item?.name?.toLowerCase(),
                                   );
 
-                                  setCity(item.name);
+                                  setCity(item?.name);
                                   setPin('');
                                   setState(matchedState?.name || '');
                                   fetchPincodes(
-                                    item.name,
+                                    item?.name,
                                     matchedState?.name || '',
                                   );
 
@@ -859,7 +806,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                                   setShowPinDropdown(true);
                                 }}
                               >
-                                {item.name}
+                                {item?.name}
                               </Text>
                             ))}
                           </ScrollView>
@@ -868,7 +815,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                     </View>
                   </View>
 
-                  {/* PINCODE */}
                   <View style={[styles.col, { zIndex: 999 }]}>
                     <View style={{ position: 'relative' }}>
                       <BorderTextInput
@@ -894,15 +840,15 @@ const EditProfileScreen = ({ navigation }: any) => {
                               <TouchableOpacity
                                 key={index}
                                 onPress={() => {
-                                  setPin(item.Pincode);
+                                  setPin(item?.Pincode);
                                   setShowPinDropdown(false);
                                 }}
                               >
                                 <Text style={styles.item}>
-                                  {item.Pincode}
+                                  {item?.Pincode}
                                   <Text style={{ color: '#888' }}>
                                     {' '}
-                                    - {item.Name}
+                                    - {item?.Name}
                                   </Text>
                                 </Text>
                               </TouchableOpacity>
@@ -935,15 +881,15 @@ const EditProfileScreen = ({ navigation }: any) => {
                               key={index}
                               style={styles.item}
                               onPress={() => {
-                                setState(item.name);
+                                setState(item?.name);
                                 setStateSuggestions([]);
                                 setShowStateDropdown(false);
-                                if (!city.trim()) {
+                                if (!city?.trim()) {
                                   setCity('');
                                 }
                               }}
                             >
-                              {item.name}
+                              {item?.name}
                             </Text>
                           ))}
                         </ScrollView>
@@ -956,7 +902,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                   label="Address"
                   value={address}
                   onChangeText={setAddress}
-                  //multiline
                   placeholder="Enter your Address"
                 />
 
@@ -969,7 +914,8 @@ const EditProfileScreen = ({ navigation }: any) => {
                     keyboardType="number-pad"
                   />
                 )}
-                <View style={{}}>
+
+                <View>
                   {isProfessional &&
                     links.map((item, index) => (
                       <View key={index} style={{ marginBottom: 10 }}>
@@ -1025,7 +971,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                     multiline={true}
                   />
                 )}
-                {/* SAVE BUTTON */}
+
                 <TouchableOpacity
                   style={[styles.saveBtn, { opacity: isFormValid() ? 1 : 0.5 }]}
                   onPress={handleSave}
@@ -1047,9 +993,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                   onPress: () => {
                     setShowPopup(false);
                     if (isProfessional) {
-                      navigation.replace('ProfTabNav');
+                      navigation?.replace?.('ProfTabNav');
                     } else {
-                      navigation.replace('CustmTabNav');
+                      navigation?.replace?.('CustmTabNav');
                     }
                   },
                 },
@@ -1076,28 +1022,23 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
-
   header: {
     height: HEIGHT(24),
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
-
   backBtn: {
     position: 'absolute',
     top: HEIGHT(6),
     left: WIDTH(5),
   },
-
   profileWrapper: {
     alignItems: 'center',
     marginTop: -60,
   },
-
   profileSection: {
     position: 'relative',
   },
-
   profileImage: {
     width: 110,
     height: 110,
@@ -1105,34 +1046,25 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: '#fff',
   },
-
   cameraBtn: {
     position: 'absolute',
     bottom: -2,
     right: -20,
-
     padding: 8,
     borderRadius: 20,
   },
-
   card: {
     padding: WIDTH(5),
     borderRadius: 14,
-    // shadowOpacity: 0.05,
-    // shadowRadius: 10,
-    // elevation: 4,
     gap: 10,
   },
-
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-
   col: {
     width: '48%',
   },
-
   saveBtn: {
     backgroundColor: Colors.primary,
     padding: 10,
@@ -1140,7 +1072,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
-
   saveText: {
     color: '#fff',
     fontFamily: FONT.POPPINS_SEMIBOLD,
@@ -1150,7 +1081,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 110,
     right: 10,
-
     padding: 8,
     borderRadius: 20,
   },
@@ -1161,14 +1091,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 2,
   },
-
   addMoreText: {
     color: Colors.primary,
     fontFamily: FONT.POPPINS_MEDIUM,
     fontSize: 14,
     textAlignVertical: 'center',
   },
-
   dropdown: {
     position: 'absolute',
     top: HEIGHT(8),
@@ -1179,9 +1107,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     zIndex: 9999,
     elevation: 20,
-    maxHeight: HEIGHT(25), // increase
+    maxHeight: HEIGHT(25),
   },
-
   item: {
     padding: 10,
     borderBottomWidth: 0.5,

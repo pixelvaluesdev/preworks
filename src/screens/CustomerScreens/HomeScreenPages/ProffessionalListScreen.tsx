@@ -57,11 +57,11 @@ const ProfessionalListScreen = () => {
   const finalList = professionals.filter(item => {
     const searchText = search.toLowerCase();
 
-    const fullName = `${item.firstName || ''} ${
-      item.lastName || ''
+    const fullName = `${item?.firstName || ''} ${
+      item?.lastName || ''
     }`.toLowerCase();
-    const experience = (item.experience || '').toLowerCase();
-    const location = (item.city || item.location || '').toLowerCase();
+    const experience = String(item?.experience || '').toLowerCase();
+    const location = String(item?.city || item?.location || '').toLowerCase();
 
     return (
       fullName.includes(searchText) ||
@@ -83,8 +83,11 @@ const ProfessionalListScreen = () => {
       const response = await ApiManager.getProfessionals(apiType, token);
 
       if (response?.data?.status === 'success') {
-        setProfessionals(response.data.data);
-        console.log('Fetched professionals:', response.data.data);
+        const nextProfessionals = Array.isArray(response.data.data)
+          ? response.data.data
+          : [];
+        setProfessionals(nextProfessionals);
+        console.log('Fetched professionals:', nextProfessionals.length);
       }
     } catch (error) {
       console.log('Error fetching professionals:', error);

@@ -59,10 +59,13 @@ const ProfessionalProfileScreen = () => {
 
   const [loading, setLoading] = useState(false);
   const blinkAnim = useRef(new Animated.Value(0)).current;
+  const blinkLoop = useRef<Animated.CompositeAnimation | null>(null);
+  const comingSoonTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (showComingSoon) {
-      Animated.loop(
+      blinkLoop.current?.stop();
+      blinkLoop.current = Animated.loop(
         Animated.sequence([
           Animated.timing(blinkAnim, {
             toValue: 1,
@@ -75,13 +78,22 @@ const ProfessionalProfileScreen = () => {
             useNativeDriver: true,
           }),
         ]),
-      ).start();
+      );
+      blinkLoop.current.start();
 
-      // Hide after 3 sec
-      setTimeout(() => {
+      comingSoonTimer.current = setTimeout(() => {
         setShowComingSoon(false);
       }, 3000);
     }
+
+    return () => {
+      blinkLoop.current?.stop();
+      blinkLoop.current = null;
+      if (comingSoonTimer.current) {
+        clearTimeout(comingSoonTimer.current);
+        comingSoonTimer.current = null;
+      }
+    };
   }, [blinkAnim, showComingSoon]);
 
   const fetchProfile = useCallback(async () => {
@@ -148,9 +160,11 @@ const ProfessionalProfileScreen = () => {
           Alert.alert('Permission Denied');
           return;
         }
-      }
 
-      RNImmediatePhoneCall.immediatePhoneCall(phone);
+        RNImmediatePhoneCall.immediatePhoneCall(phone);
+      } else {
+        await Linking.openURL(`tel:${phone}`);
+      }
     } catch (error) {
       console.error('Unable to place phone call:', error);
       Alert.alert('Unable to make call', 'Please try again later.');
@@ -175,7 +189,7 @@ const ProfessionalProfileScreen = () => {
     Alert.alert('Copied', 'Link copied to clipboard');
   };
 
-  const openLink = (url: string) => {
+  const openLink = async (url: string) => {
     let fixedUrl = url;
 
     if (url.startsWith('https:/') && !url.startsWith('https://')) {
@@ -186,7 +200,12 @@ const ProfessionalProfileScreen = () => {
       fixedUrl = `https://${fixedUrl}`;
     }
 
-    Linking.openURL(fixedUrl);
+    try {
+      await Linking.openURL(fixedUrl);
+    } catch (error) {
+      console.error('Unable to open profile link:', error);
+      Alert.alert('Unable to open link', 'Please try again later.');
+    }
   };
 
   if (loading) {

@@ -23,6 +23,7 @@ import RNFS from 'react-native-fs';
 import { triggerHaptic } from '../../../utils/hapticks';
 import sendNotification from '../../../utils/sendNotifications';
 import { useSelector } from 'react-redux';
+import ScreenWrapper from '../../../utils/screenWrapper';
 
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
@@ -93,7 +94,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenWrapper style={styles.container}>
       <ScreenHeader showBack />
 
       <ScrollView contentContainerStyle={{ padding: WIDTH(5) }}>
@@ -184,7 +185,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           onRequestClose={() => setViewerVisible(false)}
         />
       </ScrollView>
-    </View>
+    </ScreenWrapper>
   );
 };
 

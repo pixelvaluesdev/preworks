@@ -1,6 +1,7 @@
 import { getApp } from '@react-native-firebase/app';
 import {
   getMessaging,
+  getAPNSToken,
   getToken,
   onMessage,
   onNotificationOpenedApp,
@@ -48,9 +49,20 @@ export async function getFCMToken() {
   }
 }
 
+export async function getAPNsToken() {
+  try {
+    const token = await getAPNSToken(messaging);
+    console.log('APNs token:', token);
+    return token;
+  } catch (error) {
+    console.log('APNs TOKEN ERROR:', error);
+    return null;
+  }
+}
+
 // Foreground notification
 export function notificationListener() {
-  onMessage(messaging, async remoteMessage => {
+  return onMessage(messaging, async remoteMessage => {
     console.log('Foreground Notification:', remoteMessage);
 
     const title = remoteMessage.notification?.title || 'No Title';

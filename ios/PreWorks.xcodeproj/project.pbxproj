@@ -14,8 +14,8 @@
 		42D965472BA1436AB53F62B7 /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 12BE65C3EE024337A38F2AB8 /* Poppins-Black.ttf */; };
 		4309B9C124ED41158B17A9E8 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FAB0BDD7A37147CE92AAF34D /* Poppins-Bold.ttf */; };
 		485EDC7A3145416BA498C03A /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B44031C972CA47748955C08B /* Poppins-ExtraLight.ttf */; };
+		4E4C8E0B305D0BBC00F51A2D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4E4C8E0A305D0BBC00F51A2D /* GoogleService-Info.plist */; };
 		4E534C5600004094B60311BB /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABAB4AD12955459CA486CAC9 /* Poppins-ExtraBoldItalic.ttf */; };
-		4E62FB56303C249600299618 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4E62FB55303C249600299618 /* GoogleService-Info.plist */; };
 		5B626E6C95FD4964AF56A02C /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88D38D9BAFEF479581A4B56C /* Poppins-Italic.ttf */; };
 		6057EF2084B3435AA563900C /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E5249B150EEA40DBB3F8E9D8 /* Poppins-BoldItalic.ttf */; };
 		6522E9C8E3634F8C986FDDDB /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4D7ED0238065472D8161445E /* Poppins-Medium.ttf */; };
@@ -43,7 +43,8 @@
 		3B4392A12AC88292D35C810B /* Pods-PreWorks.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PreWorks.debug.xcconfig"; path = "Target Support Files/Pods-PreWorks/Pods-PreWorks.debug.xcconfig"; sourceTree = "<group>"; };
 		40590699FA594B46AD2EA1FC /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		4D7ED0238065472D8161445E /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
-		4E62FB55303C249600299618 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4E4C8E0A305D0BBC00F51A2D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4E4C8E0C305D122400F51A2D /* PreWorksRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = PreWorksRelease.entitlements; path = PreWorks/PreWorksRelease.entitlements; sourceTree = "<group>"; };
 		4E62FB57303C2B9500299618 /* PreWorks.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = PreWorks.entitlements; path = PreWorks/PreWorks.entitlements; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-PreWorks.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PreWorks.release.xcconfig"; path = "Target Support Files/Pods-PreWorks/Pods-PreWorks.release.xcconfig"; sourceTree = "<group>"; };
 		594BB145CD7B420EBA4C349C /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
@@ -81,8 +82,9 @@
 		13B07FAE1A68108700A75B9A /* PreWorks */ = {
 			isa = PBXGroup;
 			children = (
+				4E4C8E0C305D122400F51A2D /* PreWorksRelease.entitlements */,
+				4E4C8E0A305D0BBC00F51A2D /* GoogleService-Info.plist */,
 				4E62FB57303C2B9500299618 /* PreWorks.entitlements */,
-				4E62FB55303C249600299618 /* GoogleService-Info.plist */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -245,8 +247,8 @@
 				0D28DC67654C4EC9B25000F5 /* Poppins-SemiBold.ttf in Resources */,
 				65C0B7408AA44815A2CD7E39 /* Poppins-SemiBoldItalic.ttf in Resources */,
 				815B5EBD980541F9BA53FD1D /* Poppins-Thin.ttf in Resources */,
+				4E4C8E0B305D0BBC00F51A2D /* GoogleService-Info.plist in Resources */,
 				7682B16DCA524B0C99840095 /* Poppins-ThinItalic.ttf in Resources */,
-				4E62FB56303C249600299618 /* GoogleService-Info.plist in Resources */,
 				9C05B8CB34E3A8438E40A931 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -367,11 +369,12 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-PreWorks.debug.xcconfig */;
 			buildSettings = {
+				APS_ENVIRONMENT = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = PreWorks/PreWorks.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = 44M5LGRJG3;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = PreWorks/Info.plist;
@@ -404,11 +407,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-PreWorks.release.xcconfig */;
 			buildSettings = {
+				APS_ENVIRONMENT = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = PreWorks/PreWorks.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_ENTITLEMENTS = PreWorks/PreWorksRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = 44M5LGRJG3;
 				INFOPLIST_FILE = PreWorks/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -425,6 +431,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.preworknewapp;
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.preworknewapp;
 				PRODUCT_NAME = PreWorks;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -464,7 +471,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -546,7 +552,6 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

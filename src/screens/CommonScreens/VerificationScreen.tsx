@@ -138,9 +138,15 @@ const VerificationScreen = () => {
 
         // STEP 3 → Final navigation
         if (isProfessional) {
-          navigation.replace('ProfTabNav');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'ProfTabNav' }],
+          });
         } else {
-          navigation.replace('CustmTabNav');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'CustmTabNav' }],
+          });
         }
       }
     } catch (error) {

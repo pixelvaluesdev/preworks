@@ -80,8 +80,8 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
   const [loadingFileIndex, setLoadingFileIndex] = useState(null);
 
-  const images =
-    project?.image && project.image.length > 0 ? project.image : [null];
+  const projectImages = Array.isArray(project?.image) ? project.image : [];
+  const images = projectImages.length > 0 ? projectImages : [null];
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
 
@@ -109,28 +109,33 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       return;
     }
 
-    const hasPermission = await requestCallPermission();
+    try {
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestCallPermission();
 
-    if (!hasPermission) {
-      Alert.alert('Permission Denied');
-      return;
+        if (!hasPermission) {
+          Alert.alert('Permission Denied');
+          return;
+        }
+
+        RNImmediatePhoneCall.immediatePhoneCall(phone);
+      } else {
+        await Linking.openURL(`tel:${phone}`);
+      }
+
+      triggerHaptic('impactHeavy');
+    } catch (error) {
+      console.error('Unable to place project call:', error);
+      Alert.alert('Unable to make call', 'Please try again later.');
     }
-
-    triggerHaptic('impactHeavy');
-
-    RNImmediatePhoneCall.immediatePhoneCall(phone);
   };
-  const allImages = [
-    ...(project?.image || []),
-    ...drawings.filter(isImageFile),
-  ];
+  const allImages = [...projectImages, ...drawings.filter(isImageFile)];
 
-  const imageUrls = [
-    ...(project?.image || []),
-    ...drawings.filter(isImageFile),
-  ].map(img => ({
-    uri: `${IMG_URL}/${img}`,
-  }));
+  const imageUrls = [...projectImages, ...drawings.filter(isImageFile)].map(
+    img => ({
+      uri: `${IMG_URL}/${img}`,
+    }),
+  );
 
   useEffect(() => {
     if (imageCount <= 1) return;
