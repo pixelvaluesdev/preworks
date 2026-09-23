@@ -27,7 +27,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import AddIcon from '../../../assets/svgs/AddBtnIcon.svg';
 import CustomPopup from '../../../components/Popups/CustomPopup';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useRoute } from '@react-navigation/native';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { setUser } from '../../../redux/slices/authSlice';
 import ScreenWrapper from '../../../utils/screenWrapper';
@@ -39,16 +38,16 @@ const EditProfileScreen = ({ navigation }: any) => {
   const token = useSelector((state: any) => state?.auth?.userToken);
   const isProfessional = userType !== 'customer';
 
-  const route = useRoute();
+  const dispatch = useDispatch();
 
-  const rawUserId =
-    route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
-  const userId =
-    rawUserId !== undefined && rawUserId !== null && String(rawUserId).trim()
+  const userId = useMemo(() => {
+    const rawUserId = loggedInUser?._id || loggedInUser?.id;
+    return rawUserId !== undefined &&
+      rawUserId !== null &&
+      String(rawUserId).trim()
       ? String(rawUserId).trim()
       : '';
-
-  const dispatch = useDispatch();
+  }, [loggedInUser?._id, loggedInUser?.id]);
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -103,7 +102,8 @@ const EditProfileScreen = ({ navigation }: any) => {
     if (navigation?.canGoBack?.()) {
       navigation.goBack();
     }
-  }, [userId, navigation, route, loggedInUser?._id, userType, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, navigation]);
 
   useEffect(() => {
     const backAction = () => {
@@ -486,7 +486,9 @@ const EditProfileScreen = ({ navigation }: any) => {
       const result = await response?.json?.();
 
       if (result?.[0]?.Status === 'Success') {
-        const pins = result?.[0]?.PostOffice || [];
+        const pins = Array.isArray(result?.[0]?.PostOffice)
+          ? result[0].PostOffice
+          : [];
 
         setCityPincodes(pins);
         setPinSuggestions(pins);
@@ -560,7 +562,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     const trimmedText = text?.trim?.() || '';
 
-    if (trimmedText.length < 2) {
+    if (trimmedText.length < 2 || !indianCities?.length) {
       setCitySuggestions([]);
       setShowDropdown(false);
       return;
@@ -569,7 +571,7 @@ const EditProfileScreen = ({ navigation }: any) => {
     const query = trimmedText.toLowerCase();
 
     const filteredCities = [...indianCities]
-      .filter(city => city?.name?.toLowerCase?.().includes(query))
+      .filter(item => item?.name?.toLowerCase?.().includes(query))
       .sort((a, b) => {
         const scoreDiff =
           getCityMatchScore(a?.name, query) - getCityMatchScore(b?.name, query);
@@ -590,7 +592,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     const trimmedText = cleanedText.trim();
 
-    if (trimmedText.length < 2) {
+    if (trimmedText.length < 2 || !indianStates?.length) {
       setStateSuggestions([]);
       setShowStateDropdown(false);
       return;
@@ -618,7 +620,7 @@ const EditProfileScreen = ({ navigation }: any) => {
   const handlePinSearch = text => {
     handleInputChange('pin', text, setPin);
 
-    if (!text?.trim?.()) {
+    if (!text?.trim?.() || !cityPincodes?.length) {
       setPinSuggestions([]);
       setShowPinDropdown(false);
       return;
@@ -775,7 +777,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                         placeholder="City"
                       />
 
-                      {showDropdown && citySuggestions.length > 0 && (
+                      {showDropdown && citySuggestions?.length > 0 && (
                         <View style={styles.dropdown}>
                           <ScrollView
                             nestedScrollEnabled
@@ -787,7 +789,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 key={index}
                                 style={styles.item}
                                 onPress={() => {
-                                  const matchedState = indianStates.find(
+                                  const matchedState = indianStates?.find?.(
                                     s =>
                                       s?.isoCode === item?.stateCode ||
                                       s?.name?.toLowerCase() ===
@@ -829,7 +831,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                         }}
                       />
 
-                      {showPinDropdown && pinSuggestions.length > 0 && (
+                      {showPinDropdown && pinSuggestions?.length > 0 && (
                         <View style={styles.dropdown}>
                           <ScrollView
                             nestedScrollEnabled={true}
@@ -869,7 +871,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                       placeholder="Enter your State"
                     />
 
-                    {showStateDropdown && stateSuggestions.length > 0 && (
+                    {showStateDropdown && stateSuggestions?.length > 0 && (
                       <View style={styles.dropdown}>
                         <ScrollView
                           nestedScrollEnabled
@@ -884,9 +886,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                                 setState(item?.name);
                                 setStateSuggestions([]);
                                 setShowStateDropdown(false);
-                                if (!city?.trim()) {
-                                  setCity('');
-                                }
                               }}
                             >
                               {item?.name}
@@ -917,6 +916,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
                 <View>
                   {isProfessional &&
+                    links?.length > 0 &&
                     links.map((item, index) => (
                       <View key={index} style={{ marginBottom: 10 }}>
                         <BorderTextInput
@@ -927,7 +927,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                           mandotory={false}
                         />
 
-                        {linkErrors[index] ? (
+                        {linkErrors?.[index] ? (
                           <Text
                             style={{
                               color: 'red',

@@ -28,6 +28,9 @@ import ScreenWrapper from '../../../utils/screenWrapper';
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
   const user = candidate?.userId || {};
+  const profileImage = Array.isArray(user?.image)
+    ? user.image[0]
+    : user?.image;
 
   const token = useSelector((state: any) => state.auth.userToken);
   const loggedInUser = useSelector((state: any) => state.auth.user);
@@ -101,8 +104,8 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
         <View style={styles.profileContainer}>
           <Image
             source={
-              user?.image?.[0]
-                ? { uri: `${IMG_URL}/${user.image[0]}` }
+              profileImage
+                ? { uri: `${IMG_URL}${profileImage}` }
                 : require('../../../assets/pngs/Placeholder.png')
             }
             style={styles.profileImage}

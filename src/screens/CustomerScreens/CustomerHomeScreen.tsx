@@ -60,7 +60,13 @@ const CustomerHomeScreen = () => {
       const response = await ApiManager.getBanners(token);
 
       if (response?.data?.status === 'success') {
-        setBanners(response.data.data);
+        const bannerData = response.data.data || [];
+        bannerData.forEach((banner: any) => {
+          if (banner?.image) {
+            Image.prefetch(`${IMG_URL}${banner.image}`);
+          }
+        });
+        setBanners(bannerData);
       }
     } catch (error) {
       console.log('Banner error', error);
@@ -186,7 +192,10 @@ const CustomerHomeScreen = () => {
             renderItem={({ item }: any) => (
               <>
                 <Image
-                  source={{ uri: `${IMG_URL}${item?.image}` }}
+                  source={{
+                    uri: `${IMG_URL}${item?.image}`,
+                    cache: 'force-cache',
+                  }}
                   style={styles.bannerImage}
                   resizeMode="cover"
                 />
@@ -260,7 +269,10 @@ const CustomerHomeScreen = () => {
                   <Image
                     source={
                       hasValidImage
-                        ? { uri: `${IMG_URL}${item.image}` }
+                        ? {
+                            uri: `${IMG_URL}${item.image}`,
+                            cache: 'force-cache',
+                          }
                         : require('../../assets/pngs/Placeholder.png')
                     }
                     style={styles.proImage}

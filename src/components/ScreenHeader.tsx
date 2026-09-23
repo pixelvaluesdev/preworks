@@ -23,14 +23,14 @@ const ScreenHeader = ({ title, showBack = false, onBackPress }) => {
   return (
     <View style={styles.container}>
       {showBack && (
-        <TouchableOpacity onPress={handleBack}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <BackIcon width={22} height={22} />
         </TouchableOpacity>
       )}
 
       <Text style={styles.title}>{title}</Text>
 
-      {showBack && <View style={{ width: 22 }} />}
+      {showBack && <View style={styles.backButton} />}
     </View>
   );
 };
@@ -38,6 +38,13 @@ const ScreenHeader = ({ title, showBack = false, onBackPress }) => {
 export default ScreenHeader;
 
 const styles = StyleSheet.create({
+  backButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   container: {
     flexDirection: 'row',
     alignItems: 'center',

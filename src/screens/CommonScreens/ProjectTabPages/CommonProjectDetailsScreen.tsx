@@ -34,6 +34,8 @@ import DownloadIcon from '../../../assets/svgs/DownloadIcon.svg';
 import SecondaryButton from '../../../components/Buttons/SecondaryBtn';
 import Popup from '../../../components/Popup';
 import CallIcon from '../../../assets/svgs/Call.svg';
+import FloorArea from '../../../assets/svgs/FloorArea.svg';
+
 import BackArrow from '../../../assets/svgs/LeftArrow.svg';
 import EditIcon from '../../../assets/svgs/WhiteEdit.svg';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
@@ -495,7 +497,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
             {/* Floor Area */}
             <View style={styles.rowBetween}>
               <View style={styles.rowLeft}>
-                <Stairs width={25} height={25} />
+                <FloorArea width={25} height={25} />
                 <Text style={[styles.label, { marginLeft: 10, margin: 10 }]}>
                   Floor Area
                 </Text>

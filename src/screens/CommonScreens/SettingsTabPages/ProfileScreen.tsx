@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
-
 import { WIDTH, HEIGHT } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
 import { FONT } from '../../../theme/fonts';
@@ -21,75 +19,42 @@ import Pincode from '../../../assets/svgs/GreenLocation.svg';
 import Building from '../../../assets/svgs/BuildingIcon.svg';
 import Address from '../../../assets/svgs/AddressIcon.svg';
 import Back from '../../../assets/svgs/whiteBackIcon.svg';
-import { useFocusEffect, useRoute } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
 const ProfileScreen = ({ navigation }: any) => {
-  const route = useRoute();
-  const loggedInUser = useSelector((state: any) => state.auth.user);
-  const userId = route?.params?.userId || loggedInUser?._id || loggedInUser?.id;
-  console.log('Logeed in usewee', loggedInUser);
-
+  const userId = useSelector((state: any) => state?.auth?.user?.id);
   const token = useSelector((state: any) => state.auth.userToken);
+
   console.log('Token from Redux:', token);
 
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<any>('');
   const [loading, setLoading] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
+  console.log('profile', profile);
 
-  // useEffect(() => {
-  //   if (userId) {
-  //     fetchProfile();
-  //   }
-  // }, [userId]);
+  useEffect(() => {
+    userId && token && fetchProfile();
+  }, [userId, token]);
 
-  const fetchProfile = useCallback(async () => {
+  const fetchProfile = async () => {
     try {
       setLoading(true);
-
       const response = await ApiManager.getProfile(userId, token);
 
       if (response?.data?.status === 'success') {
-        setProfile(response.data.data);
-        console.log('Profile data:', response.data.data);
+        setProfile(response?.data?.data);
       }
     } catch (error) {
       console.log('Profile error:', error);
     } finally {
       setLoading(false);
     }
-  }, [token, userId]);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (userId) {
-        fetchProfile();
-      }
-    }, [fetchProfile, userId]),
-  );
+  };
 
   const handleEditPress = () => {
-    if (isNavigating) {
-      return;
-    }
-
-    if (!userId || !String(userId).trim()) {
-      Alert.alert(
-        'Profile not available',
-        'Please login again and try once more.',
-      );
-      return;
-    }
-
-    setIsNavigating(true);
     navigation.navigate('EditProfileScreen', {
-      userId: String(userId),
+      userId: userId,
     });
-
-    setTimeout(() => {
-      setIsNavigating(false);
-    }, 700);
   };
 
   if (loading) {

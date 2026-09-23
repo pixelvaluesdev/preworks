@@ -1,5 +1,4 @@
-import { View, StyleSheet } from 'react-native';
-import Logo from '../../assets/svgs/PreworksLogo.svg';
+import { View, StyleSheet, Image } from 'react-native';
 import { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useAppSelector } from '../../redux/hooks';
@@ -61,7 +60,11 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Logo />
+      <Image
+        source={require('../../assets/pngs/PWLogo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
     </View>
   );
 };
@@ -74,5 +77,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  logo: {
+    width: 300,
+    height: 300,
   },
 });

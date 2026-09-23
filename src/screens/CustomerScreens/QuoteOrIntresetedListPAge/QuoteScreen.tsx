@@ -53,6 +53,9 @@ const QuoteListScreen = ({ route }: any) => {
 
   const renderItem = ({ item }) => {
     const user = item?.userId;
+    const profileImage = Array.isArray(user?.image)
+      ? user.image[0]
+      : user?.image;
 
     if (loading) {
       return (
@@ -71,8 +74,8 @@ const QuoteListScreen = ({ route }: any) => {
       >
         <Image
           source={
-            user?.image?.[0]
-              ? { uri: `${IMG_URL}/${user.image[0]}` }
+            profileImage
+              ? { uri: `${IMG_URL}${profileImage}` }
               : require('../../../assets/pngs/Placeholder.png')
           }
           style={styles.avatar}
