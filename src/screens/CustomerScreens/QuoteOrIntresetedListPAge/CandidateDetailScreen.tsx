@@ -28,9 +28,7 @@ import ScreenWrapper from '../../../utils/screenWrapper';
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
   const user = candidate?.userId || {};
-  const profileImage = Array.isArray(user?.image)
-    ? user.image[0]
-    : user?.image;
+  const profileImage = Array.isArray(user?.image) ? user.image[0] : user?.image;
 
   const token = useSelector((state: any) => state.auth.userToken);
   const loggedInUser = useSelector((state: any) => state.auth.user);
