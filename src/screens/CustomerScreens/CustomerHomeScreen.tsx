@@ -25,6 +25,7 @@ import { useBackExit } from '../../hooks/useBackExit';
 import LocationIcon from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
 import useCheckLogin from '../../hooks/useCheckLogin';
+import LoadingImage from '../../components/LoadingImage';
 
 const CustomerHomeScreen = () => {
   useCheckLogin();
@@ -191,11 +192,13 @@ const CustomerHomeScreen = () => {
             }}
             renderItem={({ item }: any) => (
               <>
-                <Image
+                <LoadingImage
                   source={{
                     uri: `${IMG_URL}${item?.image}`,
                     cache: 'force-cache',
                   }}
+                  placeholderSource={require('../../assets/pngs/BannerPlaceholder.png')}
+                  placeholderResizeMode="stretch"
                   style={styles.bannerImage}
                   resizeMode="cover"
                 />
@@ -266,7 +269,7 @@ const CustomerHomeScreen = () => {
                     });
                   }}
                 >
-                  <Image
+                  <LoadingImage
                     source={
                       hasValidImage
                         ? {
@@ -369,6 +372,7 @@ const styles = StyleSheet.create({
   bannerImage: {
     width: WIDTH(100),
     height: 360,
+    position: 'relative',
   },
 
   searchBar: {

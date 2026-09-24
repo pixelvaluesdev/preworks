@@ -66,6 +66,15 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const getValidDate = (value: unknown) => {
     if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
 
+    if (typeof value === 'string') {
+      const dateOnlyMatch = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (dateOnlyMatch) {
+        const [, year, month, day] = dateOnlyMatch;
+        const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+        return Number.isNaN(localDate.getTime()) ? null : localDate;
+      }
+    }
+
     if (typeof value !== 'string' && typeof value !== 'number') return null;
 
     const date = new Date(value);

@@ -446,9 +446,18 @@ const PortfolioScreen = () => {
 
                   if (isSuccess) {
                     setPopupVisible(false);
+                    setForm({
+                      projectName: '',
+                      siteName: '',
+                      budget: '',
+                      image: [],
+                      caption: '',
+                    });
+                    setIsStepTwo(false);
                     navigation.navigate('ProfessionalProfile', {
                       userId: userId,
                       isSelfProfile: true,
+                      fromEditPortfolio: true,
                     });
                   }
                 },

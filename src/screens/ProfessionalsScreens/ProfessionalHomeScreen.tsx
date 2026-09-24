@@ -29,6 +29,7 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import ScreenWrapper from '../../utils/screenWrapper';
 import useCheckLogin from '../../hooks/useCheckLogin';
+import LoadingImage from '../../components/LoadingImage';
 
 const ProfessionalHomeScreen = () => {
   useCheckLogin();
@@ -308,11 +309,13 @@ const ProfessionalHomeScreen = () => {
             }}
             renderItem={({ item }: any) => (
               <>
-                <Image
+                <LoadingImage
                   source={{
                     uri: `${IMG_URL}${item?.image}`,
                     cache: 'force-cache',
                   }}
+                  placeholderSource={require('../../assets/pngs/BannerPlaceholder.png')}
+                  placeholderResizeMode="stretch"
                   style={styles.bannerImage}
                   resizeMode="cover"
                 />

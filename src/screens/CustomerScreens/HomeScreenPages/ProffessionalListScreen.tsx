@@ -6,7 +6,6 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,6 +23,7 @@ import ApiManager from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import LoadingImage from '../../../components/LoadingImage';
 
 const suggestions = [
   'Residential',
@@ -169,7 +169,7 @@ const ProfessionalListScreen = () => {
                   })
                 }
               >
-                <Image
+                <LoadingImage
                   source={
                     hasValidImage
                       ? { uri: `${IMG_URL}${item.image}` }

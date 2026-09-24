@@ -61,11 +61,10 @@ const normalizeDateValue = (value: unknown) => {
     const trimmedValue = value.trim();
     if (!trimmedValue) return '';
 
-    const date = new Date(
-      /^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)
-        ? `${trimmedValue}T00:00:00`
-        : trimmedValue,
-    );
+    const dateOnlyMatch = trimmedValue.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dateOnlyMatch) return dateOnlyMatch[1];
+
+    const date = new Date(trimmedValue);
     return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
   }
 

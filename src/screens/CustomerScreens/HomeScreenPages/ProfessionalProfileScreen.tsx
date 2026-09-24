@@ -12,6 +12,7 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  BackHandler,
 } from 'react-native';
 import {
   useFocusEffect,
@@ -40,7 +41,11 @@ import sendNotification from '../../../utils/sendNotifications';
 
 const ProfessionalProfileScreen = () => {
   const route = useRoute();
-  const { userId, isSelfProfile = false } = route.params || {};
+  const {
+    userId,
+    isSelfProfile = false,
+    fromEditPortfolio = false,
+  } = (route.params as any) || {};
 
   const token = useSelector((state: any) => state.auth.userToken);
   console.log('ProfessionalProfileScreen token:', token);
@@ -50,6 +55,54 @@ const ProfessionalProfileScreen = () => {
   const userIdLoggedin = user?._id;
   const userType = useSelector((state: any) => state.auth.userType);
   const isProffesional = userType !== 'customer';
+
+  const handleBack = useCallback(() => {
+    if (fromEditPortfolio) {
+      (navigation as any).reset({
+        index: 0,
+        routes: [
+          {
+            name: 'ProfTabNav',
+            state: {
+              routes: [{ name: 'Home' }],
+              index: 0,
+            },
+          },
+        ],
+      });
+      return true;
+    }
+
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      (navigation as any).reset({
+        index: 0,
+        routes: [{ name: isProffesional ? 'ProfTabNav' : 'CustmTabNav' }],
+      });
+    }
+    return true;
+  }, [fromEditPortfolio, navigation, isProffesional]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!fromEditPortfolio) {
+        return;
+      }
+
+      const onBackPress = () => {
+        handleBack();
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress,
+      );
+
+      return () => subscription.remove();
+    }, [fromEditPortfolio, handleBack]),
+  );
 
   const [showComingSoon, setShowComingSoon] = useState(false);
 
@@ -232,7 +285,7 @@ const ProfessionalProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={() => navigation.goBack()}
+            onPress={handleBack}
           >
             <BackArrow width={25} height={25} />
           </TouchableOpacity>
