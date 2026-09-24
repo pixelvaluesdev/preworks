@@ -145,10 +145,6 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const safeBudget = Number.isFinite(budget) ? budget : 0;
   const lastDate = getValidDate(data?.lastDate);
 
-  const budget = Number(data?.budget);
-  const safeBudget = Number.isFinite(budget) ? budget : 0;
-  const lastDate = getValidDate(data?.lastDate);
-
   const minimumDate =
     selectedField === 'lastDate'
       ? parseDate(data.startDate) || new Date()
@@ -268,9 +264,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
         minimumDate={
-          selectedField === 'startDate' && data.lastDate
-            ? new Date(data.lastDate)
-            : new Date()
+          selectedField === 'startDate' && lastDate ? lastDate : new Date()
         }
       />
     </View>
