@@ -81,6 +81,13 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
     return Number.isNaN(date.getTime()) ? null : date;
   };
 
+  const formatLocalDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleConfirm = (date: unknown) => {
     const validDate = getValidDate(date);
     if (!validDate) {
@@ -89,7 +96,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       return;
     }
 
-    const formatted = validDate.toISOString().split('T')[0];
+    const formatted = formatLocalDate(validDate);
 
     if (selectedField === 'startDate') {
       handleChange('startDate', formatted);
@@ -245,6 +252,18 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="date"
+        date={(() => {
+          const currentVal =
+            selectedField === 'startDate'
+              ? getValidDate(data?.startDate)
+              : getValidDate(data?.lastDate);
+          const minDate =
+            selectedField === 'startDate' && lastDate ? lastDate : new Date();
+          if (currentVal && currentVal.getTime() >= minDate.getTime()) {
+            return currentVal;
+          }
+          return minDate;
+        })()}
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
         minimumDate={
