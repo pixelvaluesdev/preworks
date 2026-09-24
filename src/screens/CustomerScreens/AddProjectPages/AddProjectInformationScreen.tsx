@@ -56,6 +56,13 @@ const emptyProjectForm = {
   hideNumber: false,
 };
 
+const formatLocalDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const normalizeDateValue = (value: unknown) => {
   if (typeof value === 'string') {
     const trimmedValue = value.trim();
@@ -65,12 +72,12 @@ const normalizeDateValue = (value: unknown) => {
     if (dateOnlyMatch) return dateOnlyMatch[1];
 
     const date = new Date(trimmedValue);
-    return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+    return Number.isNaN(date.getTime()) ? '' : formatLocalDate(date);
   }
 
   if (typeof value === 'number' && Number.isFinite(value)) {
     const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+    return Number.isNaN(date.getTime()) ? '' : formatLocalDate(date);
   }
 
   return '';
