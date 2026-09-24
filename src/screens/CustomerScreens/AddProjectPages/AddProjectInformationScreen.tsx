@@ -56,6 +56,26 @@ const emptyProjectForm = {
   hideNumber: false,
 };
 
+const normalizeDateValue = (value: unknown) => {
+  if (typeof value === 'string') {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) return '';
+
+    const dateOnlyMatch = trimmedValue.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (dateOnlyMatch) return dateOnlyMatch[1];
+
+    const date = new Date(trimmedValue);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
+  }
+
+  return '';
+};
+
 const normalizeProjectForm = (draftForm = {}) => ({
   ...emptyProjectForm,
   ...draftForm,
@@ -67,8 +87,8 @@ const normalizeProjectForm = (draftForm = {}) => ({
   plotSize: String(draftForm?.plotSize ?? ''),
   floors: String(draftForm?.floors ?? ''),
   quoteType: String(draftForm?.quoteType ?? ''),
-  startDate: String(draftForm?.startDate ?? ''),
-  lastDate: String(draftForm?.lastDate ?? ''),
+  startDate: normalizeDateValue(draftForm?.startDate),
+  lastDate: normalizeDateValue(draftForm?.lastDate),
   description: String(draftForm?.description ?? ''),
   budget: String(draftForm?.budget ?? ''),
   siteImage: Array.isArray(draftForm?.siteImage) ? draftForm.siteImage : [],
@@ -243,8 +263,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       quoteType:
         project?.typeOfQuote === 'labour' ? 'Labour Only' : 'Labour + Material',
 
-      startDate: project?.constStartDate?.split('T')[0] || '',
-      lastDate: project?.quoteLastDate?.split('T')[0] || '',
+      startDate: normalizeDateValue(project?.constStartDate),
+      lastDate: normalizeDateValue(project?.quoteLastDate),
 
       description: project?.requirementDesc || '',
       budget: project?.priceRange || '',
@@ -252,10 +272,10 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       siteImage: [],
       archDrawing: [],
 
-      existingImages: project?.image || [],
-      existingDrawings: project?.drawing || [],
+      existingImages: Array.isArray(project?.image) ? project.image : [],
+      existingDrawings: Array.isArray(project?.drawing) ? project.drawing : [],
       hasDrawing: project?.drawingStatus || false,
-      services: project?.services || [],
+      services: Array.isArray(project?.services) ? project.services : [],
       hideNumber: project?.hideNumber || false,
     };
 
@@ -291,7 +311,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       setIsSuccess(false);
 
       const formData = new FormData();
-      formData.append('projectId', projectId || '');
+      formData.append('projectId', String(projectId ?? ''));
 
       formData.append('projectName', String(safeForm.projectName || ''));
       formData.append('plotAddress', String(safeForm.address || ''));
@@ -317,8 +337,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       formData.append('requirementDesc', String(safeForm.description || ''));
       formData.append('priceRange', String(safeForm.budget || ''));
 
-      formData.append('drawingStatus', safeForm.hasDrawing ? true : false);
-      formData.append('hideNumber', safeForm.hideNumber ? true : false);
+      formData.append('drawingStatus', String(!!safeForm.hasDrawing));
+      formData.append('hideNumber', String(!!safeForm.hideNumber));
 
       if (!safeForm.hasDrawing) {
         formData.append('services', JSON.stringify(safeForm.services || []));
@@ -326,25 +346,29 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       if (Array.isArray(safeForm.siteImage) && safeForm.siteImage.length) {
         safeForm.siteImage.forEach((file, index) => {
+          if (!file || typeof file !== 'object' || !file.uri) return;
+
           formData.append('image', {
-            uri: file?.uri,
-            type: file?.type || 'image/jpeg',
-            name: file?.name || `image_${index}.jpg`,
+            uri: String(file.uri),
+            type: String(file.type || 'image/jpeg'),
+            name: String(file.name || `image_${index}.jpg`),
           });
         });
       }
 
       if (Array.isArray(safeForm.archDrawing) && safeForm.archDrawing.length) {
         safeForm.archDrawing.forEach((file, index) => {
+          if (!file || typeof file !== 'object' || !file.uri) return;
+
           formData.append('drawing', {
-            uri: file?.uri,
-            type: file?.type || 'application/pdf',
-            name: file?.name || `drawing_${index}.pdf`,
+            uri: String(file.uri),
+            type: String(file.type || 'application/pdf'),
+            name: String(file.name || `drawing_${index}.pdf`),
           });
         });
       }
 
-      formData.append('userId', userId || '');
+      formData.append('userId', String(userId ?? ''));
 
       if (
         Array.isArray(safeForm.existingImages) &&

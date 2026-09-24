@@ -25,7 +25,17 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
   const token = useSelector(state => state.auth.userToken);
 
   const hasDrawing = data?.hasDrawing ?? true;
-  const services = data?.services || [];
+  const services = Array.isArray(data?.services) ? data.services : [];
+  const existingImages = Array.isArray(data?.existingImages)
+    ? data.existingImages
+    : [];
+  const existingDrawings = Array.isArray(data?.existingDrawings)
+    ? data.existingDrawings
+    : [];
+  const siteImages = Array.isArray(data?.siteImage) ? data.siteImage : [];
+  const architecturalDrawings = Array.isArray(data?.archDrawing)
+    ? data.archDrawing
+    : [];
   const isDrawingToggleDisabled = !!isEdit;
 
   const [popupVisible, setPopupVisible] = useState(false);
@@ -60,7 +70,8 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
   const MAX_FILES = 5;
 
   const pickImage = key => {
-    const existingCount = (data[key] || []).length;
+    const existingFiles = Array.isArray(data?.[key]) ? data[key] : [];
+    const existingCount = existingFiles.length;
 
     if (existingCount >= MAX_FILES) {
       Alert.alert('Limit reached', 'You can upload max 5 images');
@@ -88,12 +99,13 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
         });
       }
 
-      handleChange(key, [...(data[key] || []), ...files]);
+      handleChange(key, [...existingFiles, ...files]);
     });
   };
 
   const pickDocument = async key => {
-    const existingCount = (data[key] || []).length;
+    const existingFiles = Array.isArray(data?.[key]) ? data[key] : [];
+    const existingCount = existingFiles.length;
 
     if (existingCount >= MAX_FILES) {
       Alert.alert('Limit reached', 'You can upload max 5 files');
@@ -106,7 +118,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
         allowMultiSelection: true,
       });
 
-      const files = res.map(item => ({
+      const files = (Array.isArray(res) ? res : []).map(item => ({
         uri: item.uri,
         type: item.type,
         name: item.name,
@@ -119,7 +131,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
         return;
       }
 
-      handleChange(key, [...(data[key] || []), ...files]);
+      handleChange(key, [...existingFiles, ...files]);
     } catch (err) {
       console.log(err);
     }
@@ -149,12 +161,16 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
 
   const handleRemove = async (file, index, type) => {
     // NEW FILE (local)
-    if (file.uri) {
+    if (file && typeof file === 'object' && file.uri) {
       const key = type === 'image' ? 'siteImage' : 'archDrawing';
-      const updated = data[key].filter((_, i) => i !== index);
+      const updated = (Array.isArray(data?.[key]) ? data[key] : []).filter(
+        (_, i) => i !== index,
+      );
       handleChange(key, updated);
       return;
     }
+
+    if (typeof file !== 'string') return;
 
     // EXISTING FILE
     try {
@@ -168,10 +184,14 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       );
 
       if (type === 'image') {
-        const updated = data.existingImages.filter(item => item !== file);
+        const updated = (
+          Array.isArray(data?.existingImages) ? data.existingImages : []
+        ).filter(item => item !== file);
         handleChange('existingImages', updated);
       } else {
-        const updated = data.existingDrawings.filter(item => item !== file);
+        const updated = (
+          Array.isArray(data?.existingDrawings) ? data.existingDrawings : []
+        ).filter(item => item !== file);
         handleChange('existingDrawings', updated);
       }
     } catch (err) {
@@ -192,7 +212,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       <TouchableOpacity onPress={() => pickImage('siteImage')}>
         <UploadBox
           label="Site Images & Elevation"
-          value={[...(data.existingImages || []), ...(data.siteImage || [])]}
+          value={[...existingImages, ...siteImages]}
           onPress={() => pickImage('siteImage')}
           rightComponent={<UploadIcon />}
           onRemove={(file, index) => handleRemove(file, index, 'image')}
@@ -254,19 +274,20 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
 
       {hasDrawing && (
         <TouchableOpacity
-          onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
+          onPress={() =>
+            !isDrawingToggleDisabled && openPickerPopup('archDrawing')
+          }
           disabled={isDrawingToggleDisabled}
         >
           <UploadBox
             label="Upload architectural drawings (Preferred PDF)"
-            value={[
-              ...(data.existingDrawings || []),
-              ...(data.archDrawing || []),
-            ]}
+            value={[...existingDrawings, ...architecturalDrawings]}
             onRemove={(file, index) =>
               !isDrawingToggleDisabled && handleRemove(file, index, 'drawing')
             }
-            onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
+            onPress={() =>
+              !isDrawingToggleDisabled && openPickerPopup('archDrawing')
+            }
             rightComponent={<UploadIcon />}
             textStyle={{ fontSize: 12 }}
             disabled={isDrawingToggleDisabled}
@@ -450,7 +471,9 @@ const UploadBox = ({
                     <View style={styles.pdfBox}>
                       <Text style={{ fontSize: 22 }}>📄</Text>
                       <Text numberOfLines={1} style={styles.pdfText}>
-                        {isExisting ? file.split('/').pop() : file.name}
+                        {isExisting
+                          ? file.split('/').pop() || 'File'
+                          : file?.name || 'File'}
                       </Text>
                     </View>
                   )}

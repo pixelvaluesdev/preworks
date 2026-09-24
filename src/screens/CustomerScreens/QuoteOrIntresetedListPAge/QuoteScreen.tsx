@@ -82,7 +82,9 @@ const QuoteListScreen = ({ route }: any) => {
         />
 
         <View style={styles.info}>
-          <Text style={styles.name}>{user?.firstName}</Text>
+          <Text style={styles.name}>
+            {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'No Name'}
+          </Text>
 
           <Text style={styles.exp}>
             <Text style={styles.exp}>

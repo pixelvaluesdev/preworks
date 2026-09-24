@@ -29,6 +29,7 @@ import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import ImageViewing from 'react-native-image-viewing';
 import { triggerHaptic } from '../../utils/hapticks';
 import ScreenWrapper from '../../utils/screenWrapper';
+import FloorArea from '../../assets/svgs/FloorArea.svg';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
@@ -236,7 +237,7 @@ const GeneralEnquiryScreen = () => {
         <View style={styles.dashedDivider} />
         {/* Floor Area */}
         <DetailRow
-          icon={<StairsIcon />}
+          icon={<FloorArea />}
           label="Floor Area"
           value={`${project?.floorArea ?? 'N/A'} sq.ft`}
         />

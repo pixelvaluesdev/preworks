@@ -70,8 +70,37 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
 
-  const handleConfirm = (date: Date) => {
-    const formatted = date.toISOString().split('T')[0];
+  const getValidDate = (value: unknown) => {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+
+    if (typeof value === 'string') {
+      const dateOnlyMatch = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (dateOnlyMatch) {
+        const [, year, month, day] = dateOnlyMatch;
+        const localDate = new Date(
+          Number(year),
+          Number(month) - 1,
+          Number(day),
+        );
+        return Number.isNaN(localDate.getTime()) ? null : localDate;
+      }
+    }
+
+    if (typeof value !== 'string' && typeof value !== 'number') return null;
+
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  const handleConfirm = (date: unknown) => {
+    const validDate = getValidDate(date);
+    if (!validDate) {
+      setSelectedField(null);
+      hideDatePicker();
+      return;
+    }
+
+    const formatted = validDate.toISOString().split('T')[0];
 
     if (selectedField === 'startDate') {
       handleChange('startDate', formatted);
@@ -91,7 +120,8 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
   //  Tooltip position
   const getThumbPosition = () => {
-    const ratio = data.budget / 100;
+    const budget = Number(data?.budget);
+    const ratio = (Number.isFinite(budget) ? budget : 0) / 100;
     const position = ratio * sliderWidth;
 
     const labelWidth = 90;
@@ -101,8 +131,8 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       sliderWidth - labelWidth,
     );
   };
-  const formatDisplayDate = (dateString: string) => {
-    if (!dateString) return '';
+  const formatDisplayDate = (dateString: unknown) => {
+    if (typeof dateString !== 'string' || !dateString.trim()) return '';
 
     const [year, month, day] = dateString.split('-');
 
@@ -110,6 +140,14 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
     return `${day}-${month}-${year}`;
   };
+
+  const budget = Number(data?.budget);
+  const safeBudget = Number.isFinite(budget) ? budget : 0;
+  const lastDate = getValidDate(data?.lastDate);
+
+  const budget = Number(data?.budget);
+  const safeBudget = Number.isFinite(budget) ? budget : 0;
+  const lastDate = getValidDate(data?.lastDate);
 
   const minimumDate =
     selectedField === 'lastDate'
@@ -176,7 +214,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       <BorderTextInput
         label="Scope of work details"
         placeholder="Write here..."
-        value={data.description}
+        value={typeof data?.description === 'string' ? data.description : ''}
         onChangeText={text => handleChange('description', text)}
         multiline
         height={HEIGHT(10)}
@@ -201,7 +239,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
             minimumValue={0}
             maximumValue={100}
             step={2.5}
-            value={data.budget}
+            value={safeBudget}
             minimumTrackTintColor={Colors.primary}
             maximumTrackTintColor="#ccc"
             thumbTintColor={Colors.primary}
@@ -214,7 +252,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
           <View style={[styles.tooltipContainer, { left: getThumbPosition() }]}>
             <View style={styles.tooltipBox}>
               <Text style={styles.tooltipText}>
-                {getLabelFromPercentage(data.budget)}
+                {getLabelFromPercentage(safeBudget)}
               </Text>
             </View>
 
@@ -229,7 +267,11 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
-        minimumDate={minimumDate}
+        minimumDate={
+          selectedField === 'startDate' && data.lastDate
+            ? new Date(data.lastDate)
+            : new Date()
+        }
       />
     </View>
   );

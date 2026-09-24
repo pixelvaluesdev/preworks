@@ -109,7 +109,9 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
             style={styles.profileImage}
           />
 
-          <Text style={styles.name}>{user?.firstName || 'No Name'}</Text>
+          <Text style={styles.name}>
+            {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'No Name'}
+          </Text>
 
           <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
             <CallIcon width={25} height={25} />
