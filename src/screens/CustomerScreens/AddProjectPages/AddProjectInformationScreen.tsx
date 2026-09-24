@@ -66,9 +66,7 @@ const normalizeDateValue = (value: unknown) => {
         ? `${trimmedValue}T00:00:00`
         : trimmedValue,
     );
-    return Number.isNaN(date.getTime())
-      ? ''
-      : date.toISOString().split('T')[0];
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString().split('T')[0];
   }
 
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -276,9 +274,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       archDrawing: [],
 
       existingImages: Array.isArray(project?.image) ? project.image : [],
-      existingDrawings: Array.isArray(project?.drawing)
-        ? project.drawing
-        : [],
+      existingDrawings: Array.isArray(project?.drawing) ? project.drawing : [],
       hasDrawing: project?.drawingStatus || false,
       services: Array.isArray(project?.services) ? project.services : [],
       hideNumber: project?.hideNumber || false,

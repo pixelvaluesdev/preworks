@@ -274,7 +274,9 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
 
       {hasDrawing && (
         <TouchableOpacity
-          onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
+          onPress={() =>
+            !isDrawingToggleDisabled && openPickerPopup('archDrawing')
+          }
           disabled={isDrawingToggleDisabled}
         >
           <UploadBox
@@ -283,7 +285,9 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
             onRemove={(file, index) =>
               !isDrawingToggleDisabled && handleRemove(file, index, 'drawing')
             }
-            onPress={() => !isDrawingToggleDisabled && openPickerPopup('archDrawing')}
+            onPress={() =>
+              !isDrawingToggleDisabled && openPickerPopup('archDrawing')
+            }
             rightComponent={<UploadIcon />}
             textStyle={{ fontSize: 12 }}
             disabled={isDrawingToggleDisabled}
