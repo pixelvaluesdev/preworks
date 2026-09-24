@@ -60,6 +60,13 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const [selectedField, setSelectedField] = useState<any>(null);
   const [sliderWidth, setSliderWidth] = useState(0);
 
+  const parseDate = (dateString: string) => {
+    if (!dateString) return undefined;
+
+    const date = new Date(`${dateString}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? undefined : date;
+  };
+
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
 
@@ -99,8 +106,15 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
 
     const [year, month, day] = dateString.split('-');
 
+    if (!year || !month || !day) return '';
+
     return `${day}-${month}-${year}`;
   };
+
+  const minimumDate =
+    selectedField === 'lastDate'
+      ? parseDate(data.startDate) || new Date()
+      : new Date();
 
   return (
     <View style={styles.container}>
@@ -215,11 +229,7 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
-        minimumDate={
-          selectedField === 'startDate' && data.lastDate
-            ? new Date(data.lastDate)
-            : new Date()
-        }
+        minimumDate={minimumDate}
       />
     </View>
   );

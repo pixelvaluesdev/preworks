@@ -22,8 +22,9 @@ import Back from '../../../assets/svgs/whiteBackIcon.svg';
 import { useSelector } from 'react-redux';
 import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 
-const ProfileScreen = ({ navigation }: any) => {
-  const userId = useSelector((state: any) => state?.auth?.user?.id);
+const ProfileScreen = ({ navigation, route }: any) => {
+  const user = useSelector((state: any) => state?.auth?.user);
+  const userId = route?.params?.userId || user?._id || user?.id;
   const token = useSelector((state: any) => state.auth.userToken);
 
   console.log('Token from Redux:', token);

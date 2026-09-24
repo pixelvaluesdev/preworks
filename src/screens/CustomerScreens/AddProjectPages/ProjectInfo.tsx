@@ -5,6 +5,7 @@ import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import { City } from 'country-state-city';
 
 const ProjectInfo = ({ data, handleChange }: any) => {
+  const safeData = data || {};
   const [citySuggestions, setCitySuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [pinSuggestions, setPinSuggestions] = useState([]);
@@ -21,8 +22,10 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       if (result[0]?.Status === 'Success') {
         const pins = result[0]?.PostOffice || [];
 
-        setCityPincodes(pins);
-        setPinSuggestions(pins);
+        const safePins = Array.isArray(pins) ? pins : [];
+
+        setCityPincodes(safePins);
+        setPinSuggestions(safePins);
 
         // ADD THESE LINES
         setShowPinDropdown(true);
@@ -52,7 +55,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       return;
     }
 
-    const filteredCities = indianCities
+    const filteredCities = (Array.isArray(indianCities) ? indianCities : [])
       .filter(city => city.name.toLowerCase().startsWith(query))
       .slice(0, 10);
 
@@ -61,21 +64,22 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   };
 
   const handlePinSearch = (text: string) => {
-    handleChange('pinCode', text);
+    const safeText = String(text ?? '');
+    handleChange('pinCode', safeText);
 
-    if (text.length === 0) {
+    if (safeText.length === 0) {
       setPinSuggestions(cityPincodes);
-      setShowPinDropdown(cityPincodes.length > 0);
+      setShowPinDropdown(Array.isArray(cityPincodes) && cityPincodes.length > 0);
       return;
     }
 
-    const search = text.toLowerCase();
+    const search = safeText.toLowerCase();
 
-    const filteredPins = cityPincodes
+    const filteredPins = (Array.isArray(cityPincodes) ? cityPincodes : [])
       .filter(item => {
         return (
-          item.Pincode.includes(search) ||
-          item.Name.toLowerCase().includes(search)
+          String(item?.Pincode ?? '').includes(search) ||
+          String(item?.Name ?? '').toLowerCase().includes(search)
         );
       })
       .slice(0, 10);
@@ -84,20 +88,20 @@ const ProjectInfo = ({ data, handleChange }: any) => {
     setShowPinDropdown(filteredPins.length > 0);
   };
 
-  console.log('ProjectInfo city value:', data.city);
+  console.log('ProjectInfo city value:', safeData.city);
   return (
     <View style={{ gap: 6, zIndex: 1, paddingBottom: HEIGHT(30) }}>
       <BorderTextInput
         label="Project Name"
         placeholder="Enter your project name"
-        value={data.projectName}
+        value={safeData.projectName}
         onChangeText={text => handleChange('projectName', text)}
         height={HEIGHT(7)}
       />
       <BorderTextInput
         label="Full Plot Address"
         placeholder="Enter full address of plot"
-        value={data.address}
+        value={safeData.address}
         onChangeText={text => handleChange('address', text)}
         height={HEIGHT(7)}
       />
@@ -105,12 +109,12 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         <BorderTextInput
           label="City"
           placeholder="Enter city name"
-          value={data.city}
+          value={safeData.city}
           onChangeText={handleCitySearch}
           height={HEIGHT(7)}
         />
 
-        {showDropdown && citySuggestions.length > 0 && (
+        {showDropdown && Array.isArray(citySuggestions) && citySuggestions.length > 0 && (
           <View style={styles.dropdown}>
             <ScrollView
               nestedScrollEnabled
@@ -123,8 +127,8 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                   style={styles.item}
                   onPress={() => {
                     console.log('Selected city:', item.name);
-                    handleChange('city', item.name);
-                    fetchPincodes(item.name);
+                    handleChange('city', item?.name ?? '');
+                    fetchPincodes(item?.name ?? '');
                     setShowDropdown(false);
                   }}
                 >
@@ -139,12 +143,12 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         <BorderTextInput
           label="PIN Code/Locality"
           placeholder="Enter postal code"
-          value={data.pinCode}
+          value={safeData.pinCode}
           onChangeText={handlePinSearch}
           height={HEIGHT(7)}
         />
 
-        {showPinDropdown && pinSuggestions.length > 0 && (
+        {showPinDropdown && Array.isArray(pinSuggestions) && pinSuggestions.length > 0 && (
           <View style={styles.dropdown}>
             <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
               {pinSuggestions.map((item, index) => (
@@ -152,15 +156,15 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                   key={index}
                   style={styles.item}
                   onPress={() => {
-                    const selectedValue = `${item.Pincode} - ${item.Name}`;
+                    const selectedValue = `${item?.Pincode ?? ''} - ${item?.Name ?? ''}`;
 
                     handleChange('pinCode', selectedValue);
 
                     setShowPinDropdown(false);
                   }}
                 >
-                  {item.Pincode}{' '}
-                  <Text style={{ color: '#888' }}>- {item.Name}</Text>
+                  {item?.Pincode ?? ''}{' '}
+                  <Text style={{ color: '#888' }}>- {item?.Name ?? ''}</Text>
                 </Text>
               ))}
             </ScrollView>
