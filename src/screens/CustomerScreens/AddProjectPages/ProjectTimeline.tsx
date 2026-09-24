@@ -60,6 +60,13 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const [selectedField, setSelectedField] = useState<any>(null);
   const [sliderWidth, setSliderWidth] = useState(0);
 
+  const parseDate = (dateString: string) => {
+    if (!dateString) return undefined;
+
+    const date = new Date(`${dateString}T00:00:00`);
+    return Number.isNaN(date.getTime()) ? undefined : date;
+  };
+
   const showDatePicker = () => setDatePickerVisibility(true);
   const hideDatePicker = () => setDatePickerVisibility(false);
 
@@ -70,7 +77,11 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
       const dateOnlyMatch = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if (dateOnlyMatch) {
         const [, year, month, day] = dateOnlyMatch;
-        const localDate = new Date(Number(year), Number(month) - 1, Number(day));
+        const localDate = new Date(
+          Number(year),
+          Number(month) - 1,
+          Number(day),
+        );
         return Number.isNaN(localDate.getTime()) ? null : localDate;
       }
     }
@@ -140,6 +151,11 @@ const ProjectTimeline = ({ data, handleChange }: any) => {
   const budget = Number(data?.budget);
   const safeBudget = Number.isFinite(budget) ? budget : 0;
   const lastDate = getValidDate(data?.lastDate);
+
+  const minimumDate =
+    selectedField === 'lastDate'
+      ? parseDate(data.startDate) || new Date()
+      : new Date();
 
   return (
     <View style={styles.container}>
