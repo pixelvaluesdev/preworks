@@ -11,6 +11,7 @@ import { FONTSIZE, WIDTH } from '../../utils/responsive';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
 import { triggerHaptic } from '../../utils/hapticks';
+import usePressGuard from '../../hooks/usePressGuard';
 
 const CustomPopup = ({
   visible,
@@ -20,6 +21,10 @@ const CustomPopup = ({
   disableOutsideClick = false,
 }) => {
   const isObject = typeof message === 'object';
+  const guardedButtonPress = usePressGuard((button: any) => {
+    triggerHaptic('impactHeavy');
+    return button.onPress?.();
+  });
 
   const title = isObject ? message?.title : message;
   const subtitle = isObject ? message?.subtitle : null;
@@ -54,10 +59,7 @@ const CustomPopup = ({
                         styles.button,
                         btn.type === 'primary' && styles.primaryBtn,
                       ]}
-                      onPress={() => {
-                        triggerHaptic('impactHeavy');
-                        btn.onPress?.();
-                      }}
+                      onPress={() => guardedButtonPress(btn)}
                     >
                       <Text
                         style={[
@@ -75,10 +77,7 @@ const CustomPopup = ({
                 <View style={styles.bottomButtonContainer}>
                   <TouchableOpacity
                     style={[styles.button, styles.singleButton]}
-                    onPress={() => {
-                      triggerHaptic('impactHeavy');
-                      buttons[2].onPress?.();
-                    }}
+                    onPress={() => guardedButtonPress(buttons[2])}
                   >
                     <Text style={styles.buttonText}>{buttons[2].label}</Text>
                   </TouchableOpacity>
@@ -99,10 +98,7 @@ const CustomPopup = ({
                       buttons.length === 1 && styles.singleButton,
                       btn.type === 'primary' && styles.primaryBtn,
                     ]}
-                    onPress={() => {
-                      triggerHaptic('impactHeavy');
-                      btn.onPress?.();
-                    }}
+                    onPress={() => guardedButtonPress(btn)}
                   >
                     <Text
                       style={[

@@ -14,10 +14,11 @@ import Colors from '../../constants/colors';
 import { FONT } from '../../theme/fonts';
 import { FONTSIZE } from '../../utils/responsive';
 import { triggerHaptic } from '../../utils/hapticks';
+import usePressGuard from '../../hooks/usePressGuard';
 
 interface SecondaryButtonProps {
   title: string;
-  onPress: (event: GestureResponderEvent) => void;
+  onPress: (event: GestureResponderEvent) => unknown;
   style?: ViewStyle;
   textStyle?: TextStyle;
   disabled?: boolean;
@@ -40,12 +41,13 @@ const SecondaryButton: React.FC<SecondaryButtonProps> = ({
     }
 
     triggerHaptic('impactHeavy');
-    onPress(event);
+    return onPress(event);
   };
+  const guardedPress = usePressGuard(handlePress);
   return (
     <TouchableOpacity
       style={[styles.button, style, disabled && styles.disabled]}
-      onPress={handlePress}
+      onPress={guardedPress}
       disabled={disabled}
       activeOpacity={0.8}
     >

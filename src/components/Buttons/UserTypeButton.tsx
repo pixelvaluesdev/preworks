@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import { WIDTH } from '../../utils/responsive';
+import usePressGuard from '../../hooks/usePressGuard';
 
 interface Props {
   title: string;
@@ -10,11 +11,13 @@ interface Props {
 }
 
 const UserTypeButton = ({ title, Icon, onPress }: Props) => {
+  const guardedPress = usePressGuard(onPress);
+
   return (
     <TouchableOpacity
       activeOpacity={0.9}
       style={styles.container}
-      onPress={onPress}
+      onPress={guardedPress}
     >
       <View style={styles.innerContainer}>
         <View style={styles.iconContainer}>

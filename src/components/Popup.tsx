@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -34,6 +34,7 @@ const Popup = ({
   const [message, setMessage] = useState('');
   const [quotationFiles, setQuotationFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const pickerInFlight = useRef(false);
   const navigation = useNavigation();
 
   console.log(
@@ -175,24 +176,42 @@ const Popup = ({
 
   // IMAGE PICKER
   const pickImage = () => {
-    launchImageLibrary({ mediaType: 'photo', selectionLimit: 0 }, response => {
-      if (response.didCancel || response.errorCode) return;
+    if (pickerInFlight.current) return;
+    pickerInFlight.current = true;
 
-      const files =
-        response.assets?.map(item => ({
-          uri: item.uri,
-          type: item.type,
-          name: item.fileName,
-        })) || [];
+    try {
+      launchImageLibrary(
+        { mediaType: 'photo', selectionLimit: 0 },
+        response => {
+          try {
+            if (response.didCancel || response.errorCode) return;
 
-      if (files.length) {
-        setQuotationFiles(prev => [...prev, ...files]);
-      }
-    });
+            const files =
+              response.assets?.filter(item => item?.uri).map(item => ({
+                uri: item.uri,
+                type: item.type,
+                name: item.fileName,
+              })) || [];
+
+            if (files.length) {
+              setQuotationFiles(prev => [...prev, ...files]);
+            }
+          } finally {
+            pickerInFlight.current = false;
+          }
+        },
+      );
+    } catch (error) {
+      pickerInFlight.current = false;
+      console.log('Unable to open quotation image picker:', error);
+    }
   };
 
   // PDF PICKER
   const pickDocument = async () => {
+    if (pickerInFlight.current) return;
+    pickerInFlight.current = true;
+
     try {
       const res = await pick({
         type: ['application/pdf'],
@@ -208,6 +227,8 @@ const Popup = ({
       setQuotationFiles(prev => [...prev, ...files]);
     } catch (err) {
       console.log(err);
+    } finally {
+      pickerInFlight.current = false;
     }
   };
 
@@ -248,11 +269,7 @@ const Popup = ({
                     onChangeText={setQuotation}
                     placeholder="Select"
                     editable={false}
-                    rightComponent={
-                      <TouchableOpacity onPress={pickMedia}>
-                        <UploadIcon />
-                      </TouchableOpacity>
-                    }
+                    rightComponent={<UploadIcon />}
                   />
                 </TouchableOpacity>
               )}

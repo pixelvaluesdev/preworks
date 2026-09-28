@@ -25,9 +25,13 @@ import DeleteICon from '../../../assets/svgs/BlackDeleteIcon.svg';
 import EditIcon from '../../../assets/svgs/BlackEditIcon.svg';
 import { triggerHaptic } from '../../../utils/hapticks';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import usePressGuard from '../../../hooks/usePressGuard';
 
 const ProjectsScreen = ({ route }: any) => {
   const navigation = useNavigation();
+  const openNewProject = usePressGuard(() =>
+    navigation.navigate('AddProjectInformation'),
+  );
 
   const userType = useSelector((state: any) => state.auth.userType);
   const token = useSelector((state: any) => state.auth.userToken);
@@ -285,7 +289,7 @@ const ProjectsScreen = ({ route }: any) => {
               <SecondaryButton
                 title="Post Your Projects"
                 style={styles.button}
-                onPress={() => navigation.navigate('AddProjectInformation')}
+                onPress={openNewProject}
                 icon={<PlusIcon height={20} width={30} />}
               />
             )}
@@ -460,7 +464,7 @@ const ProjectsScreen = ({ route }: any) => {
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => {
-              navigation.navigate('AddProjectInformation');
+              openNewProject();
               triggerHaptic('impactHeavy');
             }}
           >

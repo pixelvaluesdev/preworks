@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import { City } from 'country-state-city';
@@ -11,13 +11,25 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   const [pinSuggestions, setPinSuggestions] = useState([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
   const [cityPincodes, setCityPincodes] = useState([]);
+  const pinRequestId = useRef(0);
+
+  useEffect(
+    () => () => {
+      pinRequestId.current += 1;
+    },
+    [],
+  );
+
   const fetchPincodes = async cityName => {
+    const requestId = ++pinRequestId.current;
+
     try {
       const response = await fetch(
         `https://api.postalpincode.in/postoffice/${cityName}`,
       );
 
       const result = await response.json();
+      if (requestId !== pinRequestId.current) return;
 
       if (result[0]?.Status === 'Success') {
         const pins = result[0]?.PostOffice || [];
@@ -45,6 +57,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   }, []);
 
   const handleCitySearch = text => {
+    pinRequestId.current += 1;
     handleChange('city', text);
 
     const query = text.trim().toLowerCase();

@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import Colors from '../../constants/colors';
+import usePressGuard from '../../hooks/usePressGuard';
 
 const AppButton = ({
   title,
@@ -11,10 +12,11 @@ const AppButton = ({
   disabled = false,
 }: any) => {
   const isOutline = type === 'outline';
+  const guardedPress = usePressGuard((event: any) => onPress?.(event));
 
   return (
     <TouchableOpacity
-      onPress={onPress}
+      onPress={guardedPress}
       disabled={disabled}
       style={[
         styles.button,

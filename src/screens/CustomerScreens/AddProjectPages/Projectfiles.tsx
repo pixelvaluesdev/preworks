@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import ApiManager, { IMG_URL } from '../../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { ActivityIndicator } from 'react-native-paper';
 import { Image as Compressor } from 'react-native-compressor';
+import usePressGuard from '../../../hooks/usePressGuard';
 
 const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
   const token = useSelector(state => state.auth.userToken);
@@ -40,6 +41,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
 
   const [popupVisible, setPopupVisible] = useState(false);
   const [currentKey, setCurrentKey] = useState('');
+  const pickerInFlight = useRef(false);
 
   const toggleService = service => {
     let updated = [...services];
@@ -70,6 +72,8 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
   const MAX_FILES = 5;
 
   const pickImage = key => {
+    if (pickerInFlight.current) return;
+
     const existingFiles = Array.isArray(data?.[key]) ? data[key] : [];
     const existingCount = existingFiles.length;
 
@@ -84,26 +88,40 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       selectionLimit: MAX_FILES - existingCount, //  remaining
     };
 
-    launchImageLibrary(options, async response => {
-      if (response.didCancel) return;
+    pickerInFlight.current = true;
+    try {
+      launchImageLibrary(options, async response => {
+        try {
+          if (response.didCancel || response.errorCode) return;
 
-      let files = [];
+          const files = [];
+          for (const item of response.assets || []) {
+            if (!item?.uri) continue;
+            const compressedUri = await compressImage(item.uri);
 
-      for (let item of response.assets || []) {
-        const compressedUri = await compressImage(item.uri);
+            files.push({
+              uri: compressedUri,
+              type: item.type,
+              name: item.fileName,
+            });
+          }
 
-        files.push({
-          uri: compressedUri,
-          type: item.type,
-          name: item.fileName,
-        });
-      }
-
-      handleChange(key, [...existingFiles, ...files]);
-    });
+          if (files.length) handleChange(key, [...existingFiles, ...files]);
+        } catch (error) {
+          console.log('Image picker error:', error);
+        } finally {
+          pickerInFlight.current = false;
+        }
+      });
+    } catch (error) {
+      pickerInFlight.current = false;
+      console.log('Unable to open image picker:', error);
+    }
   };
 
   const pickDocument = async key => {
+    if (pickerInFlight.current) return;
+
     const existingFiles = Array.isArray(data?.[key]) ? data[key] : [];
     const existingCount = existingFiles.length;
 
@@ -112,6 +130,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       return;
     }
 
+    pickerInFlight.current = true;
     try {
       const res = await pick({
         type: ['application/pdf'],
@@ -134,6 +153,8 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       handleChange(key, [...existingFiles, ...files]);
     } catch (err) {
       console.log(err);
+    } finally {
+      pickerInFlight.current = false;
     }
   };
 
@@ -198,6 +219,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       console.log('Delete error', err);
     }
   };
+  const guardedHandleRemove = usePressGuard(handleRemove);
 
   if (loading) {
     return (
@@ -209,16 +231,16 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => pickImage('siteImage')}>
-        <UploadBox
-          label="Site Images & Elevation"
-          value={[...existingImages, ...siteImages]}
-          onPress={() => pickImage('siteImage')}
-          rightComponent={<UploadIcon />}
-          onRemove={(file, index) => handleRemove(file, index, 'image')}
-          required={false}
-        />
-      </TouchableOpacity>
+      <UploadBox
+        label="Site Images & Elevation"
+        value={[...existingImages, ...siteImages]}
+        onPress={() => pickImage('siteImage')}
+        rightComponent={<UploadIcon />}
+        onRemove={(file, index) =>
+          guardedHandleRemove(file, index, 'image')
+        }
+        required={false}
+      />
 
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>
@@ -273,26 +295,20 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
       </View>
 
       {hasDrawing && (
-        <TouchableOpacity
+        <UploadBox
+          label="Upload architectural drawings (Preferred PDF)"
+          value={[...existingDrawings, ...architecturalDrawings]}
+          onRemove={(file, index) =>
+            !isDrawingToggleDisabled &&
+            guardedHandleRemove(file, index, 'drawing')
+          }
           onPress={() =>
             !isDrawingToggleDisabled && openPickerPopup('archDrawing')
           }
+          rightComponent={<UploadIcon />}
+          textStyle={{ fontSize: 12 }}
           disabled={isDrawingToggleDisabled}
-        >
-          <UploadBox
-            label="Upload architectural drawings (Preferred PDF)"
-            value={[...existingDrawings, ...architecturalDrawings]}
-            onRemove={(file, index) =>
-              !isDrawingToggleDisabled && handleRemove(file, index, 'drawing')
-            }
-            onPress={() =>
-              !isDrawingToggleDisabled && openPickerPopup('archDrawing')
-            }
-            rightComponent={<UploadIcon />}
-            textStyle={{ fontSize: 12 }}
-            disabled={isDrawingToggleDisabled}
-          />
-        </TouchableOpacity>
+        />
       )}
 
       {!hasDrawing && (

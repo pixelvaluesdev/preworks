@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { FONT } from '../../theme/fonts';
 import { WIDTH } from '../../utils/responsive';
 import Colors from '../../constants/colors';
+import usePressGuard from '../../hooks/usePressGuard';
 
 const PrimaryButton = ({
   title,
@@ -11,6 +12,8 @@ const PrimaryButton = ({
   disabled = false,
   width,
 }: any) => {
+  const guardedPress = usePressGuard((event: any) => onPress?.(event));
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -19,7 +22,7 @@ const PrimaryButton = ({
         width && { width },
         disabled && styles.disabled,
       ]}
-      onPress={onPress}
+      onPress={guardedPress}
       disabled={disabled}
     >
       <View style={styles.innerContainer}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -31,6 +31,7 @@ import {
   saveProjectDraft,
   clearProjectDraft,
 } from '../../../redux/slices/projectDraftSlice';
+import usePressGuard from '../../../hooks/usePressGuard';
 
 const TOTAL_STEPS = 4;
 
@@ -121,8 +122,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
+  const submitInFlight = useRef(false);
+  const projectSubmitted = useRef(false);
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
+  const dispatch = useDispatch();
   const userId = user?._id;
   const draftForm = useSelector(state => state.projectDraft.form);
   const [initialForm, setInitialForm] = useState(null);
@@ -136,20 +140,16 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   }, [isEdit, projectId]);
 
   const [form, setForm] = useState(() =>
-    normalizeProjectForm({
-      ...draftForm,
-      hasDrawing: isEdit
-        ? draftForm?.hasDrawing
-        : draftForm?.hasDrawing ?? true,
-    }),
+    normalizeProjectForm(isEdit ? emptyProjectForm : draftForm),
   );
 
   useEffect(() => {
+    if (isEdit || projectSubmitted.current) return;
+
     dispatch(saveProjectDraft(normalizeProjectForm(form)));
-  }, [form]);
+  }, [dispatch, form, isEdit]);
 
   console.log('Form state:', form.hasDrawing);
-  const dispatch = useDispatch();
 
   const handleChange = (key: string, value: any) => {
     console.log('handleChange', key, value);
@@ -230,8 +230,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     }
     triggerHaptic('impactHeavy');
   };
+  const guardedHandleNext = usePressGuard(handleNext);
 
   const handleBack = () => {
+    if (submitInFlight.current) return;
+
     if (step === 0) {
       navigation.goBack();
     } else {
@@ -239,6 +242,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     }
     triggerHaptic('impactHeavy');
   };
+  const guardedHandleBack = usePressGuard(handleBack);
 
   const mapFloors = val => {
     if (val === 'Only Ground Floor') return 'g';
@@ -312,6 +316,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   };
 
   const submitProjectApi = async () => {
+    if (submitInFlight.current) return;
+    submitInFlight.current = true;
+
     try {
       const safeForm = normalizeProjectForm(form);
       setLoading(true);
@@ -428,6 +435,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
       console.log(response?.data?.message, 'Thiisssss is ss ewmewemn');
 
+      projectSubmitted.current = true;
       setIsSuccess(true);
       setPopupMessage({
         title: isEdit
@@ -450,6 +458,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
           'Something went wrong',
       );
     } finally {
+      submitInFlight.current = false;
       setLoading(false);
       setPopupVisible(true);
     }
@@ -468,7 +477,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   return (
     <ScreenWrapper style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
+        <TouchableOpacity onPress={guardedHandleBack} style={styles.backBtn}>
           <BackArrow />
         </TouchableOpacity>
 
@@ -525,7 +534,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                 marginVertical: HEIGHT(2),
                 opacity: validateStep() ? 1 : 0.5,
               }}
-              onPress={handleNext}
+              onPress={guardedHandleNext}
             />
           )}
 
@@ -534,7 +543,8 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
               <AppButton
                 title="Back"
                 type="outline"
-                onPress={handleBack}
+                onPress={guardedHandleBack}
+                disabled={loading}
                 style={{ flex: 1 }}
               />
 
@@ -548,7 +558,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                       : 'Submit Project'
                     : 'Continue'
                 }
-                onPress={handleNext}
+                onPress={guardedHandleNext}
                 disabled={
                   !validateStep() ||
                   loading ||
@@ -582,7 +592,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
                 setPopupVisible(false);
 
                 if (isSuccess) {
-                  dispatch(clearProjectDraft());
+                  if (!isEdit) {
+                    dispatch(clearProjectDraft());
+                  }
                   navigation.replace('ProjectDetails');
                 }
               },
