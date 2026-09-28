@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import {
+  Dimensions,
+  Modal,
   View,
   StyleSheet,
   ScrollView,
@@ -77,6 +79,13 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const [pinSuggestions, setPinSuggestions] = useState([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
+  const pinInputRef = useRef<View>(null);
+  const [pinInputFrame, setPinInputFrame] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
 
   const [cityPincodes, setCityPincodes] = useState([]);
   const [linkErrors, setLinkErrors] = useState([]);
@@ -634,6 +643,22 @@ const EditProfileScreen = ({ navigation }: any) => {
     setShowPinDropdown(true);
   };
 
+  const measurePinInput = () => {
+    pinInputRef.current?.measureInWindow((x, y, width, height) => {
+      setPinInputFrame({ x, y, width, height });
+    });
+  };
+
+  const pinDropdownHeight = Math.min(
+    pinSuggestions.length * HEIGHT(5),
+    HEIGHT(25),
+  );
+  const pinDropdownTop =
+    pinInputFrame.y + pinInputFrame.height + pinDropdownHeight + 8 >
+    Dimensions.get('window').height
+      ? Math.max(8, pinInputFrame.y - pinDropdownHeight - 4)
+      : pinInputFrame.y + pinInputFrame.height + 4;
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center' }}>
@@ -649,9 +674,13 @@ const EditProfileScreen = ({ navigation }: any) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.container}>
+            <ScrollView
+              nestedScrollEnabled
+              scrollEnabled={!showPinDropdown}
+              keyboardShouldPersistTaps="always"
+              showsVerticalScrollIndicator={false}
+            >
               <LinearGradient
                 colors={['#53d78e', '#166850']}
                 start={{ x: 0, y: 0 }}
@@ -785,9 +814,9 @@ const EditProfileScreen = ({ navigation }: any) => {
                             showsVerticalScrollIndicator={false}
                           >
                             {citySuggestions.map((item, index) => (
-                              <Text
+                              <TouchableOpacity
                                 key={index}
-                                style={styles.item}
+                                activeOpacity={0.7}
                                 onPress={() => {
                                   const matchedState = indianStates?.find?.(
                                     s =>
@@ -806,10 +835,11 @@ const EditProfileScreen = ({ navigation }: any) => {
 
                                   setShowDropdown(false);
                                   setShowPinDropdown(true);
+                                  Keyboard.dismiss();
                                 }}
                               >
-                                {item?.name}
-                              </Text>
+                                <Text style={styles.item}>{item?.name}</Text>
+                              </TouchableOpacity>
                             ))}
                           </ScrollView>
                         </View>
@@ -818,7 +848,12 @@ const EditProfileScreen = ({ navigation }: any) => {
                   </View>
 
                   <View style={[styles.col, { zIndex: 999 }]}>
-                    <View style={{ position: 'relative' }}>
+                    <View
+                      ref={pinInputRef}
+                      collapsable={false}
+                      onLayout={measurePinInput}
+                      style={{ position: 'relative' }}
+                    >
                       <BorderTextInput
                         label="Pin code"
                         value={pin}
@@ -826,38 +861,11 @@ const EditProfileScreen = ({ navigation }: any) => {
                         placeholder="Pincode"
                         keyboardType="number-pad"
                         onFocus={() => {
+                          measurePinInput();
                           setPinSuggestions(cityPincodes);
                           setShowPinDropdown(true);
                         }}
                       />
-
-                      {showPinDropdown && pinSuggestions?.length > 0 && (
-                        <View style={styles.dropdown}>
-                          <ScrollView
-                            nestedScrollEnabled={true}
-                            keyboardShouldPersistTaps="handled"
-                            showsVerticalScrollIndicator={true}
-                          >
-                            {pinSuggestions.map((item, index) => (
-                              <TouchableOpacity
-                                key={index}
-                                onPress={() => {
-                                  setPin(item?.Pincode);
-                                  setShowPinDropdown(false);
-                                }}
-                              >
-                                <Text style={styles.item}>
-                                  {item?.Pincode}
-                                  <Text style={{ color: '#888' }}>
-                                    {' '}
-                                    - {item?.Name}
-                                  </Text>
-                                </Text>
-                              </TouchableOpacity>
-                            ))}
-                          </ScrollView>
-                        </View>
-                      )}
                     </View>
                   </View>
                 </View>
@@ -1001,9 +1009,56 @@ const EditProfileScreen = ({ navigation }: any) => {
                 },
               ]}
             />
-          </View>
-        </TouchableWithoutFeedback>
+        </View>
       </KeyboardAvoidingView>
+      <Modal
+        transparent
+        visible={showPinDropdown && pinSuggestions.length > 0}
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setShowPinDropdown(false)}
+        onShow={measurePinInput}
+      >
+        <View style={styles.pinModalRoot}>
+          <TouchableWithoutFeedback
+            onPress={() => setShowPinDropdown(false)}
+          >
+            <View style={styles.pinModalBackdrop} />
+          </TouchableWithoutFeedback>
+          <View
+            style={[
+              styles.pinModalDropdown,
+              {
+                left: pinInputFrame.x,
+                top: pinDropdownTop,
+                width: pinInputFrame.width,
+                height: pinDropdownHeight,
+              },
+            ]}
+          >
+            <ScrollView
+              style={styles.pinModalScroll}
+              showsVerticalScrollIndicator
+              keyboardShouldPersistTaps="handled"
+            >
+              {pinSuggestions.map((item, index) => (
+                <TouchableOpacity
+                  key={`${item?.Pincode}-${index}`}
+                  onPress={() => {
+                    setPin(item?.Pincode || '');
+                    setShowPinDropdown(false);
+                  }}
+                >
+                  <Text style={styles.item}>
+                    {item?.Pincode}
+                    <Text style={{ color: '#888' }}> - {item?.Name}</Text>
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </ScreenWrapper>
   );
 };
@@ -1108,6 +1163,24 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     elevation: 20,
     maxHeight: HEIGHT(25),
+  },
+  pinModalRoot: {
+    flex: 1,
+  },
+  pinModalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  pinModalDropdown: {
+    position: 'absolute',
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    elevation: 20,
+  },
+  pinModalScroll: {
+    flex: 1,
   },
   item: {
     padding: 10,

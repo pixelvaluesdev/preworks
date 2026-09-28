@@ -500,6 +500,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
       >
         <ScrollView
           style={{ flex: 1 }}
+          keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.formContainer}
         >

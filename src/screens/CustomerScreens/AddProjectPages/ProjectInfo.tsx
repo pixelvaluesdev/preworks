@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
@@ -141,18 +148,19 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                 showsVerticalScrollIndicator={false}
               >
                 {citySuggestions.map((item, index) => (
-                  <Text
+                  <TouchableOpacity
                     key={index}
-                    style={styles.item}
+                    activeOpacity={0.7}
                     onPress={() => {
                       console.log('Selected city:', item.name);
                       handleChange('city', item?.name ?? '');
                       fetchPincodes(item?.name ?? '');
                       setShowDropdown(false);
+                      Keyboard.dismiss();
                     }}
                   >
-                    {item.name}
-                  </Text>
+                    <Text style={styles.item}>{item.name}</Text>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
             </View>

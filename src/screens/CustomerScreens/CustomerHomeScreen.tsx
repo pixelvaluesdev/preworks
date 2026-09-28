@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import Colors from '../../constants/colors';
 import SearchHeader from '../../components/SearchHeader';
 import WhatWeDoSection from '../../components/CustomerUI/WhatWeDoSection';
 import SecondaryButton from '../../components/Buttons/SecondaryBtn';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import { useEffect } from 'react';
@@ -29,11 +29,6 @@ import LoadingImage from '../../components/LoadingImage';
 
 const CustomerHomeScreen = () => {
   useCheckLogin();
-  useEffect(() => {
-    setTimeout(() => {
-      triggerHaptic('impactHeavy');
-    }, 2000);
-  }, []);
   const navigation = useNavigation();
   const token = useSelector((state: any) => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
@@ -47,7 +42,20 @@ const CustomerHomeScreen = () => {
   const [search, setSearch] = useState('');
   const flatListRef = useRef(null);
   const [helpLoading, setHelpLoading] = useState(false);
-  const [postLoading, setPostLoading] = useState(false);
+  const openingProjectRef = useRef(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      openingProjectRef.current = false;
+    }, []),
+  );
+
+  const handlePostProject = () => {
+    if (openingProjectRef.current) return;
+
+    openingProjectRef.current = true;
+    navigation.navigate('AddProjectInformation');
+  };
 
   useEffect(() => {
     console.log(token, 'Tokennnn here');
@@ -306,31 +314,14 @@ const CustomerHomeScreen = () => {
 
         {/* Add Project Button */}
         <SecondaryButton
-          title={postLoading ? 'Opening...' : 'Post Your Project'}
+          title="Post Your Project"
           style={{
             marginHorizontal: WIDTH(4),
             marginVertical: HEIGHT(2),
-            opacity: postLoading ? 0.9 : 1,
           }}
           textStyle={{ fontSize: 18 }}
           icon={<PlusIcon height={20} width={20} />}
-          loading={postLoading}
-          onPress={() => {
-            if (postLoading) {
-              return;
-            }
-
-            setPostLoading(true);
-            triggerHaptic('impactHeavy');
-
-            requestAnimationFrame(() => {
-              navigation.navigate('AddProjectInformation');
-            });
-
-            setTimeout(() => {
-              setPostLoading(false);
-            }, 1200);
-          }}
+          onPress={handlePostProject}
         />
 
         <CustomPopup
