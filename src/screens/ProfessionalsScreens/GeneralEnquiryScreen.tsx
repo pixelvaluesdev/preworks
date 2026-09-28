@@ -237,7 +237,7 @@ const GeneralEnquiryScreen = () => {
         <View style={styles.dashedDivider} />
         {/* Floor Area */}
         <DetailRow
-          icon={<FloorArea />}
+          icon={<FloorArea height={25} width={25} />}
           label="Floor Area"
           value={`${project?.floorArea ?? 'N/A'} sq.ft`}
         />
