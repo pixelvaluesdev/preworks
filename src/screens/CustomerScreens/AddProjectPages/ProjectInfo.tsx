@@ -82,7 +82,9 @@ const ProjectInfo = ({ data, handleChange }: any) => {
 
     if (safeText.length === 0) {
       setPinSuggestions(cityPincodes);
-      setShowPinDropdown(Array.isArray(cityPincodes) && cityPincodes.length > 0);
+      setShowPinDropdown(
+        Array.isArray(cityPincodes) && cityPincodes.length > 0,
+      );
       return;
     }
 
@@ -92,7 +94,9 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       .filter(item => {
         return (
           String(item?.Pincode ?? '').includes(search) ||
-          String(item?.Name ?? '').toLowerCase().includes(search)
+          String(item?.Name ?? '')
+            .toLowerCase()
+            .includes(search)
         );
       })
       .slice(0, 10);
@@ -127,30 +131,32 @@ const ProjectInfo = ({ data, handleChange }: any) => {
           height={HEIGHT(7)}
         />
 
-        {showDropdown && Array.isArray(citySuggestions) && citySuggestions.length > 0 && (
-          <View style={styles.dropdown}>
-            <ScrollView
-              nestedScrollEnabled
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {citySuggestions.map((item, index) => (
-                <Text
-                  key={index}
-                  style={styles.item}
-                  onPress={() => {
-                    console.log('Selected city:', item.name);
-                    handleChange('city', item?.name ?? '');
-                    fetchPincodes(item?.name ?? '');
-                    setShowDropdown(false);
-                  }}
-                >
-                  {item.name}
-                </Text>
-              ))}
-            </ScrollView>
-          </View>
-        )}
+        {showDropdown &&
+          Array.isArray(citySuggestions) &&
+          citySuggestions.length > 0 && (
+            <View style={styles.dropdown}>
+              <ScrollView
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
+                {citySuggestions.map((item, index) => (
+                  <Text
+                    key={index}
+                    style={styles.item}
+                    onPress={() => {
+                      console.log('Selected city:', item.name);
+                      handleChange('city', item?.name ?? '');
+                      fetchPincodes(item?.name ?? '');
+                      setShowDropdown(false);
+                    }}
+                  >
+                    {item.name}
+                  </Text>
+                ))}
+              </ScrollView>
+            </View>
+          )}
       </View>
       <View style={{ position: 'relative' }}>
         <BorderTextInput
@@ -161,28 +167,35 @@ const ProjectInfo = ({ data, handleChange }: any) => {
           height={HEIGHT(7)}
         />
 
-        {showPinDropdown && Array.isArray(pinSuggestions) && pinSuggestions.length > 0 && (
-          <View style={styles.dropdown}>
-            <ScrollView nestedScrollEnabled keyboardShouldPersistTaps="handled">
-              {pinSuggestions.map((item, index) => (
-                <Text
-                  key={index}
-                  style={styles.item}
-                  onPress={() => {
-                    const selectedValue = `${item?.Pincode ?? ''} - ${item?.Name ?? ''}`;
+        {showPinDropdown &&
+          Array.isArray(pinSuggestions) &&
+          pinSuggestions.length > 0 && (
+            <View style={styles.dropdown}>
+              <ScrollView
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+              >
+                {pinSuggestions.map((item, index) => (
+                  <Text
+                    key={index}
+                    style={styles.item}
+                    onPress={() => {
+                      const selectedValue = `${item?.Pincode ?? ''} - ${
+                        item?.Name ?? ''
+                      }`;
 
-                    handleChange('pinCode', selectedValue);
+                      handleChange('pinCode', selectedValue);
 
-                    setShowPinDropdown(false);
-                  }}
-                >
-                  {item?.Pincode ?? ''}{' '}
-                  <Text style={{ color: '#888' }}>- {item?.Name ?? ''}</Text>
-                </Text>
-              ))}
-            </ScrollView>
-          </View>
-        )}
+                      setShowPinDropdown(false);
+                    }}
+                  >
+                    {item?.Pincode ?? ''}{' '}
+                    <Text style={{ color: '#888' }}>- {item?.Name ?? ''}</Text>
+                  </Text>
+                ))}
+              </ScrollView>
+            </View>
+          )}
       </View>
     </View>
   );

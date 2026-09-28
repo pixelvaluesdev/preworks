@@ -236,9 +236,7 @@ const Projectfile = ({ data, handleChange, loading, isEdit = false }: any) => {
         value={[...existingImages, ...siteImages]}
         onPress={() => pickImage('siteImage')}
         rightComponent={<UploadIcon />}
-        onRemove={(file, index) =>
-          guardedHandleRemove(file, index, 'image')
-        }
+        onRemove={(file, index) => guardedHandleRemove(file, index, 'image')}
         required={false}
       />
 

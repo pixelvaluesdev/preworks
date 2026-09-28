@@ -187,11 +187,13 @@ const Popup = ({
             if (response.didCancel || response.errorCode) return;
 
             const files =
-              response.assets?.filter(item => item?.uri).map(item => ({
-                uri: item.uri,
-                type: item.type,
-                name: item.fileName,
-              })) || [];
+              response.assets
+                ?.filter(item => item?.uri)
+                .map(item => ({
+                  uri: item.uri,
+                  type: item.type,
+                  name: item.fileName,
+                })) || [];
 
             if (files.length) {
               setQuotationFiles(prev => [...prev, ...files]);
