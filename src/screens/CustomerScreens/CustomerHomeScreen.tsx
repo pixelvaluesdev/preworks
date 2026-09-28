@@ -43,10 +43,12 @@ const CustomerHomeScreen = () => {
   const flatListRef = useRef(null);
   const [helpLoading, setHelpLoading] = useState(false);
   const openingProjectRef = useRef(false);
+  const [openingProject, setOpeningProject] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       openingProjectRef.current = false;
+      setOpeningProject(false);
     }, []),
   );
 
@@ -54,6 +56,7 @@ const CustomerHomeScreen = () => {
     if (openingProjectRef.current) return;
 
     openingProjectRef.current = true;
+    setOpeningProject(true);
     navigation.navigate('AddProjectInformation');
   };
 
@@ -314,7 +317,9 @@ const CustomerHomeScreen = () => {
 
         {/* Add Project Button */}
         <SecondaryButton
-          title="Post Your Project"
+          title={openingProject ? 'Opening Project...' : 'Post Your Project'}
+          disabled={openingProject}
+          loading={openingProject}
           style={{
             marginHorizontal: WIDTH(4),
             marginVertical: HEIGHT(2),

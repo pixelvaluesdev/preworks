@@ -122,6 +122,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
+  const [screenReady, setScreenReady] = useState(false);
   const submitInFlight = useRef(false);
   const projectSubmitted = useRef(false);
   const token = useSelector(state => state.auth.userToken);
@@ -476,6 +477,11 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
 
   return (
     <ScreenWrapper style={styles.container}>
+      <View
+        style={styles.screenContent}
+        onLayout={() => setScreenReady(true)}
+        pointerEvents={screenReady ? 'auto' : 'none'}
+      >
       <View style={styles.header}>
         <TouchableOpacity onPress={guardedHandleBack} style={styles.backBtn}>
           <BackArrow />
@@ -603,6 +609,12 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
           ]}
         />
       </KeyboardAvoidingView>
+      {!screenReady && (
+        <View style={styles.readyOverlay}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      )}
+      </View>
     </ScreenWrapper>
   );
 };
@@ -612,6 +624,15 @@ export default AddProjectInformationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  screenContent: {
+    flex: 1,
+  },
+  readyOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#fff',
   },
 
