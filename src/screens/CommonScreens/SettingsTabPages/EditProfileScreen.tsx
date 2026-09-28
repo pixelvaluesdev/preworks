@@ -675,229 +675,169 @@ const EditProfileScreen = ({ navigation }: any) => {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
         <View style={styles.container}>
-            <ScrollView
-              nestedScrollEnabled
-              scrollEnabled={!showPinDropdown}
-              keyboardShouldPersistTaps="always"
-              showsVerticalScrollIndicator={false}
+          <ScrollView
+            nestedScrollEnabled
+            scrollEnabled={!showPinDropdown}
+            keyboardShouldPersistTaps="always"
+            showsVerticalScrollIndicator={false}
+          >
+            <LinearGradient
+              colors={['#53d78e', '#166850']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.header}
             >
-              <LinearGradient
-                colors={['#53d78e', '#166850']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-                style={styles.header}
+              <Image
+                style={styles.coverImage}
+                source={
+                  coverImage?.uri
+                    ? { uri: coverImage.uri }
+                    : profile?.userBanner
+                    ? { uri: `${IMG_URL}${profile.userBanner}` }
+                    : require('../../../assets/pngs/Placeholder.png')
+                }
+              />
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => {
+                  if (navigation?.canGoBack?.()) {
+                    navigation.goBack();
+                  } else {
+                    Alert.alert('Exit App', 'Do you want to close the app?', [
+                      {
+                        text: 'Cancel',
+                        style: 'cancel',
+                      },
+                      {
+                        text: 'OK',
+                        onPress: () => {
+                          setTimeout(() => {
+                            BackHandler.exitApp();
+                          }, 300);
+                        },
+                      },
+                    ]);
+                  }
+                }}
               >
+                <Back />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cameraCvrBtn}
+                onPress={() => showImageOptions('cover')}
+              >
+                <Camera width={35} />
+              </TouchableOpacity>
+            </LinearGradient>
+
+            <View style={styles.profileWrapper}>
+              <View style={styles.profileSection}>
                 <Image
-                  style={styles.coverImage}
+                  style={styles.profileImage}
                   source={
-                    coverImage?.uri
-                      ? { uri: coverImage.uri }
-                      : profile?.userBanner
-                      ? { uri: `${IMG_URL}${profile.userBanner}` }
+                    profileImage?.uri
+                      ? { uri: profileImage.uri }
+                      : profile?.image
+                      ? { uri: `${IMG_URL}${profile.image}` }
                       : require('../../../assets/pngs/Placeholder.png')
                   }
                 />
+
                 <TouchableOpacity
-                  style={styles.backBtn}
-                  onPress={() => {
-                    if (navigation?.canGoBack?.()) {
-                      navigation.goBack();
-                    } else {
-                      Alert.alert('Exit App', 'Do you want to close the app?', [
-                        {
-                          text: 'Cancel',
-                          style: 'cancel',
-                        },
-                        {
-                          text: 'OK',
-                          onPress: () => {
-                            setTimeout(() => {
-                              BackHandler.exitApp();
-                            }, 300);
-                          },
-                        },
-                      ]);
-                    }
-                  }}
-                >
-                  <Back />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.cameraCvrBtn}
-                  onPress={() => showImageOptions('cover')}
+                  style={styles.cameraBtn}
+                  onPress={() => showImageOptions('profile')}
                 >
                   <Camera width={35} />
-                </TouchableOpacity>
-              </LinearGradient>
 
-              <View style={styles.profileWrapper}>
-                <View style={styles.profileSection}>
-                  <Image
-                    style={styles.profileImage}
-                    source={
-                      profileImage?.uri
-                        ? { uri: profileImage.uri }
-                        : profile?.image
-                        ? { uri: `${IMG_URL}${profile.image}` }
-                        : require('../../../assets/pngs/Placeholder.png')
-                    }
+                  {isProfessional && <Text style={styles.requiredStar}>*</Text>}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.card}>
+              <BorderTextInput
+                label="Name"
+                value={name}
+                onChangeText={setName}
+                placeholder="Enter your name"
+              />
+
+              <BorderTextInput
+                label="Mobile Number"
+                value={mobile}
+                editable={false}
+                containerStyle={{ backgroundColor: '#f5f5f5' }}
+                onChangeText={text =>
+                  handleInputChange('mobile', text, setMobile)
+                }
+                placeholder="+91- Enter your mobile number"
+                keyboardType="number-pad"
+              />
+
+              {!isProfessional && (
+                <>
+                  <BorderTextInput
+                    label="Email"
+                    value={email}
+                    onChangeText={text => {
+                      setEmail(text);
+                      setErrors(prev => ({ ...prev, email: '' }));
+                    }}
+                    placeholder="Enter your email"
                   />
 
-                  <TouchableOpacity
-                    style={styles.cameraBtn}
-                    onPress={() => showImageOptions('profile')}
-                  >
-                    <Camera width={35} />
+                  {errors?.email ? (
+                    <Text style={{ color: 'red', marginTop: -20 }}>
+                      {errors.email}
+                    </Text>
+                  ) : null}
+                </>
+              )}
 
-                    {isProfessional && (
-                      <Text style={styles.requiredStar}>*</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <View style={styles.card}>
-                <BorderTextInput
-                  label="Name"
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Enter your name"
-                />
-
-                <BorderTextInput
-                  label="Mobile Number"
-                  value={mobile}
-                  editable={false}
-                  containerStyle={{ backgroundColor: '#f5f5f5' }}
-                  onChangeText={text =>
-                    handleInputChange('mobile', text, setMobile)
-                  }
-                  placeholder="+91- Enter your mobile number"
-                  keyboardType="number-pad"
-                />
-
-                {!isProfessional && (
-                  <>
-                    <BorderTextInput
-                      label="Email"
-                      value={email}
-                      onChangeText={text => {
-                        setEmail(text);
-                        setErrors(prev => ({ ...prev, email: '' }));
-                      }}
-                      placeholder="Enter your email"
-                    />
-
-                    {errors?.email ? (
-                      <Text style={{ color: 'red', marginTop: -20 }}>
-                        {errors.email}
-                      </Text>
-                    ) : null}
-                  </>
-                )}
-
-                <View style={styles.row}>
-                  <View style={[styles.col, { zIndex: 1000 }]}>
-                    <View style={{ position: 'relative' }}>
-                      <BorderTextInput
-                        label="City"
-                        value={city}
-                        onChangeText={handleCitySearch}
-                        placeholder="City"
-                      />
-
-                      {showDropdown && citySuggestions?.length > 0 && (
-                        <View style={styles.dropdown}>
-                          <ScrollView
-                            nestedScrollEnabled
-                            keyboardShouldPersistTaps="handled"
-                            showsVerticalScrollIndicator={false}
-                          >
-                            {citySuggestions.map((item, index) => (
-                              <TouchableOpacity
-                                key={index}
-                                activeOpacity={0.7}
-                                onPress={() => {
-                                  const matchedState = indianStates?.find?.(
-                                    s =>
-                                      s?.isoCode === item?.stateCode ||
-                                      s?.name?.toLowerCase() ===
-                                        item?.name?.toLowerCase(),
-                                  );
-
-                                  setCity(item?.name);
-                                  setPin('');
-                                  setState(matchedState?.name || '');
-                                  fetchPincodes(
-                                    item?.name,
-                                    matchedState?.name || '',
-                                  );
-
-                                  setShowDropdown(false);
-                                  setShowPinDropdown(true);
-                                  Keyboard.dismiss();
-                                }}
-                              >
-                                <Text style={styles.item}>{item?.name}</Text>
-                              </TouchableOpacity>
-                            ))}
-                          </ScrollView>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-
-                  <View style={[styles.col, { zIndex: 999 }]}>
-                    <View
-                      ref={pinInputRef}
-                      collapsable={false}
-                      onLayout={measurePinInput}
-                      style={{ position: 'relative' }}
-                    >
-                      <BorderTextInput
-                        label="Pin code"
-                        value={pin}
-                        onChangeText={handlePinSearch}
-                        placeholder="Pincode"
-                        keyboardType="number-pad"
-                        onFocus={() => {
-                          measurePinInput();
-                          setPinSuggestions(cityPincodes);
-                          setShowPinDropdown(true);
-                        }}
-                      />
-                    </View>
-                  </View>
-                </View>
-
-                <View style={[styles.col, { zIndex: 998, width: '100%' }]}>
+              <View style={styles.row}>
+                <View style={[styles.col, { zIndex: 1000 }]}>
                   <View style={{ position: 'relative' }}>
                     <BorderTextInput
-                      label="State"
-                      value={state}
-                      onChangeText={handleStateSearch}
-                      placeholder="Enter your State"
+                      label="City"
+                      value={city}
+                      onChangeText={handleCitySearch}
+                      placeholder="City"
                     />
 
-                    {showStateDropdown && stateSuggestions?.length > 0 && (
+                    {showDropdown && citySuggestions?.length > 0 && (
                       <View style={styles.dropdown}>
                         <ScrollView
                           nestedScrollEnabled
                           keyboardShouldPersistTaps="handled"
                           showsVerticalScrollIndicator={false}
                         >
-                          {stateSuggestions.map((item, index) => (
-                            <Text
+                          {citySuggestions.map((item, index) => (
+                            <TouchableOpacity
                               key={index}
-                              style={styles.item}
+                              activeOpacity={0.7}
                               onPress={() => {
-                                setState(item?.name);
-                                setStateSuggestions([]);
-                                setShowStateDropdown(false);
+                                const matchedState = indianStates?.find?.(
+                                  s =>
+                                    s?.isoCode === item?.stateCode ||
+                                    s?.name?.toLowerCase() ===
+                                      item?.name?.toLowerCase(),
+                                );
+
+                                setCity(item?.name);
+                                setPin('');
+                                setState(matchedState?.name || '');
+                                fetchPincodes(
+                                  item?.name,
+                                  matchedState?.name || '',
+                                );
+
+                                setShowDropdown(false);
+                                setShowPinDropdown(true);
+                                Keyboard.dismiss();
                               }}
                             >
-                              {item?.name}
-                            </Text>
+                              <Text style={styles.item}>{item?.name}</Text>
+                            </TouchableOpacity>
                           ))}
                         </ScrollView>
                       </View>
@@ -905,110 +845,168 @@ const EditProfileScreen = ({ navigation }: any) => {
                   </View>
                 </View>
 
-                <BorderTextInput
-                  label="Address"
-                  value={address}
-                  onChangeText={setAddress}
-                  placeholder="Enter your Address"
-                />
+                <View style={[styles.col, { zIndex: 999 }]}>
+                  <View
+                    ref={pinInputRef}
+                    collapsable={false}
+                    onLayout={measurePinInput}
+                    style={{ position: 'relative' }}
+                  >
+                    <BorderTextInput
+                      label="Pin code"
+                      value={pin}
+                      onChangeText={handlePinSearch}
+                      placeholder="Pincode"
+                      keyboardType="number-pad"
+                      onFocus={() => {
+                        measurePinInput();
+                        setPinSuggestions(cityPincodes);
+                        setShowPinDropdown(true);
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
 
-                {isProfessional && (
+              <View style={[styles.col, { zIndex: 998, width: '100%' }]}>
+                <View style={{ position: 'relative' }}>
                   <BorderTextInput
-                    label="Experience"
-                    value={experience}
-                    onChangeText={setExperience}
-                    placeholder="Enter your experience in years"
-                    keyboardType="number-pad"
+                    label="State"
+                    value={state}
+                    onChangeText={handleStateSearch}
+                    placeholder="Enter your State"
                   />
-                )}
 
-                <View>
-                  {isProfessional &&
-                    links?.length > 0 &&
-                    links.map((item, index) => (
-                      <View key={index} style={{ marginBottom: 10 }}>
-                        <BorderTextInput
-                          label={`Link ${index + 1} (Paste URL)`}
-                          value={item}
-                          onChangeText={text => handleLinkChange(text, index)}
-                          placeholder="e.g. Instagram / LinkedIn profile URL"
-                          mandotory={false}
-                        />
-
-                        {linkErrors?.[index] ? (
+                  {showStateDropdown && stateSuggestions?.length > 0 && (
+                    <View style={styles.dropdown}>
+                      <ScrollView
+                        nestedScrollEnabled
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                      >
+                        {stateSuggestions.map((item, index) => (
                           <Text
-                            style={{
-                              color: 'red',
-                              fontSize: 12,
-                              marginTop: -15,
-                              marginBottom: 5,
-                              marginLeft: 5,
+                            key={index}
+                            style={styles.item}
+                            onPress={() => {
+                              setState(item?.name);
+                              setStateSuggestions([]);
+                              setShowStateDropdown(false);
                             }}
                           >
-                            {linkErrors[index]}
+                            {item?.name}
                           </Text>
-                        ) : null}
-
-                        {links.length > 1 && (
-                          <TouchableOpacity onPress={() => removeLink(index)}>
-                            <Text style={{ color: 'red', fontSize: 12 }}>
-                              Remove
-                            </Text>
-                          </TouchableOpacity>
-                        )}
-                      </View>
-                    ))}
-
-                  {isProfessional && (
-                    <TouchableOpacity
-                      style={styles.addMoreBtn}
-                      onPress={addMoreLinks}
-                    >
-                      <AddIcon />
-                      <Text style={styles.addMoreText}>Add more links</Text>
-                    </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
                   )}
                 </View>
+              </View>
+
+              <BorderTextInput
+                label="Address"
+                value={address}
+                onChangeText={setAddress}
+                placeholder="Enter your Address"
+              />
+
+              {isProfessional && (
+                <BorderTextInput
+                  label="Experience"
+                  value={experience}
+                  onChangeText={setExperience}
+                  placeholder="Enter your experience in years"
+                  keyboardType="number-pad"
+                />
+              )}
+
+              <View>
+                {isProfessional &&
+                  links?.length > 0 &&
+                  links.map((item, index) => (
+                    <View key={index} style={{ marginBottom: 10 }}>
+                      <BorderTextInput
+                        label={`Link ${index + 1} (Paste URL)`}
+                        value={item}
+                        onChangeText={text => handleLinkChange(text, index)}
+                        placeholder="e.g. Instagram / LinkedIn profile URL"
+                        mandotory={false}
+                      />
+
+                      {linkErrors?.[index] ? (
+                        <Text
+                          style={{
+                            color: 'red',
+                            fontSize: 12,
+                            marginTop: -15,
+                            marginBottom: 5,
+                            marginLeft: 5,
+                          }}
+                        >
+                          {linkErrors[index]}
+                        </Text>
+                      ) : null}
+
+                      {links.length > 1 && (
+                        <TouchableOpacity onPress={() => removeLink(index)}>
+                          <Text style={{ color: 'red', fontSize: 12 }}>
+                            Remove
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))}
 
                 {isProfessional && (
-                  <BorderTextInput
-                    label="Bio"
-                    value={bio}
-                    onChangeText={setBio}
-                    placeholder="Write Here.."
-                    multiline={true}
-                  />
+                  <TouchableOpacity
+                    style={styles.addMoreBtn}
+                    onPress={addMoreLinks}
+                  >
+                    <AddIcon />
+                    <Text style={styles.addMoreText}>Add more links</Text>
+                  </TouchableOpacity>
                 )}
-
-                <TouchableOpacity
-                  style={[styles.saveBtn, { opacity: isFormValid() ? 1 : 0.5 }]}
-                  onPress={handleSave}
-                  disabled={!isFormValid()}
-                >
-                  <Text style={styles.saveText}>Save</Text>
-                </TouchableOpacity>
               </View>
-            </ScrollView>
 
-            <CustomPopup
-              visible={showPopup}
-              message="Your profile has been saved successfully!"
-              onClose={() => setShowPopup(false)}
-              buttons={[
-                {
-                  label: 'OK',
-                  type: 'primary',
-                  onPress: () => {
-                    setShowPopup(false);
-                    if (isProfessional) {
-                      navigation?.replace?.('ProfTabNav');
-                    } else {
-                      navigation?.replace?.('CustmTabNav');
-                    }
-                  },
+              {isProfessional && (
+                <BorderTextInput
+                  label="Bio"
+                  value={bio}
+                  onChangeText={setBio}
+                  placeholder="Write Here.."
+                  multiline={true}
+                />
+              )}
+
+              <TouchableOpacity
+                style={[styles.saveBtn, { opacity: isFormValid() ? 1 : 0.5 }]}
+                onPress={handleSave}
+                disabled={!isFormValid()}
+              >
+                <Text style={styles.saveText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+
+          <CustomPopup
+            visible={showPopup}
+            message="Your profile has been saved successfully!"
+            onClose={() => setShowPopup(false)}
+            buttons={[
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setShowPopup(false);
+                  if (isProfessional) {
+                    navigation?.replace?.('ProfTabNav');
+                  } else {
+                    navigation?.replace?.('CustmTabNav');
+                  }
                 },
-              ]}
-            />
+              },
+            ]}
+          />
         </View>
       </KeyboardAvoidingView>
       <Modal
@@ -1020,9 +1018,7 @@ const EditProfileScreen = ({ navigation }: any) => {
         onShow={measurePinInput}
       >
         <View style={styles.pinModalRoot}>
-          <TouchableWithoutFeedback
-            onPress={() => setShowPinDropdown(false)}
-          >
+          <TouchableWithoutFeedback onPress={() => setShowPinDropdown(false)}>
             <View style={styles.pinModalBackdrop} />
           </TouchableWithoutFeedback>
           <View
