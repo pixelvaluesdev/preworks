@@ -482,138 +482,138 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
         onLayout={() => setScreenReady(true)}
         pointerEvents={screenReady ? 'auto' : 'none'}
       >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={guardedHandleBack} style={styles.backBtn}>
-          <BackArrow />
-        </TouchableOpacity>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={guardedHandleBack} style={styles.backBtn}>
+            <BackArrow />
+          </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>
-          {step == 0 && 'Project Information'}
-          {step == 1 && 'Plot & Work Details'}
-          {step == 2 && 'Project Timeline & Scope'}
-          {step == 3 && 'Project File & Drawings'}
-        </Text>
-      </View>
+          <Text style={styles.headerTitle}>
+            {step == 0 && 'Project Information'}
+            {step == 1 && 'Plot & Work Details'}
+            {step == 2 && 'Project Timeline & Scope'}
+            {step == 3 && 'Project File & Drawings'}
+          </Text>
+        </View>
 
-      <View style={styles.stepContainer}>
-        <CustomStepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
-      </View>
+        <View style={styles.stepContainer}>
+          <CustomStepIndicator currentStep={step} totalSteps={TOTAL_STEPS} />
+        </View>
 
-      <KeyboardAvoidingView
-        style={styles.content}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={20} // tweak if needed
-      >
-        <ScrollView
-          style={{ flex: 1 }}
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.formContainer}
+        <KeyboardAvoidingView
+          style={styles.content}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={20} // tweak if needed
         >
-          {step === 0 && (
-            <ProjectInfo data={form} handleChange={handleChange} />
-          )}
+          <ScrollView
+            style={{ flex: 1 }}
+            keyboardShouldPersistTaps="always"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.formContainer}
+          >
+            {step === 0 && (
+              <ProjectInfo data={form} handleChange={handleChange} />
+            )}
 
-          {step === 1 && (
-            <PlotWorkDetails data={form} handleChange={handleChange} />
-          )}
+            {step === 1 && (
+              <PlotWorkDetails data={form} handleChange={handleChange} />
+            )}
 
-          {step === 2 && (
-            <ProjectTimeline data={form} handleChange={handleChange} />
-          )}
-          {step === 3 && (
-            <Projectfiles
-              data={{ ...form, projectId }}
-              handleChange={handleChange}
-              loading={fetchLoading}
-              isEdit={isEdit}
-            />
-          )}
-        </ScrollView>
-
-        <View style={styles.buttonContainer}>
-          {step == 0 && (
-            <SecondaryButton
-              title="Continue"
-              disabled={!validateStep()}
-              style={{
-                marginHorizontal: WIDTH(4),
-                marginVertical: HEIGHT(2),
-                opacity: validateStep() ? 1 : 0.5,
-              }}
-              onPress={guardedHandleNext}
-            />
-          )}
-
-          {step !== 0 && (
-            <View style={styles.row}>
-              <AppButton
-                title="Back"
-                type="outline"
-                onPress={guardedHandleBack}
-                disabled={loading}
-                style={{ flex: 1 }}
+            {step === 2 && (
+              <ProjectTimeline data={form} handleChange={handleChange} />
+            )}
+            {step === 3 && (
+              <Projectfiles
+                data={{ ...form, projectId }}
+                handleChange={handleChange}
+                loading={fetchLoading}
+                isEdit={isEdit}
               />
+            )}
+          </ScrollView>
 
-              <AppButton
-                title={
-                  loading
-                    ? 'Submitting...'
-                    : step === TOTAL_STEPS - 1
-                    ? isEdit
-                      ? 'Update Project'
-                      : 'Submit Project'
-                    : 'Continue'
-                }
-                onPress={guardedHandleNext}
-                disabled={
-                  !validateStep() ||
-                  loading ||
-                  (isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
-                }
+          <View style={styles.buttonContainer}>
+            {step == 0 && (
+              <SecondaryButton
+                title="Continue"
+                disabled={!validateStep()}
                 style={{
-                  flex: 1,
-                  opacity:
-                    validateStep() &&
-                    !loading &&
-                    !(isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
-                      ? 1
-                      : 0.5,
+                  marginHorizontal: WIDTH(4),
+                  marginVertical: HEIGHT(2),
+                  opacity: validateStep() ? 1 : 0.5,
                 }}
+                onPress={guardedHandleNext}
               />
-            </View>
-          )}
-        </View>
+            )}
 
-        <CustomPopup
-          visible={popupVisible}
-          title={isSuccess ? 'Success' : 'Error'}
-          message={popupMessage}
-          onClose={() => setPopupVisible(false)}
-          disableOutsideClick={true}
-          buttons={[
-            {
-              label: 'OK',
-              type: 'primary',
-              onPress: () => {
-                setPopupVisible(false);
+            {step !== 0 && (
+              <View style={styles.row}>
+                <AppButton
+                  title="Back"
+                  type="outline"
+                  onPress={guardedHandleBack}
+                  disabled={loading}
+                  style={{ flex: 1 }}
+                />
 
-                if (isSuccess) {
-                  if (!isEdit) {
-                    dispatch(clearProjectDraft());
+                <AppButton
+                  title={
+                    loading
+                      ? 'Submitting...'
+                      : step === TOTAL_STEPS - 1
+                      ? isEdit
+                        ? 'Update Project'
+                        : 'Submit Project'
+                      : 'Continue'
                   }
-                  navigation.replace('ProjectDetails');
-                }
+                  onPress={guardedHandleNext}
+                  disabled={
+                    !validateStep() ||
+                    loading ||
+                    (isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
+                  }
+                  style={{
+                    flex: 1,
+                    opacity:
+                      validateStep() &&
+                      !loading &&
+                      !(isEdit && step === TOTAL_STEPS - 1 && !hasChanges())
+                        ? 1
+                        : 0.5,
+                  }}
+                />
+              </View>
+            )}
+          </View>
+
+          <CustomPopup
+            visible={popupVisible}
+            title={isSuccess ? 'Success' : 'Error'}
+            message={popupMessage}
+            onClose={() => setPopupVisible(false)}
+            disableOutsideClick={true}
+            buttons={[
+              {
+                label: 'OK',
+                type: 'primary',
+                onPress: () => {
+                  setPopupVisible(false);
+
+                  if (isSuccess) {
+                    if (!isEdit) {
+                      dispatch(clearProjectDraft());
+                    }
+                    navigation.replace('ProjectDetails');
+                  }
+                },
               },
-            },
-          ]}
-        />
-      </KeyboardAvoidingView>
-      {!screenReady && (
-        <View style={styles.readyOverlay}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-        </View>
-      )}
+            ]}
+          />
+        </KeyboardAvoidingView>
+        {!screenReady && (
+          <View style={styles.readyOverlay}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        )}
       </View>
     </ScreenWrapper>
   );
