@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import Colors from '../constants/colors';
 import { FONT } from '../theme/fonts';
@@ -248,70 +250,72 @@ const Popup = ({
       transparent
       animationType="fade"
       visible={visible}
-      onRequestClose={onClose} //  Android back button
+      onRequestClose={onClose}
     >
-      {/*  OUTSIDE CLICK HANDLER */}
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
-          {/*  INSIDE CLICK BLOCK */}
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <View style={styles.container}>
-              <Text style={styles.title}>{title}</Text>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={styles.keyboardContainer}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
+          >
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.container}>
+                <Text style={styles.title}>{title}</Text>
 
-              {/* Quotation Input */}
-              {showQuotation && (
-                <TouchableOpacity onPress={pickMedia}>
-                  <BorderTextInput
-                    label="Quotation"
-                    value={
-                      quotationFiles.length > 0
-                        ? `${quotationFiles.length} file(s) selected`
-                        : quotation
-                    }
-                    onChangeText={setQuotation}
-                    placeholder="Select"
-                    editable={false}
-                    rightComponent={<UploadIcon />}
-                  />
-                </TouchableOpacity>
-              )}
+                {showQuotation && (
+                  <TouchableOpacity onPress={pickMedia}>
+                    <BorderTextInput
+                      label="Quotation"
+                      value={
+                        quotationFiles.length > 0
+                          ? `${quotationFiles.length} file(s) selected`
+                          : quotation
+                      }
+                      onChangeText={setQuotation}
+                      placeholder="Select"
+                      editable={false}
+                      rightComponent={<UploadIcon />}
+                    />
+                  </TouchableOpacity>
+                )}
 
-              {quotationFiles.length > 0 && (
-                <View style={styles.filesContainer}>
-                  {quotationFiles.map((file, index) => (
-                    <View key={index} style={styles.fileChip}>
-                      <Text
-                        style={styles.fileText}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {file.name}
-                      </Text>
+                {quotationFiles.length > 0 && (
+                  <View style={styles.filesContainer}>
+                    {quotationFiles.map((file, index) => (
+                      <View key={index} style={styles.fileChip}>
+                        <Text
+                          style={styles.fileText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {file.name}
+                        </Text>
 
-                      <TouchableOpacity onPress={() => removeFile(index)}>
-                        <Text style={styles.cross}>✕</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </View>
-              )}
+                        <TouchableOpacity onPress={() => removeFile(index)}>
+                          <Text style={styles.cross}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
 
-              {/* Message Input */}
-              <BorderTextInput
-                label="Why choose you?"
-                value={message}
-                onChangeText={setMessage}
-                multiline
-                placeholder="Mention your expertise, team  & nearby sites"
-              />
+                <BorderTextInput
+                  label="Why choose you?"
+                  value={message}
+                  onChangeText={setMessage}
+                  multiline
+                  placeholder="Mention your expertise, team  & nearby sites"
+                />
 
-              <SecondaryButton
-                title={loading ? 'Submitting...' : 'Submit'}
-                style={styles.submitBtn}
-                onPress={handleSubmit}
-              />
-            </View>
-          </TouchableWithoutFeedback>
+                <SecondaryButton
+                  title={loading ? 'Submitting...' : 'Submit'}
+                  style={styles.submitBtn}
+                  onPress={handleSubmit}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -380,5 +384,10 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  keyboardContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

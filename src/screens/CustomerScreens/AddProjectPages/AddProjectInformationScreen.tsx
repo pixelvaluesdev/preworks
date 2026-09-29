@@ -679,6 +679,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginHorizontal: WIDTH(4),
-    marginVertical: HEIGHT(2),
+    marginVertical: HEIGHT(1),
   },
 });

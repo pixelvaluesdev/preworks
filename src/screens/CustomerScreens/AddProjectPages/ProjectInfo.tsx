@@ -6,48 +6,181 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import BorderTextInput from '../../../components/Inputs/BorderTextInput';
-import { HEIGHT, WIDTH } from '../../../utils/responsive';
-import { City } from 'country-state-city';
+import { HEIGHT } from '../../../utils/responsive';
+
+const CITY_API = 'https://countries.dev/cities';
 
 const ProjectInfo = ({ data, handleChange }: any) => {
   const safeData = data || {};
-  const [citySuggestions, setCitySuggestions] = useState([]);
+
+  const [citySuggestions, setCitySuggestions] = useState<any[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [pinSuggestions, setPinSuggestions] = useState([]);
+
+  const [pinSuggestions, setPinSuggestions] = useState<any[]>([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
-  const [cityPincodes, setCityPincodes] = useState([]);
+
+  const [cityPincodes, setCityPincodes] = useState<any[]>([]);
+
+  const cityRequestId = useRef(0);
   const pinRequestId = useRef(0);
 
-  useEffect(
-    () => () => {
-      pinRequestId.current += 1;
-    },
-    [],
-  );
+  const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchPincodes = async cityName => {
+  useEffect(() => {
+    return () => {
+      cityRequestId.current += 1;
+      pinRequestId.current += 1;
+
+      if (cityDebounceRef.current) {
+        clearTimeout(cityDebounceRef.current);
+      }
+    };
+  }, []);
+
+  /**
+   * CITY SEARCH
+   *
+   * Uses countries.dev instead of country-state-city.
+   *
+   * Example:
+   * https://countries.dev/cities?q=mu&country=IN&limit=10
+   *
+   * No API key required.
+   */
+  const searchCities = (query: string) => {
+    const requestId = ++cityRequestId.current;
+
+    if (cityDebounceRef.current) {
+      clearTimeout(cityDebounceRef.current);
+    }
+
+    cityDebounceRef.current = setTimeout(async () => {
+      try {
+        const trimmedQuery = query.trim();
+
+        if (trimmedQuery.length < 2) {
+          setCitySuggestions([]);
+          setShowDropdown(false);
+          return;
+        }
+
+        const url =
+          `${CITY_API}?q=${encodeURIComponent(trimmedQuery)}` +
+          `&country=IN&limit=10`;
+
+        console.log('CITY API:', url);
+
+        const response = await fetch(url);
+
+        if (requestId !== cityRequestId.current) {
+          return;
+        }
+
+        if (!response.ok) {
+          console.log('City API failed:', response.status, response.statusText);
+
+          setCitySuggestions([]);
+          setShowDropdown(false);
+
+          return;
+        }
+
+        const result = await response.json();
+
+        if (requestId !== cityRequestId.current) {
+          return;
+        }
+
+        const cities = Array.isArray(result) ? result : [];
+
+        console.log('CITY API RESULT COUNT:', cities.length);
+
+        setCitySuggestions(cities);
+        setShowDropdown(cities.length > 0);
+      } catch (error) {
+        if (requestId !== cityRequestId.current) {
+          return;
+        }
+
+        console.log('CITY API ERROR:', error);
+
+        setCitySuggestions([]);
+        setShowDropdown(false);
+      }
+    }, 350);
+  };
+
+  /**
+   * CITY INPUT
+   */
+  const handleCitySearch = (text: string) => {
+    const safeText = String(text ?? '');
+
+    handleChange('city', safeText);
+
+    // Cancel old PIN request because city has changed.
+    pinRequestId.current += 1;
+
+    const query = safeText.trim();
+
+    if (query.length < 2) {
+      if (cityDebounceRef.current) {
+        clearTimeout(cityDebounceRef.current);
+      }
+
+      setCitySuggestions([]);
+      setShowDropdown(false);
+
+      return;
+    }
+
+    searchCities(query);
+  };
+
+  /**
+   * FETCH PINCODES FOR SELECTED CITY
+   */
+  const fetchPincodes = async (cityName: string) => {
     const requestId = ++pinRequestId.current;
 
     try {
-      const response = await fetch(
-        `https://api.postalpincode.in/postoffice/${cityName}`,
-      );
+      const safeCityName = String(cityName ?? '').trim();
+
+      if (!safeCityName) {
+        setCityPincodes([]);
+        setPinSuggestions([]);
+        setShowPinDropdown(false);
+        return;
+      }
+
+      const url =
+        `https://api.postalpincode.in/postoffice/` +
+        `${encodeURIComponent(safeCityName)}`;
+
+      console.log('PIN API:', url);
+
+      const response = await fetch(url);
 
       const result = await response.json();
-      if (requestId !== pinRequestId.current) return;
 
-      if (result[0]?.Status === 'Success') {
-        const pins = result[0]?.PostOffice || [];
+      if (requestId !== pinRequestId.current) {
+        return;
+      }
+
+      if (result?.[0]?.Status === 'Success') {
+        const pins = result?.[0]?.PostOffice || [];
 
         const safePins = Array.isArray(pins) ? pins : [];
+
+        console.log('PIN RESULT COUNT:', safePins.length);
 
         setCityPincodes(safePins);
         setPinSuggestions(safePins);
 
-        // ADD THESE LINES
-        setShowPinDropdown(true);
+        setShowPinDropdown(safePins.length > 0);
+
         handleChange('pinCode', '');
       } else {
         setCityPincodes([]);
@@ -55,43 +188,33 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         setShowPinDropdown(false);
       }
     } catch (error) {
+      if (requestId !== pinRequestId.current) {
+        return;
+      }
+
       console.log('PIN API Error:', error);
+
+      setCityPincodes([]);
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
     }
   };
 
-  const indianCities = useMemo(() => {
-    return City.getCitiesOfCountry('IN');
-  }, []);
-
-  const handleCitySearch = text => {
-    pinRequestId.current += 1;
-    handleChange('city', text);
-
-    const query = text.trim().toLowerCase();
-
-    if (query.length < 2) {
-      setCitySuggestions([]);
-      setShowDropdown(false);
-      return;
-    }
-
-    const filteredCities = (Array.isArray(indianCities) ? indianCities : [])
-      .filter(city => city.name.toLowerCase().startsWith(query))
-      .slice(0, 10);
-
-    setCitySuggestions(filteredCities);
-    setShowDropdown(filteredCities.length > 0);
-  };
-
+  /**
+   * PIN SEARCH
+   */
   const handlePinSearch = (text: string) => {
     const safeText = String(text ?? '');
+
     handleChange('pinCode', safeText);
 
     if (safeText.length === 0) {
       setPinSuggestions(cityPincodes);
+
       setShowPinDropdown(
         Array.isArray(cityPincodes) && cityPincodes.length > 0,
       );
+
       return;
     }
 
@@ -113,8 +236,16 @@ const ProjectInfo = ({ data, handleChange }: any) => {
   };
 
   console.log('ProjectInfo city value:', safeData.city);
+
   return (
-    <View style={{ gap: 6, zIndex: 1, paddingBottom: HEIGHT(30) }}>
+    <View
+      style={{
+        gap: 6,
+        zIndex: 1,
+        paddingBottom: HEIGHT(30),
+      }}
+    >
+      {/* PROJECT NAME */}
       <BorderTextInput
         label="Project Name"
         placeholder="Enter your project name"
@@ -122,6 +253,8 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         onChangeText={text => handleChange('projectName', text)}
         height={HEIGHT(7)}
       />
+
+      {/* FULL ADDRESS */}
       <BorderTextInput
         label="Full Plot Address"
         placeholder="Enter full address of plot"
@@ -129,6 +262,8 @@ const ProjectInfo = ({ data, handleChange }: any) => {
         onChangeText={text => handleChange('address', text)}
         height={HEIGHT(7)}
       />
+
+      {/* CITY */}
       <View style={{ position: 'relative' }}>
         <BorderTextInput
           label="City"
@@ -149,23 +284,32 @@ const ProjectInfo = ({ data, handleChange }: any) => {
               >
                 {citySuggestions.map((item, index) => (
                   <TouchableOpacity
-                    key={index}
+                    key={`${item?.name ?? 'city'}-${index}`}
                     activeOpacity={0.7}
                     onPress={() => {
-                      console.log('Selected city:', item.name);
-                      handleChange('city', item?.name ?? '');
-                      fetchPincodes(item?.name ?? '');
+                      const selectedCity = String(item?.name ?? '');
+
+                      console.log('Selected city:', selectedCity);
+
+                      handleChange('city', selectedCity);
+
                       setShowDropdown(false);
+
                       Keyboard.dismiss();
+
+                      // Fetch PIN/locality data after city selection.
+                      fetchPincodes(selectedCity);
                     }}
                   >
-                    <Text style={styles.item}>{item.name}</Text>
+                    <Text style={styles.item}>{item?.name ?? ''}</Text>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
             </View>
           )}
       </View>
+
+      {/* PIN CODE / LOCALITY */}
       <View style={{ position: 'relative' }}>
         <BorderTextInput
           label="PIN Code/Locality"
@@ -182,10 +326,13 @@ const ProjectInfo = ({ data, handleChange }: any) => {
               <ScrollView
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
               >
                 {pinSuggestions.map((item, index) => (
                   <Text
-                    key={index}
+                    key={`${item?.Pincode ?? 'pin'}-${
+                      item?.Name ?? 'locality'
+                    }-${index}`}
                     style={styles.item}
                     onPress={() => {
                       const selectedValue = `${item?.Pincode ?? ''} - ${
@@ -195,6 +342,8 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                       handleChange('pinCode', selectedValue);
 
                       setShowPinDropdown(false);
+
+                      Keyboard.dismiss();
                     }}
                   >
                     {item?.Pincode ?? ''}{' '}
@@ -221,7 +370,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     zIndex: 1000,
-    elevation: 5, //  IMPORTANT for Android
+    elevation: 5,
     maxHeight: 150,
   },
 

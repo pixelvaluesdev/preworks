@@ -39,7 +39,7 @@ function App() {
         const token = await getFCMToken();
 
         if (token) {
-          Clipboard.setString(token);
+          // Clipboard.setString(token);
           // Alert.alert(
           //   'TestFlight Push Tokens',
           //   `APNs token:\n${
