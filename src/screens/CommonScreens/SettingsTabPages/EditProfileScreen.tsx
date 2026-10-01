@@ -1248,7 +1248,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                         setShowPinDropdown(true);
                       }}
                     />
-
                   </View>
                 </View>
               </View>
@@ -1443,9 +1442,7 @@ const EditProfileScreen = ({ navigation }: any) => {
         onShow={measurePinInput}
       >
         <View style={styles.pinModalRoot}>
-          <TouchableWithoutFeedback
-            onPress={() => setShowPinDropdown(false)}
-          >
+          <TouchableWithoutFeedback onPress={() => setShowPinDropdown(false)}>
             <View style={styles.pinModalBackdrop} />
           </TouchableWithoutFeedback>
 

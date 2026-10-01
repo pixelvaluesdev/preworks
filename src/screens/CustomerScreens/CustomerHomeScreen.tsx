@@ -280,7 +280,7 @@ const CustomerHomeScreen = () => {
                     });
                   }}
                 >
-                  <LoadingImage
+                  {/* <LoadingImage
                     source={
                       hasValidImage
                         ? {
@@ -290,6 +290,21 @@ const CustomerHomeScreen = () => {
                         : require('../../assets/pngs/Placeholder.png')
                     }
                     style={styles.proImage}
+                  /> */}
+
+                  <LoadingImage
+                    source={
+                      hasValidImage
+                        ? {
+                            uri: `${IMG_URL}${item.image}`,
+                            cache: 'force-cache',
+                          }
+                        : null
+                    }
+                    placeholderSource={require('../../assets/pngs/Placeholder.png')}
+                    style={styles.proImage}
+                    resizeMode="cover"
+                    placeholderResizeMode="contain"
                   />
 
                   <Text
