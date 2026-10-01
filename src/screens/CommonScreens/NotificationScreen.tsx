@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -19,10 +20,11 @@ import ApiManager from '../../apis/ApiManager';
 import ScreenWrapper from '../../utils/screenWrapper';
 import {
   setNotifications,
-  markAllNotificationsRead,
+  markNotificationSeen,
 } from '../../redux/slices/notificationSlice';
 
 const NotificationScreen = () => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch();
@@ -32,6 +34,9 @@ const NotificationScreen = () => {
   const token = useAppSelector(state => state.auth.userToken);
   const notifications = useAppSelector(
     state => state.notification.notifications,
+  );
+  const newNotificationIds = useAppSelector(
+    state => state.notification.newNotificationIds,
   );
 
   const getNotifications = useCallback(
@@ -46,6 +51,7 @@ const NotificationScreen = () => {
         const res = await ApiManager.getNotifications(userId, token);
 
         if (res?.data?.status === 'success') {
+          console.log('Notifica', res.data.data);
           dispatch(setNotifications(res.data.data || []));
         }
       } catch (error) {
@@ -58,45 +64,40 @@ const NotificationScreen = () => {
     [dispatch, token, userId],
   );
 
-  const readAllNotifications = useCallback(async () => {
-    try {
-      const res = await ApiManager.readNotifications(userId, token);
-
-      if (res?.data?.status === 'success') {
-        dispatch(markAllNotificationsRead());
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [dispatch, token, userId]);
-
-  const loadNotifications = useCallback(async () => {
-    await getNotifications();
-    await readAllNotifications();
-  }, [getNotifications, readAllNotifications]);
+  const loadNotifications = useCallback(
+    (isRefresh = false) => getNotifications(isRefresh),
+    [getNotifications],
+  );
 
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
 
   const renderItem = ({ item }: any) => {
-    const isRead = Boolean(item?.isRead);
+    const isNew = newNotificationIds.includes(item?._id);
 
     return (
-      <TouchableOpacity activeOpacity={0.8} style={styles.cardWrapper}>
+      <TouchableOpacity
+        activeOpacity={0.8}
+        style={styles.cardWrapper}
+        onPress={() => {
+          if (isNew && item?._id) {
+            dispatch(markNotificationSeen(item._id));
+          }
+        }}
+      >
         <View
           style={[
             styles.notificationCard,
-            !isRead && styles.unreadCard,
-            isRead && styles.readCard,
+            isNew ? styles.newCard : styles.readCard,
           ]}
         >
           <View style={styles.dotWrap}>
-            {!isRead && <View style={styles.unreadDot} />}
+            {isNew && <View style={styles.unreadDot} />}
           </View>
 
           <View style={styles.contentContainer}>
-            <Text style={[styles.title, !isRead && styles.unreadTitle]}>
+            <Text style={[styles.title, isNew && styles.unreadTitle]}>
               {item?.title || 'Notification'}
             </Text>
 
@@ -113,7 +114,11 @@ const NotificationScreen = () => {
 
   return (
     <ScreenWrapper style={styles.container}>
-      <ScreenHeader title={'Notifications'} showBack />
+      <ScreenHeader
+        title="Notifications"
+        showBack
+        onBackPress={() => navigation.goBack()}
+      />
 
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -131,7 +136,7 @@ const NotificationScreen = () => {
             renderItem={renderItem}
             contentContainerStyle={styles.listContent}
             refreshing={refreshing}
-            onRefresh={() => getNotifications(true)}
+            onRefresh={() => loadNotifications(true)}
             showsVerticalScrollIndicator={false}
           />
         </View>
@@ -182,9 +187,9 @@ const styles = StyleSheet.create({
     borderColor: '#EFEFEF',
   },
 
-  unreadCard: {
-    backgroundColor: '#F8FBF9',
-    borderColor: '#DDEEE2',
+  newCard: {
+    backgroundColor: '#EAF7EE',
+    borderColor: '#CBE8D3',
   },
 
   dotWrap: {

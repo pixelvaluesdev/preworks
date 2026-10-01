@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import {
   Dimensions,
+  FlatList,
   Modal,
   View,
   StyleSheet,
@@ -1248,42 +1249,6 @@ const EditProfileScreen = ({ navigation }: any) => {
                       }}
                     />
 
-                    {showPinDropdown && pinSuggestions.length > 0 && (
-                      <View style={styles.pinDropdown}>
-                        <ScrollView
-                          nestedScrollEnabled
-                          keyboardShouldPersistTaps="handled"
-                          showsVerticalScrollIndicator={false}
-                        >
-                          {pinSuggestions.map((item, index) => (
-                            <TouchableOpacity
-                              key={`${item?.Pincode}-${index}`}
-                              activeOpacity={0.7}
-                              onPress={() => {
-                                setPin(item?.Pincode || '');
-
-                                setShowPinDropdown(false);
-
-                                Keyboard.dismiss();
-                              }}
-                            >
-                              <Text style={styles.item}>
-                                {item?.Pincode}
-
-                                <Text
-                                  style={{
-                                    color: '#888',
-                                  }}
-                                >
-                                  {' '}
-                                  - {item?.Name}
-                                </Text>
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </ScrollView>
-                      </View>
-                    )}
                   </View>
                 </View>
               </View>
@@ -1469,17 +1434,18 @@ const EditProfileScreen = ({ navigation }: any) => {
         </View>
       </KeyboardAvoidingView>
 
-      {/* PIN MODAL */}
-      {/* <Modal
+      <Modal
         transparent
         visible={showPinDropdown && pinSuggestions.length > 0}
-        animationType="fade"
+        animationType="none"
         statusBarTranslucent
         onRequestClose={() => setShowPinDropdown(false)}
         onShow={measurePinInput}
       >
         <View style={styles.pinModalRoot}>
-          <TouchableWithoutFeedback onPress={() => setShowPinDropdown(false)}>
+          <TouchableWithoutFeedback
+            onPress={() => setShowPinDropdown(false)}
+          >
             <View style={styles.pinModalBackdrop} />
           </TouchableWithoutFeedback>
 
@@ -1494,14 +1460,18 @@ const EditProfileScreen = ({ navigation }: any) => {
               },
             ]}
           >
-            <ScrollView
+            <FlatList
+              data={pinSuggestions}
+              keyExtractor={(item, index) => `${item?.Pincode}-${index}`}
               style={styles.pinModalScroll}
+              contentContainerStyle={styles.pinModalContent}
+              nestedScrollEnabled
+              scrollEnabled
               showsVerticalScrollIndicator
               keyboardShouldPersistTaps="handled"
-            >
-              {pinSuggestions.map((item, index) => (
+              renderItem={({ item }) => (
                 <TouchableOpacity
-                  key={`${item?.Pincode}-${index}`}
+                  activeOpacity={0.7}
                   onPress={() => {
                     setPin(item?.Pincode || '');
 
@@ -1523,11 +1493,11 @@ const EditProfileScreen = ({ navigation }: any) => {
                     </Text>
                   </Text>
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
+              )}
+            />
           </View>
         </View>
-      </Modal> */}
+      </Modal>
     </ScreenWrapper>
   );
 };
@@ -1670,6 +1640,9 @@ const styles = StyleSheet.create({
 
   pinModalScroll: {
     flex: 1,
+  },
+  pinModalContent: {
+    flexGrow: 1,
   },
 
   item: {

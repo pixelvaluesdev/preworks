@@ -15,11 +15,17 @@ export interface NotificationItem {
 interface NotificationState {
   notifications: NotificationItem[];
   unreadCount: number;
+  knownNotificationIds: string[];
+  newNotificationIds: string[];
+  hasNotificationBaseline: boolean;
 }
 
 const initialState: NotificationState = {
   notifications: [],
   unreadCount: 0,
+  knownNotificationIds: [],
+  newNotificationIds: [],
+  hasNotificationBaseline: false,
 };
 
 const notificationSlice = createSlice({
@@ -27,30 +33,54 @@ const notificationSlice = createSlice({
   initialState,
   reducers: {
     setNotifications: (state, action: PayloadAction<NotificationItem[]>) => {
-      state.notifications = action.payload;
+      const notifications = Array.isArray(action.payload) ? action.payload : [];
+      const ids = notifications
+        .map(item => item?._id)
+        .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
-      state.unreadCount = action.payload.filter(item => !item.isRead).length;
+      if (!state.hasNotificationBaseline) {
+        state.knownNotificationIds = Array.from(
+          new Set([...state.knownNotificationIds, ...ids]),
+        );
+        state.hasNotificationBaseline = true;
+      } else {
+        const knownIds = new Set(state.knownNotificationIds);
+        const newIds = new Set(state.newNotificationIds);
+
+        ids.forEach(id => {
+          if (!knownIds.has(id)) {
+            newIds.add(id);
+            knownIds.add(id);
+          }
+        });
+
+        state.knownNotificationIds = Array.from(knownIds);
+        state.newNotificationIds = Array.from(newIds);
+      }
+
+      state.notifications = notifications;
+      state.unreadCount = state.newNotificationIds.length;
     },
 
-    markAllNotificationsRead: state => {
-      state.notifications = state.notifications.map(item => ({
-        ...item,
-        isRead: true,
-      }));
-
-      state.unreadCount = 0;
+    markNotificationSeen: (state, action: PayloadAction<string>) => {
+      state.newNotificationIds = state.newNotificationIds.filter(
+        id => id !== action.payload,
+      );
+      state.notifications = state.notifications.map(item =>
+        item._id === action.payload ? { ...item, isRead: true } : item,
+      );
+      state.unreadCount = state.newNotificationIds.length;
     },
 
     clearNotifications: state => {
-      state.notifications = [];
-      state.unreadCount = 0;
+      Object.assign(state, initialState);
     },
   },
 });
 
 export const {
   setNotifications,
-  markAllNotificationsRead,
+  markNotificationSeen,
   clearNotifications,
 } = notificationSlice.actions;
 
