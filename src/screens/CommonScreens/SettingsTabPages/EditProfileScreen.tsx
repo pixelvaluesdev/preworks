@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
+  FlatList,
   View,
   StyleSheet,
   ScrollView,
@@ -83,6 +84,17 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const [pinSuggestions, setPinSuggestions] = useState<any[]>([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
+  const [isPinInputFocused, setIsPinInputFocused] = useState(false);
+
+  const pinDropdownHostRef = useRef<View>(null);
+  const pinInputRef = useRef<View>(null);
+  const [pinDropdownHostHeight, setPinDropdownHostHeight] = useState(0);
+  const [pinInputFrame, setPinInputFrame] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
 
   const [cityPincodes, setCityPincodes] = useState<any[]>([]);
 
@@ -97,10 +109,27 @@ const EditProfileScreen = ({ navigation }: any) => {
   const cityRequestId = useRef(0);
   const stateRequestId = useRef(0);
   const pinRequestId = useRef(0);
+  const cityAbortRef = useRef<AbortController | null>(null);
+  const pinAbortRef = useRef<AbortController | null>(null);
+  const citySearchCache = useRef(new Map<string, any[]>());
+  const pincodeCache = useRef(new Map<string, any[]>());
 
   const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stateDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const measurePinInput = useCallback(() => {
+    pinDropdownHostRef.current?.measureInWindow((hostX, hostY) => {
+      pinInputRef.current?.measureInWindow((x, y, width, height) => {
+        setPinInputFrame({
+          x: x - hostX,
+          y: y - hostY,
+          width,
+          height,
+        });
+      });
+    });
+  }, []);
 
   /*
    * Cleanup
@@ -110,6 +139,8 @@ const EditProfileScreen = ({ navigation }: any) => {
       cityRequestId.current += 1;
       stateRequestId.current += 1;
       pinRequestId.current += 1;
+      cityAbortRef.current?.abort();
+      pinAbortRef.current?.abort();
 
       if (cityDebounceRef.current) {
         clearTimeout(cityDebounceRef.current);
@@ -120,6 +151,15 @@ const EditProfileScreen = ({ navigation }: any) => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const keyboardListener = Keyboard.addListener(
+      'keyboardDidShow',
+      measurePinInput,
+    );
+
+    return () => keyboardListener.remove();
+  }, [measurePinInput]);
 
   /*
    * ============================================================
@@ -610,23 +650,45 @@ const EditProfileScreen = ({ navigation }: any) => {
    */
 
   const fetchPincodes = async (cityName: string, fallbackState = '') => {
+    const safeCityName = String(cityName ?? '').trim();
     const requestId = ++pinRequestId.current;
+    pinAbortRef.current?.abort();
+    pinAbortRef.current = null;
+
+    if (!safeCityName) {
+      setCityPincodes([]);
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
+      return;
+    }
+
+    const cacheKey = safeCityName.toLocaleLowerCase();
+    const cachedPins = pincodeCache.current.get(cacheKey);
+    if (cachedPins) {
+      setCityPincodes(cachedPins);
+      setPinSuggestions(cachedPins);
+      if (fallbackState) {
+        setState(fallbackState);
+      } else if (cachedPins[0]?.State) {
+        setState(cachedPins[0].State);
+      }
+      return;
+    }
+
+    const controller = new AbortController();
+    pinAbortRef.current = controller;
 
     try {
-      const safeCityName = String(cityName ?? '').trim();
-
-      if (!safeCityName) {
-        setCityPincodes([]);
-        setPinSuggestions([]);
-        setShowPinDropdown(false);
-        return;
-      }
-
       const response = await fetch(
         `https://api.postalpincode.in/postoffice/${encodeURIComponent(
           safeCityName,
         )}`,
+        { signal: controller.signal },
       );
+
+      if (!response.ok) {
+        throw new Error(`PIN API failed with status ${response.status}`);
+      }
 
       const result = await response?.json?.();
 
@@ -639,6 +701,7 @@ const EditProfileScreen = ({ navigation }: any) => {
           ? result[0].PostOffice
           : [];
 
+        pincodeCache.current.set(cacheKey, pins);
         setCityPincodes(pins);
         setPinSuggestions(pins);
 
@@ -657,9 +720,14 @@ const EditProfileScreen = ({ navigation }: any) => {
         return;
       }
 
+      console.warn('PIN API ERROR:', error);
       setCityPincodes([]);
       setPinSuggestions([]);
       setShowPinDropdown(false);
+    } finally {
+      if (requestId === pinRequestId.current) {
+        pinAbortRef.current = null;
+      }
     }
   };
 
@@ -675,7 +743,7 @@ const EditProfileScreen = ({ navigation }: any) => {
    * API:
    * https://countries.dev/cities
    *
-   * q       = search text
+   * q       = search text (requested after 2 characters)
    * country = IN
    * limit   = 10
    *
@@ -690,22 +758,40 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     const trimmedText = cleanedText.trim();
 
+    cityRequestId.current += 1;
+    const requestId = cityRequestId.current;
+    cityAbortRef.current?.abort();
+    cityAbortRef.current = null;
+    pinRequestId.current += 1;
+    pinAbortRef.current?.abort();
+    pinAbortRef.current = null;
+
     if (cityDebounceRef.current) {
       clearTimeout(cityDebounceRef.current);
     }
 
     if (trimmedText.length < 2) {
-      cityRequestId.current += 1;
-
       setCitySuggestions([]);
       setShowDropdown(false);
 
       return;
     }
 
-    const requestId = ++cityRequestId.current;
+    const cacheKey = trimmedText.toLocaleLowerCase();
 
     cityDebounceRef.current = setTimeout(async () => {
+      const cachedCities = citySearchCache.current.get(cacheKey);
+      if (cachedCities) {
+        if (requestId === cityRequestId.current) {
+          setCitySuggestions(cachedCities);
+          setShowDropdown(cachedCities.length > 0);
+        }
+        return;
+      }
+
+      const controller = new AbortController();
+      cityAbortRef.current = controller;
+
       try {
         const url =
           `${CITY_API}?q=${encodeURIComponent(trimmedText)}` +
@@ -713,7 +799,7 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         console.log('CITY SEARCH API:', url);
 
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
 
         if (requestId !== cityRequestId.current) {
           return;
@@ -738,7 +824,9 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         console.log('CITY API RESULT:', cities.length);
 
-        setCitySuggestions(cities.slice(0, 10));
+        const suggestions = cities.slice(0, 10);
+        citySearchCache.current.set(cacheKey, suggestions);
+        setCitySuggestions(suggestions);
 
         setShowDropdown(cities.length > 0);
       } catch (error) {
@@ -750,8 +838,12 @@ const EditProfileScreen = ({ navigation }: any) => {
 
         setCitySuggestions([]);
         setShowDropdown(false);
+      } finally {
+        if (requestId === cityRequestId.current) {
+          cityAbortRef.current = null;
+        }
       }
-    }, 350);
+    }, 500);
   };
 
   /*
@@ -918,6 +1010,20 @@ const EditProfileScreen = ({ navigation }: any) => {
     setShowPinDropdown(filteredPins.length > 0);
   };
 
+  const pinDropdownHeight = Math.min(
+    pinSuggestions.length * HEIGHT(5),
+    HEIGHT(25),
+    pinDropdownHostHeight,
+  );
+  const pinDropdownTop =
+    pinInputFrame.y +
+    pinInputFrame.height +
+    pinDropdownHeight +
+    8 >
+    pinDropdownHostHeight
+      ? Math.max(0, pinInputFrame.y - pinDropdownHeight - 4)
+      : pinInputFrame.y + pinInputFrame.height + 4;
+
   /*
    * ============================================================
    * LOADING
@@ -950,11 +1056,20 @@ const EditProfileScreen = ({ navigation }: any) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
-        <View style={styles.container}>
+        <View
+          ref={pinDropdownHostRef}
+          collapsable={false}
+          style={styles.container}
+          onLayout={event =>
+            setPinDropdownHostHeight(event.nativeEvent.layout.height)
+          }
+        >
           <ScrollView
             nestedScrollEnabled
-            disableScrollViewPanResponder
-            scrollEnabled={true}
+            scrollEnabled={
+              !isPinInputFocused &&
+              !(showPinDropdown && pinSuggestions.length > 0)
+            }
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="none"
             showsVerticalScrollIndicator={false}
@@ -1184,7 +1299,12 @@ const EditProfileScreen = ({ navigation }: any) => {
                     },
                   ]}
                 >
-                  <View style={{ position: 'relative' }}>
+                  <View
+                    ref={pinInputRef}
+                    collapsable={false}
+                    onLayout={measurePinInput}
+                    style={{ position: 'relative' }}
+                  >
                     <BorderTextInput
                       label="Pin code"
                       value={pin}
@@ -1192,50 +1312,13 @@ const EditProfileScreen = ({ navigation }: any) => {
                       placeholder="Pincode"
                       keyboardType="number-pad"
                       onFocus={() => {
+                        setIsPinInputFocused(true);
                         setPinSuggestions(cityPincodes);
                         setShowPinDropdown(true);
+                        requestAnimationFrame(measurePinInput);
                       }}
+                      onBlur={() => setIsPinInputFocused(false)}
                     />
-                    {showPinDropdown && pinSuggestions.length > 0 && (
-                      <View
-                        style={[
-                          styles.pinDropdown,
-                          {
-                            height: Math.min(
-                              pinSuggestions.length * HEIGHT(5),
-                              HEIGHT(25),
-                            ),
-                          },
-                        ]}
-                      >
-                        <ScrollView
-                          style={{ flex: 1 }}
-                          nestedScrollEnabled
-                          keyboardShouldPersistTaps="handled"
-                          showsVerticalScrollIndicator
-                        >
-                          {pinSuggestions.map((item, index) => (
-                            <TouchableOpacity
-                              key={`${item?.Pincode}-${index}`}
-                              activeOpacity={0.7}
-                              onPress={() => {
-                                setPin(item?.Pincode || '');
-                                setShowPinDropdown(false);
-                                Keyboard.dismiss();
-                              }}
-                            >
-                              <Text style={styles.item}>
-                                {item?.Pincode}
-                                <Text style={{ color: '#888' }}>
-                                  {' '}
-                                  - {item?.Name}
-                                </Text>
-                              </Text>
-                            </TouchableOpacity>
-                          ))}
-                        </ScrollView>
-                      </View>
-                    )}
                   </View>
                 </View>
               </View>
@@ -1398,6 +1481,53 @@ const EditProfileScreen = ({ navigation }: any) => {
             </View>
           </ScrollView>
 
+          {showPinDropdown && pinSuggestions.length > 0 && (
+            <View
+              pointerEvents="box-none"
+              style={styles.pinDropdownLayer}
+            >
+              <View
+                style={[
+                  styles.pinDropdown,
+                  {
+                    left: pinInputFrame.x,
+                    top: pinDropdownTop,
+                    width: pinInputFrame.width,
+                    height: pinDropdownHeight,
+                  },
+                ]}
+              >
+                <FlatList
+                  data={pinSuggestions}
+                  keyExtractor={(item, index) =>
+                    `${item?.Pincode}-${index}`
+                  }
+                  style={styles.pinDropdownList}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setPin(item?.Pincode || '');
+                        setShowPinDropdown(false);
+                        Keyboard.dismiss();
+                      }}
+                    >
+                      <Text style={styles.item}>
+                        {item?.Pincode}
+                        <Text style={{ color: '#888' }}>
+                          {' '}
+                          - {item?.Name}
+                        </Text>
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            </View>
+          )}
+
           <CustomPopup
             visible={showPopup}
             message="Your profile has been saved successfully!"
@@ -1559,15 +1689,19 @@ const styles = StyleSheet.create({
   },
   pinDropdown: {
     position: 'absolute',
-    top: HEIGHT(6) + 4,
-    left: 0,
-    width: '100%',
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    zIndex: 10000,
-    elevation: 30,
+    zIndex: 10001,
+    elevation: 31,
     overflow: 'hidden',
+  },
+  pinDropdownLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 10000,
+  },
+  pinDropdownList: {
+    flex: 1,
   },
 });
