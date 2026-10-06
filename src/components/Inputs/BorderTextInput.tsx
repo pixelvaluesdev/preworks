@@ -20,6 +20,8 @@ interface BorderTextInputProps {
   maxLength?: number;
   mandotory?: boolean;
   leftComponent?: React.ReactNode;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const BorderTextInput: React.FC<BorderTextInputProps> = ({
@@ -36,6 +38,8 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
   maxLength,
   mandotory = true,
   leftComponent,
+  onFocus,
+  onBlur,
 }) => {
   const [inputHeight, setInputHeight] = useState(height || HEIGHT(6));
   const [isFocused, setIsFocused] = useState(false);
@@ -65,8 +69,14 @@ const BorderTextInput: React.FC<BorderTextInputProps> = ({
           activeOutlineColor={Colors.primary}
           textColor={'#474747'}
           editable={editable}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          onFocus={() => {
+            setIsFocused(true);
+            onFocus?.();
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+            onBlur?.();
+          }}
           contentStyle={{
             fontSize: 16,
             fontFamily: FONT.POPPINS_REGULAR,

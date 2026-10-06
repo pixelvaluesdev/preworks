@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import {
-  Dimensions,
-  FlatList,
-  Modal,
   View,
   StyleSheet,
   ScrollView,
@@ -12,7 +9,6 @@ import {
   Text,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
   Keyboard,
   Alert,
   PermissionsAndroid,
@@ -87,15 +83,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   const [pinSuggestions, setPinSuggestions] = useState<any[]>([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
-
-  const pinInputRef = useRef<View>(null);
-
-  const [pinInputFrame, setPinInputFrame] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
 
   const [cityPincodes, setCityPincodes] = useState<any[]>([]);
 
@@ -933,34 +920,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
   /*
    * ============================================================
-   * PIN DROPDOWN POSITION
-   * ============================================================
-   */
-
-  const measurePinInput = () => {
-    pinInputRef.current?.measureInWindow((x, y, width, height) => {
-      setPinInputFrame({
-        x,
-        y,
-        width,
-        height,
-      });
-    });
-  };
-
-  const pinDropdownHeight = Math.min(
-    pinSuggestions.length * HEIGHT(5),
-    HEIGHT(25),
-  );
-
-  const pinDropdownTop =
-    pinInputFrame.y + pinInputFrame.height + pinDropdownHeight + 8 >
-    Dimensions.get('window').height
-      ? Math.max(8, pinInputFrame.y - pinDropdownHeight - 4)
-      : pinInputFrame.y + pinInputFrame.height + 4;
-
-  /*
-   * ============================================================
    * LOADING
    * ============================================================
    */
@@ -994,11 +953,10 @@ const EditProfileScreen = ({ navigation }: any) => {
         <View style={styles.container}>
           <ScrollView
             nestedScrollEnabled
+            disableScrollViewPanResponder
             scrollEnabled={true}
             keyboardShouldPersistTaps="handled"
-            keyboardDismissMode={
-              Platform.OS === 'ios' ? 'interactive' : 'on-drag'
-            }
+            keyboardDismissMode="none"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               paddingBottom: HEIGHT(5),
@@ -1226,14 +1184,7 @@ const EditProfileScreen = ({ navigation }: any) => {
                     },
                   ]}
                 >
-                  <View
-                    ref={pinInputRef}
-                    collapsable={false}
-                    onLayout={measurePinInput}
-                    style={{
-                      position: 'relative',
-                    }}
-                  >
+                  <View style={{ position: 'relative' }}>
                     <BorderTextInput
                       label="Pin code"
                       value={pin}
@@ -1241,13 +1192,50 @@ const EditProfileScreen = ({ navigation }: any) => {
                       placeholder="Pincode"
                       keyboardType="number-pad"
                       onFocus={() => {
-                        measurePinInput();
-
                         setPinSuggestions(cityPincodes);
-
                         setShowPinDropdown(true);
                       }}
                     />
+                    {showPinDropdown && pinSuggestions.length > 0 && (
+                      <View
+                        style={[
+                          styles.pinDropdown,
+                          {
+                            height: Math.min(
+                              pinSuggestions.length * HEIGHT(5),
+                              HEIGHT(25),
+                            ),
+                          },
+                        ]}
+                      >
+                        <ScrollView
+                          style={{ flex: 1 }}
+                          nestedScrollEnabled
+                          keyboardShouldPersistTaps="handled"
+                          showsVerticalScrollIndicator
+                        >
+                          {pinSuggestions.map((item, index) => (
+                            <TouchableOpacity
+                              key={`${item?.Pincode}-${index}`}
+                              activeOpacity={0.7}
+                              onPress={() => {
+                                setPin(item?.Pincode || '');
+                                setShowPinDropdown(false);
+                                Keyboard.dismiss();
+                              }}
+                            >
+                              <Text style={styles.item}>
+                                {item?.Pincode}
+                                <Text style={{ color: '#888' }}>
+                                  {' '}
+                                  - {item?.Name}
+                                </Text>
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                        </ScrollView>
+                      </View>
+                    )}
                   </View>
                 </View>
               </View>
@@ -1433,68 +1421,6 @@ const EditProfileScreen = ({ navigation }: any) => {
         </View>
       </KeyboardAvoidingView>
 
-      <Modal
-        transparent
-        visible={showPinDropdown && pinSuggestions.length > 0}
-        animationType="none"
-        statusBarTranslucent
-        onRequestClose={() => setShowPinDropdown(false)}
-        onShow={measurePinInput}
-      >
-        <View style={styles.pinModalRoot}>
-          <TouchableWithoutFeedback onPress={() => setShowPinDropdown(false)}>
-            <View style={styles.pinModalBackdrop} />
-          </TouchableWithoutFeedback>
-
-          <View
-            style={[
-              styles.pinModalDropdown,
-              {
-                left: pinInputFrame.x,
-                top: pinDropdownTop,
-                width: pinInputFrame.width,
-                height: pinDropdownHeight,
-              },
-            ]}
-          >
-            <FlatList
-              data={pinSuggestions}
-              keyExtractor={(item, index) => `${item?.Pincode}-${index}`}
-              style={styles.pinModalScroll}
-              contentContainerStyle={styles.pinModalContent}
-              nestedScrollEnabled
-              scrollEnabled
-              showsVerticalScrollIndicator
-              keyboardShouldPersistTaps="handled"
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => {
-                    setPin(item?.Pincode || '');
-
-                    setShowPinDropdown(false);
-
-                    Keyboard.dismiss();
-                  }}
-                >
-                  <Text style={styles.item}>
-                    {item?.Pincode}
-
-                    <Text
-                      style={{
-                        color: '#888',
-                      }}
-                    >
-                      {' '}
-                      - {item?.Name}
-                    </Text>
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
     </ScreenWrapper>
   );
 };
@@ -1617,31 +1543,6 @@ const styles = StyleSheet.create({
     maxHeight: HEIGHT(25),
   },
 
-  pinModalRoot: {
-    flex: 1,
-  },
-
-  pinModalBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-
-  pinModalDropdown: {
-    position: 'absolute',
-    overflow: 'hidden',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    elevation: 20,
-  },
-
-  pinModalScroll: {
-    flex: 1,
-  },
-  pinModalContent: {
-    flexGrow: 1,
-  },
-
   item: {
     padding: 10,
     borderBottomWidth: 0.5,
@@ -1658,16 +1559,15 @@ const styles = StyleSheet.create({
   },
   pinDropdown: {
     position: 'absolute',
-    top: HEIGHT(8),
+    top: HEIGHT(6) + 4,
     left: 0,
     width: '100%',
-    maxHeight: HEIGHT(25),
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    zIndex: 99999,
-    elevation: 20,
+    zIndex: 10000,
+    elevation: 30,
     overflow: 'hidden',
   },
 });
