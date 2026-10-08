@@ -4,10 +4,12 @@ const DEFAULT_NOTIFICATION_TITLE = 'PreWorks';
 const DEFAULT_NOTIFICATION_BODY = 'You have a new notification.';
 
 const firstNonEmptyString = (...values: unknown[]) =>
-  values.find(
-    (value): value is string =>
-      typeof value === 'string' && value.trim().length > 0,
-  )?.trim();
+  values
+    .find(
+      (value): value is string =>
+        typeof value === 'string' && value.trim().length > 0,
+    )
+    ?.trim();
 
 export function getNotificationContent(remoteMessage: any) {
   const notification = remoteMessage?.notification || {};
