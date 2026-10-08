@@ -32,6 +32,7 @@ import { setUser } from '../../../redux/slices/authSlice';
 import ScreenWrapper from '../../../utils/screenWrapper';
 
 const CITY_API = 'https://countries.dev/cities';
+const DROPDOWN_ROW_HEIGHT = 40;
 
 const EditProfileScreen = ({ navigation }: any) => {
   const userType = useSelector((state: any) => state?.auth?.userType);
@@ -1049,10 +1050,21 @@ const EditProfileScreen = ({ navigation }: any) => {
                     />
 
                     {showDropdown && citySuggestions?.length > 0 && (
-                      <View style={styles.dropdown}>
+                      <View
+                        style={[
+                          styles.dropdown,
+                          {
+                            height: Math.min(
+                              HEIGHT(25),
+                              citySuggestions.length * DROPDOWN_ROW_HEIGHT,
+                            ),
+                          },
+                        ]}
+                      >
                         <ScrollView
+                          style={styles.dropdownScroll}
                           nestedScrollEnabled
-                          keyboardShouldPersistTaps="handled"
+                          keyboardShouldPersistTaps="always"
                           showsVerticalScrollIndicator={false}
                         >
                           {citySuggestions.map((item, index) => (
@@ -1147,10 +1159,21 @@ const EditProfileScreen = ({ navigation }: any) => {
                   />
 
                   {showStateDropdown && stateSuggestions?.length > 0 && (
-                    <View style={styles.dropdown}>
+                    <View
+                      style={[
+                        styles.dropdown,
+                        {
+                          height: Math.min(
+                            HEIGHT(25),
+                            stateSuggestions.length * DROPDOWN_ROW_HEIGHT,
+                          ),
+                        },
+                      ]}
+                    >
                       <ScrollView
+                        style={styles.dropdownScroll}
                         nestedScrollEnabled
-                        keyboardShouldPersistTaps="handled"
+                        keyboardShouldPersistTaps="always"
                         showsVerticalScrollIndicator={false}
                       >
                         {stateSuggestions.map((item, index) => (
@@ -1414,8 +1437,6 @@ const styles = StyleSheet.create({
   },
 
   dropdown: {
-    position: 'absolute',
-    top: HEIGHT(8),
     width: '100%',
     backgroundColor: '#fff',
     borderWidth: 1,
@@ -1424,6 +1445,11 @@ const styles = StyleSheet.create({
     zIndex: 9999,
     elevation: 20,
     maxHeight: HEIGHT(25),
+    overflow: 'hidden',
+  },
+
+  dropdownScroll: {
+    flex: 1,
   },
 
   item: {
