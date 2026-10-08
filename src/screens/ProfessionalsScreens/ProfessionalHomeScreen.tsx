@@ -12,6 +12,7 @@ import {
   Image,
   FlatList,
   ScrollView,
+  RefreshControl,
   ActivityIndicator,
   TouchableOpacity,
   Alert,
@@ -25,7 +26,7 @@ import ProjectCard from '../../components/ProfessionalUI/ProjectCard';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
 import { useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import ScreenWrapper from '../../utils/screenWrapper';
 import useCheckLogin from '../../hooks/useCheckLogin';
@@ -60,6 +61,7 @@ const ProfessionalHomeScreen = () => {
   const [enquiries, setEnquiries] = useState([]);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -249,30 +251,48 @@ const ProfessionalHomeScreen = () => {
 
   useBackExit();
 
-  useEffect(() => {
-    if (token) {
-      fetchProjects();
-    }
-  }, [token]);
+  const fetchProjects = useCallback(
+    async (showLoading = true) => {
+      try {
+        if (showLoading) {
+          setLoading(true);
+        }
 
-  const fetchProjects = async () => {
-    try {
-      setLoading(true);
+        const response = await ApiManager.getProjectsForProfessional(
+          userId,
+          token,
+        );
 
-      const response = await ApiManager.getProjectsForProfessional(
-        userId,
-        token,
-      );
-
-      if (response?.data?.status === 'success') {
-        setProjects(response.data.data.projects);
-        setEnquiries(response.data.data.enquiries || []);
-        console.log('Projects for professional', response.data.data.projects);
+        if (response?.data?.status === 'success') {
+          setProjects(response.data.data.projects);
+          setEnquiries(response.data.data.enquiries || []);
+          console.log('Projects for professional', response.data.data.projects);
+        }
+      } catch (error) {
+        console.log('Project error', error);
+      } finally {
+        if (showLoading) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.log('Project error', error);
+    },
+    [token, userId],
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        fetchProjects();
+      }
+    }, [fetchProjects, token]),
+  );
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchProjects(false);
     } finally {
-      setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -291,6 +311,14 @@ const ProfessionalHomeScreen = () => {
           }
         }}
         scrollEventThrottle={16}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+          />
+        }
       >
         {/* Banner */}
         <View style={styles.banner}>
@@ -314,9 +342,12 @@ const ProfessionalHomeScreen = () => {
                     uri: `${IMG_URL}${item?.image}`,
                     cache: 'force-cache',
                   }}
-                  placeholderSource={require('../../assets/pngs/BannerPlaceholder.png')}
-                  placeholderResizeMode="stretch"
-                  style={styles.bannerImage}
+                  showPlaceholder={false}
+                  showLoader={false}
+                  style={[
+                    styles.bannerImage,
+                    { backgroundColor: 'transparent' },
+                  ]}
                   resizeMode="cover"
                 />
 

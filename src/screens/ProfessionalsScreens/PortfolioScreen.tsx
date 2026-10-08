@@ -264,7 +264,7 @@ const PortfolioScreen = () => {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+        //keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
       >
         <View style={styles.container}>
           <ScreenHeader title={isEdit ? 'Edit Work' : 'Add Work'} showBack />

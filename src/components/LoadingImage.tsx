@@ -16,6 +16,8 @@ const LoadingImage = ({
   resizeMode = 'cover',
   placeholderResizeMode = 'contain',
   revealDelay = 0,
+  showPlaceholder = true,
+  showLoader = true,
   ...props
 }: any) => {
   const [loaded, setLoaded] = useState(false);
@@ -62,7 +64,7 @@ const LoadingImage = ({
   return (
     <View style={[styles.container, style]}>
       {/* CENTERED PLACEHOLDER */}
-      {!loaded && (
+      {showPlaceholder && !loaded && (
         <View style={styles.placeholderContainer}>
           <Image
             source={placeholderSource}
@@ -107,7 +109,7 @@ const LoadingImage = ({
       )}
 
       {/* LOADER */}
-      {isLoading && (
+      {showLoader && isLoading && (
         <Animated.View style={[styles.loader, { opacity: pulse }]}>
           <ActivityIndicator size="small" color="#FFFFFF" />
         </Animated.View>

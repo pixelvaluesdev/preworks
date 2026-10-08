@@ -6,6 +6,7 @@ import {
   Image,
   FlatList,
   ScrollView,
+  RefreshControl,
   TouchableOpacity,
 } from 'react-native';
 import { FONTSIZE, HEIGHT, WIDTH } from '../../utils/responsive';
@@ -38,7 +39,7 @@ const CustomerHomeScreen = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const [professionals, setProfessionals] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const flatListRef = useRef(null);
   const [helpLoading, setHelpLoading] = useState(false);
@@ -87,14 +88,8 @@ const CustomerHomeScreen = () => {
 
   useBackExit();
 
-  useEffect(() => {
-    fetchProfessionals();
-  }, []);
-
-  const fetchProfessionals = async () => {
+  const fetchProfessionals = useCallback(async () => {
     try {
-      setLoading(true);
-
       const response = await ApiManager.getProfessionals('all', token);
 
       if (response?.data?.status === 'success') {
@@ -103,8 +98,23 @@ const CustomerHomeScreen = () => {
       }
     } catch (error) {
       console.log('Error fetching professionals:', error);
+    }
+  }, [token]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        fetchProfessionals();
+      }
+    }, [fetchProfessionals, token]),
+  );
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchProfessionals();
     } finally {
-      setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -185,7 +195,22 @@ const CustomerHomeScreen = () => {
         <Text style={styles.helpText}>Need help?</Text>
       </TouchableOpacity>
 
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        alwaysBounceVertical
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+            //title="Refreshing professionals..."
+            titleColor={Colors.primary}
+            progressViewOffset={HEIGHT(16)}
+          />
+        }
+      >
         {/* Banner Section */}
         <View style={styles.banner}>
           <FlatList
@@ -208,9 +233,12 @@ const CustomerHomeScreen = () => {
                     uri: `${IMG_URL}${item?.image}`,
                     cache: 'force-cache',
                   }}
-                  placeholderSource={require('../../assets/pngs/BannerPlaceholder.png')}
-                  placeholderResizeMode="stretch"
-                  style={styles.bannerImage}
+                  showPlaceholder={false}
+                  showLoader={false}
+                  style={[
+                    styles.bannerImage,
+                    { backgroundColor: 'transparent' },
+                  ]}
                   resizeMode="cover"
                 />
                 {/* <View style={styles.bannerTextContainer}>
