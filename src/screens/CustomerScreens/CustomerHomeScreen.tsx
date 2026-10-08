@@ -20,19 +20,21 @@ import PlusIcon from '../../assets/svgs/PlusIcon.svg';
 import CustomPopup from '../../components/Popups/CustomPopup';
 import { useEffect } from 'react';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import HelpIcon from '../../assets/svgs/HelpUs.svg';
 import { useBackExit } from '../../hooks/useBackExit';
 import LocationIcon from '../../assets/svgs/LocationIcon.svg';
 import { triggerHaptic } from '../../utils/hapticks';
 import useCheckLogin from '../../hooks/useCheckLogin';
 import LoadingImage from '../../components/LoadingImage';
+import { setNotifications } from '../../redux/slices/notificationSlice';
 
 const CustomerHomeScreen = () => {
   useCheckLogin();
   const navigation = useNavigation();
   const token = useSelector((state: any) => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
+  const dispatch = useDispatch();
 
   const [helpPopupVisible, setHelpPopupVisible] = useState(false);
   const [banners, setBanners] = useState([]);
@@ -112,9 +114,22 @@ const CustomerHomeScreen = () => {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await fetchProfessionals();
+      await Promise.all([fetchProfessionals(), fetchNotifications()]);
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    if (!user?._id || !token) return;
+
+    try {
+      const response = await ApiManager.getNotifications(user._id, token);
+      if (response?.data?.status === 'success') {
+        dispatch(setNotifications(response.data.data || []));
+      }
+    } catch (error) {
+      console.log('Error refreshing notifications:', error);
     }
   };
 

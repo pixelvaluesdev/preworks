@@ -24,19 +24,21 @@ import SearchHeader from '../../components/SearchHeader';
 import ToggleTabs from '../../components/ProfessionalUI/ToggleTabs';
 import ProjectCard from '../../components/ProfessionalUI/ProjectCard';
 import ApiManager, { IMG_URL } from '../../apis/ApiManager';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useBackExit } from '../../hooks/useBackExit';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import ScreenWrapper from '../../utils/screenWrapper';
 import useCheckLogin from '../../hooks/useCheckLogin';
 import LoadingImage from '../../components/LoadingImage';
+import { setNotifications } from '../../redux/slices/notificationSlice';
 
 const ProfessionalHomeScreen = () => {
   useCheckLogin();
   const token = useSelector(state => state.auth.userToken);
   const user = useSelector(state => state.auth.user);
   const userId = user?._id;
+  const dispatch = useDispatch();
 
   const navigation = useNavigation();
 
@@ -290,9 +292,22 @@ const ProfessionalHomeScreen = () => {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      await fetchProjects(false);
+      await Promise.all([fetchProjects(false), fetchNotifications()]);
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    if (!userId || !token) return;
+
+    try {
+      const response = await ApiManager.getNotifications(userId, token);
+      if (response?.data?.status === 'success') {
+        dispatch(setNotifications(response.data.data || []));
+      }
+    } catch (error) {
+      console.log('Error refreshing notifications:', error);
     }
   };
 
