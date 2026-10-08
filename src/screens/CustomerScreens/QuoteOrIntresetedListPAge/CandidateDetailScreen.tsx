@@ -110,7 +110,8 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           />
 
           <Text style={styles.name}>
-            {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'No Name'}
+            {`${user?.firstName || ''} ${user?.lastName || ''}`.trim() ||
+              'No Name'}
           </Text>
 
           <TouchableOpacity style={styles.callBtn} onPress={handleCall}>
@@ -179,7 +180,7 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
             })
           }
         >
-          <Text style={styles.profileBtnText}>Contractor Profile</Text>
+          <Text style={styles.profileBtnText}>Professional's Profile</Text>
         </TouchableOpacity>
         <ImageViewing
           images={imageUrls}
