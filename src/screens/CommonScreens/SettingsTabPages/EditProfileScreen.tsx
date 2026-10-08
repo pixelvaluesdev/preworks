@@ -107,7 +107,6 @@ const EditProfileScreen = ({ navigation }: any) => {
    */
 
   const cityRequestId = useRef(0);
-  const stateRequestId = useRef(0);
   const pinRequestId = useRef(0);
   const cityAbortRef = useRef<AbortController | null>(null);
   const pinAbortRef = useRef<AbortController | null>(null);
@@ -115,8 +114,6 @@ const EditProfileScreen = ({ navigation }: any) => {
   const pincodeCache = useRef(new Map<string, any[]>());
 
   const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const stateDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const measurePinInput = useCallback(() => {
     pinDropdownHostRef.current?.measureInWindow((hostX, hostY) => {
@@ -137,7 +134,6 @@ const EditProfileScreen = ({ navigation }: any) => {
   useEffect(() => {
     return () => {
       cityRequestId.current += 1;
-      stateRequestId.current += 1;
       pinRequestId.current += 1;
       cityAbortRef.current?.abort();
       pinAbortRef.current?.abort();
@@ -146,9 +142,6 @@ const EditProfileScreen = ({ navigation }: any) => {
         clearTimeout(cityDebounceRef.current);
       }
 
-      if (stateDebounceRef.current) {
-        clearTimeout(stateDebounceRef.current);
-      }
     };
   }, []);
 
@@ -649,7 +642,7 @@ const EditProfileScreen = ({ navigation }: any) => {
    * ============================================================
    */
 
-  const fetchPincodes = async (cityName: string, fallbackState = '') => {
+  const fetchPincodes = async (cityName: string) => {
     const safeCityName = String(cityName ?? '').trim();
     const requestId = ++pinRequestId.current;
     pinAbortRef.current?.abort();
@@ -667,11 +660,6 @@ const EditProfileScreen = ({ navigation }: any) => {
     if (cachedPins) {
       setCityPincodes(cachedPins);
       setPinSuggestions(cachedPins);
-      if (fallbackState) {
-        setState(fallbackState);
-      } else if (cachedPins[0]?.State) {
-        setState(cachedPins[0].State);
-      }
       return;
     }
 
@@ -704,12 +692,6 @@ const EditProfileScreen = ({ navigation }: any) => {
         pincodeCache.current.set(cacheKey, pins);
         setCityPincodes(pins);
         setPinSuggestions(pins);
-
-        if (fallbackState) {
-          setState(fallbackState);
-        } else if (pins?.[0]?.State) {
-          setState(pins[0].State);
-        }
       } else {
         setCityPincodes([]);
         setPinSuggestions([]);
@@ -940,41 +922,19 @@ const EditProfileScreen = ({ navigation }: any) => {
 
     const trimmedText = cleanedText.trim();
 
-    if (stateDebounceRef.current) {
-      clearTimeout(stateDebounceRef.current);
-    }
-
-    if (trimmedText.length < 2) {
-      stateRequestId.current += 1;
-
-      setStateSuggestions([]);
-      setShowStateDropdown(false);
-
-      return;
-    }
-
     const query = trimmedText.toLowerCase();
-
     const filteredStates = indianStates
       .filter(item => item.toLowerCase().includes(query))
       .sort((a, b) => {
         const scoreDiff =
           getStateMatchScore(a, query) - getStateMatchScore(b, query);
 
-        if (scoreDiff !== 0) {
-          return scoreDiff;
-        }
-
-        return a.localeCompare(b);
+        return scoreDiff !== 0 ? scoreDiff : a.localeCompare(b);
       })
-      .slice(0, 10)
-      .map(name => ({
-        name,
-      }));
+      .map(name => ({ name }));
 
     setStateSuggestions(filteredStates);
-
-    setShowStateDropdown(filteredStates.length > 0);
+    setShowStateDropdown(true);
   };
 
   /*
@@ -1259,16 +1219,6 @@ const EditProfileScreen = ({ navigation }: any) => {
 
                                 setPin('');
 
-                                /*
-                                 * countries.dev city response
-                                 * doesn't need country-state-city.
-                                 *
-                                 * State is initially cleared.
-                                 * PIN API below will return the
-                                 * correct State for the selected city.
-                                 */
-                                setState('');
-
                                 setShowDropdown(false);
 
                                 Keyboard.dismiss();
@@ -1343,6 +1293,12 @@ const EditProfileScreen = ({ navigation }: any) => {
                     value={state}
                     onChangeText={handleStateSearch}
                     placeholder="Enter your State"
+                    onFocus={() => {
+                      setStateSuggestions(
+                        indianStates.map(name => ({ name })),
+                      );
+                      setShowStateDropdown(true);
+                    }}
                   />
 
                   {showStateDropdown && stateSuggestions?.length > 0 && (

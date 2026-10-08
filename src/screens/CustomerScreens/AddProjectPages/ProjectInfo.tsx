@@ -11,6 +11,16 @@ import BorderTextInput from '../../../components/Inputs/BorderTextInput';
 import { HEIGHT } from '../../../utils/responsive';
 
 const CITY_API = 'https://countries.dev/cities';
+const POSTAL_CITY_ALIASES: Record<
+  string,
+  { query: string; districts: string[] }
+> = {
+  bengaluru: { query: 'Bangalore', districts: ['Bangalore', 'Bengaluru'] },
+  gurugram: { query: 'Gurgaon', districts: ['Gurgaon', 'Gurugram'] },
+  mangaluru: { query: 'Mangalore', districts: ['Dakshina Kannada'] },
+  mysuru: { query: 'Mysore', districts: ['Mysore', 'Mysuru'] },
+  prayagraj: { query: 'Allahabad', districts: ['Allahabad', 'Prayagraj'] },
+};
 
 const ProjectInfo = ({ data, handleChange }: any) => {
   const safeData = data || {};
@@ -20,11 +30,15 @@ const ProjectInfo = ({ data, handleChange }: any) => {
 
   const [pinSuggestions, setPinSuggestions] = useState<any[]>([]);
   const [showPinDropdown, setShowPinDropdown] = useState(false);
+  const [isLoadingPins, setIsLoadingPins] = useState(false);
+  const [pinSearchError, setPinSearchError] = useState('');
 
   const [cityPincodes, setCityPincodes] = useState<any[]>([]);
 
   const cityRequestId = useRef(0);
   const pinRequestId = useRef(0);
+  const pinAbortRef = useRef<AbortController | null>(null);
+  const pincodeCache = useRef(new Map<string, any[]>());
 
   const cityDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -32,6 +46,7 @@ const ProjectInfo = ({ data, handleChange }: any) => {
     return () => {
       cityRequestId.current += 1;
       pinRequestId.current += 1;
+      pinAbortRef.current?.abort();
 
       if (cityDebounceRef.current) {
         clearTimeout(cityDebounceRef.current);
@@ -122,6 +137,14 @@ const ProjectInfo = ({ data, handleChange }: any) => {
 
     // Cancel old PIN request because city has changed.
     pinRequestId.current += 1;
+    pinAbortRef.current?.abort();
+    pinAbortRef.current = null;
+    setCityPincodes([]);
+    setPinSuggestions([]);
+    setShowPinDropdown(false);
+    setPinSearchError('');
+    setIsLoadingPins(false);
+    handleChange('pinCode', '');
 
     const query = safeText.trim();
 
@@ -143,25 +166,46 @@ const ProjectInfo = ({ data, handleChange }: any) => {
    * FETCH PINCODES FOR SELECTED CITY
    */
   const fetchPincodes = async (cityName: string) => {
+    const safeCityName = String(cityName ?? '').trim();
+    const cacheKey = safeCityName.toLocaleLowerCase();
+
+    if (!safeCityName) {
+      setCityPincodes([]);
+      setPinSuggestions([]);
+      setShowPinDropdown(false);
+      return;
+    }
+
+    const cachedPins = pincodeCache.current.get(cacheKey);
+    if (cachedPins) {
+      setCityPincodes(cachedPins);
+      setPinSuggestions(cachedPins);
+      setShowPinDropdown(cachedPins.length > 0);
+      setPinSearchError(
+        cachedPins.length > 0 ? '' : 'No PIN codes found for this city.',
+      );
+      return;
+    }
+
     const requestId = ++pinRequestId.current;
+    pinAbortRef.current?.abort();
+    const controller = new AbortController();
+    pinAbortRef.current = controller;
+    setIsLoadingPins(true);
+    setPinSearchError('');
+    setShowPinDropdown(false);
 
     try {
-      const safeCityName = String(cityName ?? '').trim();
-
-      if (!safeCityName) {
-        setCityPincodes([]);
-        setPinSuggestions([]);
-        setShowPinDropdown(false);
-        return;
-      }
-
+      const postalCity = POSTAL_CITY_ALIASES[cacheKey];
+      const lookupCity = postalCity?.query || safeCityName;
       const url =
         `https://api.postalpincode.in/postoffice/` +
-        `${encodeURIComponent(safeCityName)}`;
+        `${encodeURIComponent(lookupCity)}`;
 
-      console.log('PIN API:', url);
-
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`PIN API failed with status ${response.status}`);
+      }
 
       const result = await response.json();
 
@@ -172,31 +216,49 @@ const ProjectInfo = ({ data, handleChange }: any) => {
       if (result?.[0]?.Status === 'Success') {
         const pins = result?.[0]?.PostOffice || [];
 
-        const safePins = Array.isArray(pins) ? pins : [];
+        const matchingPins = Array.isArray(pins) ? pins : [];
+        const safePins = postalCity
+          ? matchingPins.filter(item =>
+              postalCity.districts.some(
+                district =>
+                  String(item?.District ?? '').toLowerCase() ===
+                  district.toLowerCase(),
+              ),
+            )
+          : matchingPins;
 
         console.log('PIN RESULT COUNT:', safePins.length);
 
+        pincodeCache.current.set(cacheKey, safePins);
         setCityPincodes(safePins);
         setPinSuggestions(safePins);
-
         setShowPinDropdown(safePins.length > 0);
-
-        handleChange('pinCode', '');
+        if (safePins.length === 0) {
+          setPinSearchError('No PIN codes found for this city.');
+        }
       } else {
         setCityPincodes([]);
         setPinSuggestions([]);
         setShowPinDropdown(false);
+        setPinSearchError('No PIN codes found for this city.');
       }
     } catch (error) {
-      if (requestId !== pinRequestId.current) {
+      if (requestId !== pinRequestId.current || controller.signal.aborted) {
         return;
       }
 
-      console.log('PIN API Error:', error);
-
+      console.warn('PIN API Error:', error);
       setCityPincodes([]);
       setPinSuggestions([]);
       setShowPinDropdown(false);
+      setPinSearchError(
+        'Could not load PIN codes. Please check your connection and try again.',
+      );
+    } finally {
+      if (requestId === pinRequestId.current) {
+        pinAbortRef.current = null;
+        setIsLoadingPins(false);
+      }
     }
   };
 
@@ -292,12 +354,16 @@ const ProjectInfo = ({ data, handleChange }: any) => {
                       console.log('Selected city:', selectedCity);
 
                       handleChange('city', selectedCity);
+                      handleChange('pinCode', '');
 
                       setShowDropdown(false);
 
                       Keyboard.dismiss();
 
                       // Fetch PIN/locality data after city selection.
+                      setPinSuggestions([]);
+                      setShowPinDropdown(false);
+                      setPinSearchError('');
                       fetchPincodes(selectedCity);
                     }}
                   >
@@ -317,13 +383,39 @@ const ProjectInfo = ({ data, handleChange }: any) => {
           value={safeData.pinCode}
           onChangeText={handlePinSearch}
           height={HEIGHT(7)}
+          onFocus={() => {
+            if (cityPincodes.length > 0) {
+              setPinSuggestions(cityPincodes);
+              setShowPinDropdown(true);
+            } else if (safeData.city?.trim() && !isLoadingPins) {
+              fetchPincodes(safeData.city);
+            }
+          }}
         />
+
+        {isLoadingPins ? (
+          <Text style={styles.pinStatus}>Loading PIN codes...</Text>
+        ) : pinSearchError ? (
+          <Text style={styles.pinError}>{pinSearchError}</Text>
+        ) : null}
 
         {showPinDropdown &&
           Array.isArray(pinSuggestions) &&
           pinSuggestions.length > 0 && (
-            <View style={styles.dropdown}>
+            <View
+              style={[
+                styles.dropdown,
+                styles.pinDropdown,
+                {
+                  height: Math.min(
+                    pinSuggestions.length * HEIGHT(5),
+                    HEIGHT(25),
+                  ),
+                },
+              ]}
+            >
               <ScrollView
+                style={styles.dropdownScroll}
                 nestedScrollEnabled
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
@@ -372,6 +464,25 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     elevation: 5,
     maxHeight: 150,
+  },
+  pinDropdown: {
+    zIndex: 1001,
+    elevation: 10,
+  },
+  dropdownScroll: {
+    flex: 1,
+  },
+  pinStatus: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: -14,
+    marginBottom: 8,
+  },
+  pinError: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: -14,
+    marginBottom: 8,
   },
 
   item: {
