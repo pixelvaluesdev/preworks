@@ -233,7 +233,9 @@ const CustomerHomeScreen = () => {
                     uri: `${IMG_URL}${item?.image}`,
                     cache: 'force-cache',
                   }}
-                  showPlaceholder={false}
+                  placeholderSource={require('../../assets/pngs/BannerPlaceholder.png')}
+                  placeholderStyle={{ width: '100%', height: '100%' }}
+                  placeholderResizeMode="cover"
                   showLoader={false}
                   style={[
                     styles.bannerImage,

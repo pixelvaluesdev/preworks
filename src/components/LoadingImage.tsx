@@ -12,6 +12,7 @@ const placeholderImage = require('../assets/pngs/Placeholder.png');
 const LoadingImage = ({
   source,
   placeholderSource = placeholderImage,
+  placeholderStyle,
   style,
   resizeMode = 'cover',
   placeholderResizeMode = 'contain',
@@ -68,7 +69,7 @@ const LoadingImage = ({
         <View style={styles.placeholderContainer}>
           <Image
             source={placeholderSource}
-            style={styles.placeholder}
+            style={[styles.placeholder, placeholderStyle]}
             resizeMode={placeholderResizeMode}
           />
         </View>
