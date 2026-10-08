@@ -350,6 +350,7 @@ const CustomerHomeScreen = () => {
                     style={styles.proImage}
                     resizeMode="cover"
                     placeholderResizeMode="contain"
+                    showLoader={hasValidImage}
                   />
 
                   <Text

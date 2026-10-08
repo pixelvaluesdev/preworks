@@ -489,7 +489,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
               </View>
 
               {/* RIGHT SIDE */}
-              <Text style={styles.value}>{project?.plotSize} sq.ft</Text>
+              <Text style={styles.value}>
+                {project?.plotSize == 0 ? 'N/A' : project?.plotSize + ' sq.ft'}
+              </Text>
             </View>
 
             <View style={styles.dashedDivider} />
