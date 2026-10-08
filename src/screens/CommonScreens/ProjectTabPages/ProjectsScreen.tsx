@@ -47,7 +47,12 @@ const ProjectsScreen = ({ route }: any) => {
   const [menuVisible, setMenuVisible] = React.useState(false);
   const [menuPosition, setMenuPosition] = React.useState({ x: 0, y: 0 });
   const [apiFinished, setApiFinished] = React.useState(false);
-  const [selectedTab, setSelectedTab] = React.useState('quoted');
+  const [selectedTab, setSelectedTab] = React.useState(() =>
+    route?.params?.selectedTab === 'enquiry' ||
+    route?.params?.selectedTab === 'interested'
+      ? 'interested'
+      : 'quoted',
+  );
   const [quotedProjects, setQuotedProjects] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -57,6 +62,17 @@ const ProjectsScreen = ({ route }: any) => {
     { id: '3', name: 'House Construction' },
     { id: '4', name: 'House Construction' },
   ]);
+
+  React.useEffect(() => {
+    if (route?.params?.selectedTab === 'enquiry' || route?.params?.selectedTab === 'interested') {
+      setSelectedTab('interested');
+    } else if (
+      route?.params?.selectedTab === 'quotation' ||
+      route?.params?.selectedTab === 'quoted'
+    ) {
+      setSelectedTab('quoted');
+    }
+  }, [route?.params?.selectedTab]);
 
   useFocusEffect(
     React.useCallback(() => {

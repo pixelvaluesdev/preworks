@@ -9,6 +9,8 @@ import {
   Linking,
   Alert,
   FlatList,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import { HEIGHT, WIDTH } from '../../../utils/responsive';
 import Colors from '../../../constants/colors';
@@ -24,6 +26,7 @@ import { triggerHaptic } from '../../../utils/hapticks';
 import sendNotification from '../../../utils/sendNotifications';
 import { useSelector } from 'react-redux';
 import ScreenWrapper from '../../../utils/screenWrapper';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
 const CandidateDetailScreen = ({ route, navigation }: any) => {
   const { candidate } = route.params || {};
@@ -84,14 +87,48 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
     }
   };
 
-  const handleCall = () => {
-    if (user?.phone) {
-      Linking.openURL(`tel:${user.phone}`);
-    } else {
+  const requestCallPermission = async () => {
+    if (Platform.OS !== 'android') return true;
+
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      {
+        title: 'Phone Call Permission',
+        message: 'App needs permission to make phone calls',
+        buttonPositive: 'Allow',
+        buttonNegative: 'Deny',
+      },
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  };
+
+  const handleCall = async () => {
+    const phone = user?.phone;
+
+    if (!phone) {
       Alert.alert('No phone number available');
+      return;
     }
 
-    triggerHaptic('impactHeavy');
+    try {
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestCallPermission();
+        if (!hasPermission) {
+          Alert.alert('Permission Denied');
+          return;
+        }
+
+        RNImmediatePhoneCall.immediatePhoneCall(String(phone));
+      } else {
+        await Linking.openURL(`tel:${phone}`);
+      }
+
+      triggerHaptic('impactHeavy');
+    } catch (error) {
+      console.error('Unable to place candidate call:', error);
+      Alert.alert('Unable to make call', 'Please try again later.');
+    }
   };
 
   return (

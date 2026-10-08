@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 
 import ScreenHeader from '../../components/ScreenHeader';
@@ -30,6 +32,7 @@ import ImageViewing from 'react-native-image-viewing';
 import { triggerHaptic } from '../../utils/hapticks';
 import ScreenWrapper from '../../utils/screenWrapper';
 import FloorArea from '../../assets/svgs/FloorArea.svg';
+import RNImmediatePhoneCall from 'react-native-immediate-phone-call';
 
 const GeneralEnquiryScreen = () => {
   const route = useRoute();
@@ -60,6 +63,22 @@ const GeneralEnquiryScreen = () => {
       uri: `${IMG_URL}${img}`,
     })) || [];
 
+  const requestCallPermission = async () => {
+    if (Platform.OS !== 'android') return true;
+
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+      {
+        title: 'Phone Call Permission',
+        message: 'App needs permission to make phone calls',
+        buttonPositive: 'Allow',
+        buttonNegative: 'Deny',
+      },
+    );
+
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  };
+
   const handleCall = async () => {
     const phone = project?.userId?.phone;
 
@@ -69,7 +88,18 @@ const GeneralEnquiryScreen = () => {
     }
 
     try {
-      await Linking.openURL(`tel:${phone}`);
+      if (Platform.OS === 'android') {
+        const hasPermission = await requestCallPermission();
+        if (!hasPermission) {
+          Alert.alert('Permission Denied');
+          return;
+        }
+
+        RNImmediatePhoneCall.immediatePhoneCall(String(phone));
+      } else {
+        await Linking.openURL(`tel:${phone}`);
+      }
+
       triggerHaptic('impactHeavy');
     } catch (error) {
       console.error('Unable to open enquiry call:', error);

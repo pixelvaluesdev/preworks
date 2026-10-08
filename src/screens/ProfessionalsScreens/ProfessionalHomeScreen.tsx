@@ -195,10 +195,7 @@ const ProfessionalHomeScreen = () => {
         type: 'enquiry',
       }));
 
-    const finalResults =
-      selectedTab === 'project' ? projectResults : enquiryResults;
-
-    setFilteredResults(finalResults);
+    setFilteredResults([...projectResults, ...enquiryResults]);
     setShowSuggestions(true);
   };
 
