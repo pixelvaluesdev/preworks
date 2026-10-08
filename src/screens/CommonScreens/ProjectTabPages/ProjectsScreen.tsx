@@ -64,7 +64,10 @@ const ProjectsScreen = ({ route }: any) => {
   ]);
 
   React.useEffect(() => {
-    if (route?.params?.selectedTab === 'enquiry' || route?.params?.selectedTab === 'interested') {
+    if (
+      route?.params?.selectedTab === 'enquiry' ||
+      route?.params?.selectedTab === 'interested'
+    ) {
       setSelectedTab('interested');
     } else if (
       route?.params?.selectedTab === 'quotation' ||
