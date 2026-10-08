@@ -9,7 +9,10 @@ import {
   registerDeviceForRemoteMessages,
 } from '@react-native-firebase/messaging';
 
-import { showLocalNotification } from './localNotifications';
+import {
+  getNotificationContent,
+  showLocalNotification,
+} from './localNotifications';
 
 const app = getApp();
 const messaging = getMessaging(app);
@@ -65,10 +68,7 @@ export function notificationListener() {
   return onMessage(messaging, async remoteMessage => {
     console.log('Foreground Notification:', remoteMessage);
 
-    const title = remoteMessage.notification?.title || 'No Title';
-    const body = remoteMessage.notification?.body || 'No Body';
-
-    //  THIS IS THE MAIN PART
+    const { title, body } = getNotificationContent(remoteMessage);
     await showLocalNotification(title, body);
   });
 }
