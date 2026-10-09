@@ -370,7 +370,11 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}
           >
             <BackArrow width={25} height={25} />
           </TouchableOpacity>

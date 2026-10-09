@@ -165,7 +165,11 @@ const ProjectDetailsScreen = () => {
 
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
+          }}
         >
           <BackArrow width={25} height={25} />
         </TouchableOpacity>
@@ -229,7 +233,9 @@ const ProjectDetailsScreen = () => {
                 onPress: () => {
                   setSuccessModal(false);
                   if (message === 'Work deleted successfully') {
-                    navigation.goBack();
+                    if (navigation.canGoBack()) {
+                      navigation.goBack();
+                    }
                   }
                 },
               },

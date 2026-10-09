@@ -60,7 +60,11 @@ const OnboardingScreen = () => {
     <View style={styles.slide}>
       <TouchableOpacity
         style={styles.backBtn}
-        onPress={() => navigation.goBack()}
+        onPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
         activeOpacity={0.7}
       >
         <BackIcon width={20} height={20} />

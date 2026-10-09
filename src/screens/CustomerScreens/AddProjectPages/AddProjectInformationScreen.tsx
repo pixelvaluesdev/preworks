@@ -237,7 +237,9 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
     if (submitInFlight.current) return;
 
     if (step === 0) {
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
     } else {
       setStep(prev => prev - 1);
     }

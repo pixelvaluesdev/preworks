@@ -117,7 +117,11 @@ const NotificationScreen = () => {
       <ScreenHeader
         title="Notifications"
         showBack
-        onBackPress={() => navigation.goBack()}
+        onBackPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          }
+        }}
       />
 
       {loading ? (

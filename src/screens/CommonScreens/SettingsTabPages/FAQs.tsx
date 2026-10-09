@@ -94,7 +94,9 @@ const FAQScreen = () => {
           title="FAQ"
           showBack
           onBackPress={() => {
-            navigation.goBack();
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            }
             triggerHaptic('impactHeavy');
           }}
         />

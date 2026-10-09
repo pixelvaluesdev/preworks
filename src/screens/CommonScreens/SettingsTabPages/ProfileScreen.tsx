@@ -87,7 +87,11 @@ const ProfileScreen = ({ navigation, route }: any) => {
 
           <TouchableOpacity
             style={styles.backBtn}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            }}
           >
             <Back />
           </TouchableOpacity>
