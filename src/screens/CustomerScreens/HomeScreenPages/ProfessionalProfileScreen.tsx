@@ -281,10 +281,7 @@ const ProfessionalProfileScreen = () => {
             style={styles.banner}
           />
 
-          <TouchableOpacity
-            style={styles.backBtn}
-            onPress={handleBack}
-          >
+          <TouchableOpacity style={styles.backBtn} onPress={handleBack}>
             <BackArrow width={25} height={25} />
           </TouchableOpacity>
 
