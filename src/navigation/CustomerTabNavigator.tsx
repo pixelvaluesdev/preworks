@@ -1,5 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Pressable, Text, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Platform,
+  Pressable,
+  Text,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -160,6 +167,7 @@ const CustomerTabNavigator = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: Platform.OS !== 'android',
         tabBarStyle: {
           height: 65 + insets.bottom,
           paddingBottom: Math.max(insets.bottom, 10),
