@@ -504,7 +504,7 @@ const AddProjectInformationScreen = ({ navigation, route }: any) => {
         <KeyboardAvoidingView
           style={styles.content}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          // keyboardVerticalOffset={20} // tweak if needed
+          keyboardVerticalOffset={20} // tweak if needed
         >
           <ScrollView
             style={{ flex: 1 }}
