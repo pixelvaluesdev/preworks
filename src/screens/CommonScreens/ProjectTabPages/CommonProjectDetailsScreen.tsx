@@ -10,7 +10,6 @@ import {
   ImageBackground,
   ActivityIndicator,
   Dimensions,
-  Linking,
   PermissionsAndroid,
   Platform,
   Alert,
@@ -119,11 +118,9 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
           Alert.alert('Permission Denied');
           return;
         }
-
-        RNImmediatePhoneCall.immediatePhoneCall(phone);
-      } else {
-        await Linking.openURL(`tel:${phone}`);
       }
+
+      RNImmediatePhoneCall.immediatePhoneCall(String(phone));
 
       triggerHaptic('impactHeavy');
     } catch (error) {

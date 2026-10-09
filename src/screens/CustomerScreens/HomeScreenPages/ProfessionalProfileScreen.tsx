@@ -213,11 +213,9 @@ const ProfessionalProfileScreen = () => {
           Alert.alert('Permission Denied');
           return;
         }
-
-        RNImmediatePhoneCall.immediatePhoneCall(phone);
-      } else {
-        await Linking.openURL(`tel:${phone}`);
       }
+
+      RNImmediatePhoneCall.immediatePhoneCall(String(phone));
     } catch (error) {
       console.error('Unable to place phone call:', error);
       Alert.alert('Unable to make call', 'Please try again later.');

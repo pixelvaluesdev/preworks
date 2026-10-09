@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  Linking,
   Alert,
   PermissionsAndroid,
   Platform,
@@ -94,11 +93,9 @@ const GeneralEnquiryScreen = () => {
           Alert.alert('Permission Denied');
           return;
         }
-
-        RNImmediatePhoneCall.immediatePhoneCall(String(phone));
-      } else {
-        await Linking.openURL(`tel:${phone}`);
       }
+
+      RNImmediatePhoneCall.immediatePhoneCall(String(phone));
 
       triggerHaptic('impactHeavy');
     } catch (error) {

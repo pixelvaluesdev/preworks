@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Linking,
   Alert,
   FlatList,
   PermissionsAndroid,
@@ -118,11 +117,9 @@ const CandidateDetailScreen = ({ route, navigation }: any) => {
           Alert.alert('Permission Denied');
           return;
         }
-
-        RNImmediatePhoneCall.immediatePhoneCall(String(phone));
-      } else {
-        await Linking.openURL(`tel:${phone}`);
       }
+
+      RNImmediatePhoneCall.immediatePhoneCall(String(phone));
 
       triggerHaptic('impactHeavy');
     } catch (error) {
