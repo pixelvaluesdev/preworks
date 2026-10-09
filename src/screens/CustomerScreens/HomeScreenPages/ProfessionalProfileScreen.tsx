@@ -107,6 +107,7 @@ const ProfessionalProfileScreen = () => {
   const [showComingSoon, setShowComingSoon] = useState(false);
 
   const [profile, setProfile] = useState<any>(null);
+  const profileLoadedForUserId = useRef<string | null>(null);
   const workList = profile?.workList || [];
   const [showLinks, setShowLinks] = useState(false);
 
@@ -157,6 +158,9 @@ const ProfessionalProfileScreen = () => {
 
       if (res?.data?.status === 'success') {
         setProfile(res.data.data);
+        if (userId) {
+          profileLoadedForUserId.current = userId;
+        }
         console.log('Profile data:', res.data.data);
 
         if (!isSelfProfile && userType === 'customer') {
@@ -177,8 +181,16 @@ const ProfessionalProfileScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      if (
+        userType === 'customer' &&
+        userId &&
+        profileLoadedForUserId.current === userId
+      ) {
+        return;
+      }
+
       fetchProfile();
-    }, [fetchProfile]),
+    }, [fetchProfile, userId, userType]),
   );
 
   const requestCallPermission = async () => {
