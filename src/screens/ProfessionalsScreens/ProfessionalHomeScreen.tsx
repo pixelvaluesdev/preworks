@@ -123,14 +123,7 @@ const ProfessionalHomeScreen = () => {
     return () => clearInterval(interval);
   }, [currentIndex, banners]);
 
-  useEffect(() => {
-    if (token) {
-      fetchBanners();
-      fetchProfile();
-    }
-  }, [token]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const response = await ApiManager.getProfile(userId, token);
 
@@ -140,9 +133,9 @@ const ProfessionalHomeScreen = () => {
     } catch (error) {
       console.log('Professional profile error', error);
     }
-  };
+  }, [token, userId]);
 
-  const fetchBanners = async () => {
+  const fetchBanners = useCallback(async () => {
     try {
       const response = await ApiManager.getBanners(token);
 
@@ -158,7 +151,20 @@ const ProfessionalHomeScreen = () => {
     } catch (error) {
       console.log('Banner error', error);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+
+    const loadHomeData = async () => {
+      await fetchBanners();
+      await fetchProfile();
+    };
+
+    loadHomeData();
+  }, [fetchBanners, fetchProfile, token]);
 
   const handleSearch = text => {
     setSearchText(text);
@@ -339,8 +345,18 @@ const ProfessionalHomeScreen = () => {
             data={banners}
             horizontal
             pagingEnabled
+            initialNumToRender={Math.max(banners.length, 1)}
+            windowSize={Math.max(banners.length, 1)}
+            removeClippedSubviews={false}
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item: any) => item._id}
+            ListEmptyComponent={
+              <Image
+                source={require('../../assets/pngs/BannerPlaceholder.png')}
+                style={styles.bannerImage}
+                resizeMode="cover"
+              />
+            }
             onMomentumScrollEnd={e => {
               const index = Math.round(
                 e.nativeEvent.contentOffset.x / WIDTH(100),
