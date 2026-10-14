@@ -76,12 +76,14 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
   const [showPopup, setShowPopup] = useState(false);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [viewerSource, setViewerSource] = useState<'site' | 'drawings'>('site');
   const screenWidth = Dimensions.get('window').width;
   const [imgError, setImgError] = useState(false);
 
   const [loadingFileIndex, setLoadingFileIndex] = useState(null);
 
   const projectImages = Array.isArray(project?.image) ? project.image : [];
+  const imageDrawings = drawings.filter(isImageFile);
   const images = projectImages.length > 0 ? projectImages : [null];
   console.log('project.image 👉', project?.image);
   const imageCount = images.length;
@@ -128,13 +130,12 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
       Alert.alert('Unable to make call', 'Please try again later.');
     }
   };
-  const allImages = [...projectImages, ...drawings.filter(isImageFile)];
-
-  const imageUrls = [...projectImages, ...drawings.filter(isImageFile)].map(
-    img => ({
-      uri: `${IMG_URL}/${img}`,
-    }),
-  );
+  const siteImageUrls = projectImages.map(img => ({
+    uri: `${IMG_URL}/${img}`,
+  }));
+  const drawingImageUrls = imageDrawings.map(img => ({
+    uri: `${IMG_URL}/${img}`,
+  }));
 
   useEffect(() => {
     if (imageCount <= 1) return;
@@ -153,6 +154,11 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
     return () => clearInterval(interval);
   }, [imageCount]);
   const openViewer = index => {
+    if (siteImageUrls.length === 0) {
+      return;
+    }
+
+    setViewerSource('site');
     setCurrentIndex(index);
     setViewerVisible(true);
   };
@@ -174,8 +180,15 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
 
     // IMAGE
     if (isImageFile(file)) {
-      setCurrentIndex(index);
-      setViewerVisible(true);
+      const imageIndex = imageDrawings.findIndex(
+        drawing => `${IMG_URL}/${drawing}` === fileUrl,
+      );
+
+      if (imageIndex !== -1) {
+        setViewerSource('drawings');
+        setCurrentIndex(imageIndex);
+        setViewerVisible(true);
+      }
     } else {
       // PDF LOADING START
       setLoadingFileIndex(index);
@@ -213,6 +226,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         const data = res?.data?.data;
 
         setProject(data?.project);
+        console.log('Project details for architect', data?.project);
         setEnquiryCount(data?.enquiryCount || 0);
 
         // future ready
@@ -653,7 +667,7 @@ const CommonProjectDetailsScreen = ({ route }: any) => {
         showQuotation={true}
       />
       <ImageViewing
-        images={imageUrls}
+        images={viewerSource === 'site' ? siteImageUrls : drawingImageUrls}
         imageIndex={currentIndex}
         visible={viewerVisible}
         onRequestClose={() => setViewerVisible(false)}
