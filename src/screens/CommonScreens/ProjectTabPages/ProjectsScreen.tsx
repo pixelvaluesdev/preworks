@@ -118,9 +118,62 @@ const ProjectsScreen = ({ route }: any) => {
 
         console.log('Prof blurrrr', data);
 
+        const imagesByProjectId = new Map();
+        try {
+          const projectsResponse = await ApiManager.getProjectsForProfessional(
+            userId,
+            token,
+          );
+          const projectsData = projectsResponse?.data?.data;
+          const projectsWithImages = [
+            ...(Array.isArray(projectsData?.projects)
+              ? projectsData.projects
+              : []),
+            ...(Array.isArray(projectsData?.enquiries)
+              ? projectsData.enquiries
+              : []),
+          ];
+
+          projectsWithImages.forEach(project => {
+            if (project?._id && project?.image?.[0]) {
+              imagesByProjectId.set(String(project._id), project.image);
+            }
+          });
+        } catch (error) {
+          console.log('Unable to load project site images:', error);
+        }
+
+        const projectsWithSiteImages = data.map(item => {
+          const appliedProject = item?.projectId;
+          const projectId =
+            typeof appliedProject === 'string'
+              ? appliedProject
+              : appliedProject?._id;
+          const siteImages = projectId
+            ? imagesByProjectId.get(String(projectId))
+            : undefined;
+
+          if (
+            !siteImages ||
+            !appliedProject ||
+            typeof appliedProject !== 'object'
+          ) {
+            return item;
+          }
+
+          return {
+            ...item,
+            projectId: { ...appliedProject, image: siteImages },
+          };
+        });
+
         // Split into two lists
-        const quoted = data.filter(item => item.type === 'quotation');
-        const interested = data.filter(item => item.type === 'enquiry');
+        const quoted = projectsWithSiteImages.filter(
+          item => item.type === 'quotation',
+        );
+        const interested = projectsWithSiteImages.filter(
+          item => item.type === 'enquiry',
+        );
 
         setQuotedProjects(quoted);
         setInterestedProjects(interested);
@@ -174,12 +227,12 @@ const ProjectsScreen = ({ route }: any) => {
   const renderItem = ({ item }: any) => {
     const project = isCustomer ? item : item.projectId;
 
-    const imageUrl =
-      !isCustomer && item?.files?.length > 0
-        ? { uri: `${IMG_URL}/${item.files[0]}` }
-        : project?.image?.length > 0
-        ? { uri: `${IMG_URL}/${project.image[0]}` }
-        : require('../../../assets/images/NoImg1.jpeg');
+    const siteImage = project?.image?.[0];
+    const imageUrl = siteImage
+      ? {
+          uri: `${IMG_URL}${siteImage.startsWith('/') ? '' : '/'}${siteImage}`,
+        }
+      : require('../../../assets/images/NoImg1.jpeg');
 
     const isExpired =
       item?.quoteLastDate && new Date(item.quoteLastDate) < new Date();
